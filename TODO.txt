@@ -1,9 +1,6 @@
-Need to process raw wiktionary pages (script in workflows):
-
-- remove non-lemmas to help file size
-- key with name of word
-- currently each sense is different entry, should have each as list under above key
-
-Downloaded raw wiktionary entries from https://kaikki.org/dictionary/rawdata.html.
 http://morfeusz.sgjp.pl/en can identify lemmas of words in sentences (with probability). 
 Use this and corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.
+
+Code 'game' functions which take settings as input and play (cli) for now
+
+Start making basic application!

@@ -46,23 +46,22 @@ def get_declension(dictionary, lemma, pos, numgen, case):
 if __name__ == '__main__':
 
     # Load dictionary
-    start = time.time()
     data_path = os.path.join('data', 'wiki_entries.pgz')
     gc.disable()
     with gzip.open(data_path, "rb") as f:
         dictionary = pickle.load(f)
     gc.enable()
-    end = time.time()
-    print(end-start)
 
-    # Test case
-    cases = ['n', 'g', 'd', 'a', 'i', 'l', 'v']
-    numgens = ['sma', 'smi', 'sf', 'sn', 'pv', 'pnv']
-    for case in cases:
-        row = []
-        for ng in numgens:
-            row.append(get_declension(dictionary, 'elektryczny', 'adj', ng, case))
-        print(row)
+    # # Test case
+    # cases = ['n', 'g', 'd', 'a', 'i', 'l', 'v']
+    # numgens = ['sma', 'smi', 'sf', 'sn', 'pv', 'pnv']
+    # for case in cases:
+    #     row = []
+    #     for ng in numgens:
+    #         row.append(get_declension(dictionary, 'elektryczny', 'adj', ng, case))
+    #     print(row)
+    zmk = get_declension(dictionary, 'zamek', 'noun', 's', 'g')
+    print(zmk)
 
     # print(dictionary['entries'][0].keys())
     # print(len(dictionary['entries'][0]['senses']), dictionary['entries'][0]['senses'])

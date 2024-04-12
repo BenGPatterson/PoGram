@@ -5,6 +5,24 @@ import gc
 import sys
 import time
 
+def load_dictionary(path):
+    """
+    Loads dictionary of wiki pages.
+
+    Parameters:
+        path: Path to pickled dictionary object.
+
+    Returns:
+        Dictionary of wiki pages.
+    """
+
+    gc.disable()
+    with gzip.open(data_path, "rb") as f:
+        dictionary = pickle.load(f)
+    gc.enable()
+
+    return dictionary
+
 def get_declension(dictionary, lemma, pos, numgen, case):
     """
     Gets specified declension of lemma from dictionary.
@@ -35,7 +53,7 @@ def get_declension(dictionary, lemma, pos, numgen, case):
 
     # Find corresponding declension(s)
     declensions = set()
-    for sense in dictionary[lemma][pos]:
+    for sense in dictionary[lemma.lower()][pos]:
         declension = next((item['form'] for item in sense['forms'] if set(item['tags']) == tags), None)
         declensions.add(declension)
     if None in declensions and len(declensions) > 1:

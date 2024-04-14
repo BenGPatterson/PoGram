@@ -1,8 +1,10 @@
-http://morfeusz.sgjp.pl/en can identify lemmas of words in sentences (with probability). 
-Use this and corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.
-Installed concraft (concraft_pl2.py), now follow instructions (https://github.com/kawu/concraft-pl/tree/master/bindings/python) 
-to start tagging corpus and build frequency list.
-
 Code 'game' functions which take settings as input and play (cli) for now
 
-Start making basic application!
+Make actual menu, settings, etc. in application
+
+Done:
+
+http://morfeusz.sgjp.pl/en and https://github.com/kawu/concraft-pl/tree/master/bindings/python used to identify lemmas of words in sentences (with probability). 
+Applied to (Web com 2018 1M) corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.
+
+Made (very basic) tkinter application, and added pl char implementation in pl_chars.py. ideally will have way to change shortcuts for each char in future

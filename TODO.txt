@@ -2,9 +2,11 @@ Code 'game' functions which take settings as input and play (cli) for now
 
 Make actual menu, settings, etc. in application
 
+Should change pl_chars.py to custom_widgets.py. Add combined checkbutton/radiobutton and entry, will likely use often.
+Should also write functions to load e.g. questions section that multiple trainers will need.
+
 Done:
 
 http://morfeusz.sgjp.pl/en and https://github.com/kawu/concraft-pl/tree/master/bindings/python used to identify lemmas of words in sentences (with probability). 
 Applied to (Web com 2018 1M) corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.
 
-Made (very basic) tkinter application, and added pl char implementation in pl_chars.py. ideally will have way to change shortcuts for each char in future

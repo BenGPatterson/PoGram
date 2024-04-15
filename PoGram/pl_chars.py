@@ -31,4 +31,3 @@ class Entry_pl(tk.Entry):
     def __init__(self, *args, **kwargs):
         tk.Entry.__init__(self, *args, **kwargs)
         setup_pl_chars(self)
-

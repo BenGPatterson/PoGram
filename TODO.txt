@@ -2,11 +2,9 @@ Code 'game' functions which take settings as input and play (cli) for now
 
 Make actual menu, settings, etc. in application
 
-Should change pl_chars.py to custom_widgets.py. Add combined checkbutton/radiobutton and entry, will likely use often.
-Should also write functions to load e.g. questions section that multiple trainers will need.
+Continue (re)making adjective settings in class. Radiobutton part of Entrybutton will not work yet - need to figure out parameters (will be used in word_list section)
 
 Done:
 
 http://morfeusz.sgjp.pl/en and https://github.com/kawu/concraft-pl/tree/master/bindings/python used to identify lemmas of words in sentences (with probability). 
 Applied to (Web com 2018 1M) corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.
-

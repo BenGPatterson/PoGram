@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import tkinter as tk
-import tkinter.font as tkFont
 from homepage import HomePage
   
 class tkinterApp(tk.Tk):
@@ -17,7 +16,7 @@ class tkinterApp(tk.Tk):
         self.geometry('874x540')
          
         # Creating a container
-        container = tk.Frame(self)  
+        container = tk.Frame(self)
         container.pack(side='top', fill='both', expand=True)
         container.grid_rowconfigure(0, weight=1)
         container.grid_columnconfigure(0, weight=1)

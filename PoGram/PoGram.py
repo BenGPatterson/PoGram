@@ -14,6 +14,7 @@ class tkinterApp(tk.Tk):
         # Window settings
         self.title('PoGram')
         self.geometry('874x540')
+        self.resizable(False,False)
          
         # Creating a container
         container = tk.Frame(self)

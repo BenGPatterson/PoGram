@@ -1,10 +1,10 @@
 Code 'game' functions which take settings as input and play (cli) for now
 
-Make actual menu, settings, etc. in application
-
-Continue (re)making adjective settings in class. Radiobutton part of Entrybutton will not work yet - need to figure out parameters (will be used in word_list section)
+Make other trainer UIs.
+Need to decide on better formatting/color scheme - at the moment does not look great.
 
 Done:
 
+Processed wiki entries downloaded from https://kaikki.org/dictionary/Polish/words/index.html.
 http://morfeusz.sgjp.pl/en and https://github.com/kawu/concraft-pl/tree/master/bindings/python used to identify lemmas of words in sentences (with probability). 
 Applied to (Web com 2018 1M) corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.

@@ -36,8 +36,9 @@ class Entry_pl(tk.Entry):
 class Entrybutton(tk.Frame):
     def __init__(self, *args, **kwargs):
         self.text = kwargs.pop('text', None)
-        self.check = kwargs.pop('check', True)
+        self.radio = kwargs.pop('radio', False)
         self.variable = kwargs.pop('variable', None)
+        self.value = kwargs.pop('value', None)
         self.e_width = kwargs.pop('e_width', None)
         self.justify = kwargs.pop('justify', 'left')
         self.int_only = kwargs.pop('int_only', False)
@@ -56,12 +57,14 @@ class Entrybutton(tk.Frame):
         
     # Loads Check/Radio button
     def get_button(self):
-        if self.check:
-            self.btn = tk.Checkbutton(self, variable=self.variable, onvalue=1, offvalue=0, text=self.text,
-                       bg=self.bg, activebackground=self.bg, command=lambda v=self.variable, e=[self.entry]: show_widget(v,e))
+        if self.radio:
+            self.btn = tk.Radiobutton(self, variable=self.variable, value=self.value, text=self.text, bg=self.bg, 
+                                      activebackground=self.bg)
         else:
-            self.btn = tk.Radiobutton(self, variable=self.variable, onvalue=1, offvalue=0, text=self.text,
-                       bg=self.bg, activebackground=self.bg, command=lambda v=self.variable, e=[self.entry]: show_widget(v,e))
+            self.btn = tk.Checkbutton(self, variable=self.variable, onvalue=1, offvalue=0, text=self.text,
+                       bg=self.bg, activebackground=self.bg)
+            self.value = 1
+        self.variable.trace_add('write', lambda *args, v=self.variable, t=self.value, e=[self.entry]: show_widget(v,t,e))
 
     # Loads Entry widget
     def get_entry(self):
@@ -101,10 +104,14 @@ class Entrybutton(tk.Frame):
 
         # Call parent configure()
         tk.Frame.configure(self, *args, **kwargs)
+
+    # Access input from Entry widget
+    def get(self, *args, **kwargs):
+        return self.entry.get()
         
 # Enables/disables widget
-def show_widget(var, widgets):
-    if var.get():
+def show_widget(var, onvalue, widgets):
+    if var.get() == onvalue:
         state='normal'
     else:
         state='disabled'

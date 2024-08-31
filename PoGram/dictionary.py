@@ -75,7 +75,7 @@ if __name__ == '__main__':
     #     for ng in numgens:
     #         row.append(get_declension(dictionary, 'elektryczny', 'adj', ng, case))
     #     print(row)
-    zmk = get_declension(dictionary, 'artysta', 'noun', 'p', 'n')
+    zmk = get_declension(dictionary, 'zamek', 'adj', 'pv', 'n')
     print(zmk)
 
     # print(dictionary['entries'][0].keys())

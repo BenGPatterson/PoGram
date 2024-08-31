@@ -65,7 +65,7 @@ class Entrybutton(tk.Frame):
             self.btn = tk.Checkbutton(self, variable=self.variable, onvalue=1, offvalue=0, text=self.text,
                        bg=self.bg, activebackground=self.bg)
             self.value = 1
-        self.variable.trace_add('write', lambda *args, v=self.variable, t=self.value, e=[self.entry]: show_widget(v,t,e))
+        self.variable.trace_add('write', lambda *args, v=[self.variable], t=[[self.value]], e=[self.entry]: show_widget(v,t,e))
 
     # Loads Entry widget
     def get_entry(self):
@@ -95,8 +95,9 @@ class Entrybutton(tk.Frame):
     # Expands configure() functionality to these widgets
     def configure(self, *args, **kwargs):
 
-        # Configure individual widgets
+        # Configure individual widgets, filtering incompatible kwargs
         self.btn.configure(*args, **kwargs)
+        kwargs.pop('command', None)
         self.entry.configure(*args, **kwargs)
         self.entry.configure(bg='SystemWindow')
 
@@ -106,6 +107,14 @@ class Entrybutton(tk.Frame):
     # Override widget type
     def winfo_class(self):
         return 'Entrybutton'
+    
+    # Bind to specified widget
+    def bind(self, *args, **kwargs):
+        target_widget = kwargs.pop('target_widget')
+        if target_widget.lower() == 'btn':
+            self.btn.bind(*args, **kwargs)
+        elif target_widget.lower() == 'entry':
+            self.entry.bind(*args, **kwargs)
 
     # Access input from Entry widget
     def get(self, *args, **kwargs):
@@ -123,8 +132,11 @@ class Lineborder(tk.Frame):
 
         
 # Enables/disables widget
-def show_widget(var, onvalue, widgets):
-    if var.get() == onvalue:
+def show_widget(vars, onvalues, widgets):
+    var_gets = []
+    for var in vars:
+        var_gets.append(var.get())
+    if var_gets in onvalues:
         state='normal'
     else:
         state='disabled'

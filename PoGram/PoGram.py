@@ -23,7 +23,7 @@ class tkinterApp(tk.Tk):
         container.grid_columnconfigure(0, weight=1)
   
         # Initializing all frame pages
-        self.frames = {}  
+        self.frames = {}
         for F in [HomePage]:
             frame = F(container, self)
             self.frames[F] = frame 

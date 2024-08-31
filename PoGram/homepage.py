@@ -22,7 +22,7 @@ class HomePage(tk.Frame):
             trainer_config = json.load(json_file)
         self.adj_frame = adj_trainer(self, bga='#ffb3ba', config=trainer_config['adj'])
         self.adj_frame.grid(row=1, column=0, padx=(10, 5), pady=(10, 20), sticky='nsew')
-        self.noun_frame = trainer_frame(self, bga='#ffdfba', config=trainer_config['adj'])
+        self.noun_frame = noun_trainer(self, bga='#ffdfba', config=trainer_config['noun'])
         self.noun_frame.grid(row=1, column=1, padx=5, pady=(10, 20), sticky='nsew')
         self.verb_frame = trainer_frame(self, bga='#ffffba', config=trainer_config['adj'])
         self.verb_frame.grid(row=1, column=2, padx=5, pady=(10, 20), sticky='nsew')
@@ -158,9 +158,30 @@ class trainer_frame(tk.Frame):
         for i, case in enumerate(texts):
             dcol_btns.append(tk.Checkbutton(self, variable=vars[i], onvalue=1, offvalue=0, text=case, bg=self.bg, activebackground=self.bg))
             dcol_btns[-1].grid(row=row+int(i/2), column=i%2, padx=((1-i%2)*5,0),  sticky='w')
+            dcol_btns[-1].bind('<Button-3>', lambda *args, w=dcol_btns[-1], vs=vars, idx=i: self.multi_select(*args, w, vs, idx))
+            vars[i].trace_add('write', lambda *args, w=dcol_btns[-1], vs=vars: self.dcol_check(w, vs, args[0]))
         self.line_border(row+int(i/2)+1)
         if return_btns:
             return dcol_btns
+        
+    # Select or deselect all
+    def multi_select(self, event, widget, vars, idx):
+        if widget['state'] != 'disabled':
+            target = 1 - vars[idx].get()
+            var_list = vars.copy()
+            if target == 0:
+                var_list.pop(idx)
+            for i in range(len(var_list)):
+                var_list[i].set(target)
+
+    # At least one option in double columns must be selected
+    def dcol_check(self, widget, vars, var):
+        no_selected = 0
+        for i in range(len(vars)):
+            no_selected += vars[i].get()
+        if no_selected == 0:
+            self.setvar(name=var, value=1)
+            widget.configure(bg=widget.cget('bg'))
          
     # Load word list settings
     def load_word_lists(self, row):
@@ -250,6 +271,56 @@ class adj_trainer(trainer_frame):
         config['widget_status'] = self.widget_status
 
         return config
+    
+# Train nouns  
+class noun_trainer(trainer_frame):
+    def __init__(self, *args, **kwargs):
+        trainer_frame.__init__(self, *args, **kwargs)
+
+        # Load title and question settings
+        self.load_title(0, 'Nouns')
+        self.load_questions(3, 'declensions')
+
+        # Load case settings
+        cases = ['Nom.', 'Gen.', 'Dat.', 'Acc.', 'Ins.', 'Loc.', 'Voc.']
+        self.case_vars = []
+        for i in range(len(cases)):
+            self.case_vars.append(tk.IntVar(value=self.config['case_vars'][i]))
+        self.load_dcol(7, cases, self.case_vars)
+
+        # Load word lists
+        self.load_word_lists(12)
+
+        # Finish loading
+        self.toggle_active(widget_status=self.config['widget_status'])
+
+    # Loads button to only train virile nominative declensions
+    def load_vn_only(self, row, var, disable_widgets):
+        vn_only = tk.Checkbutton(self, variable=var, onvalue=1, offvalue=0, text='Virile nominative only', 
+                                     bg=self.bg, activebackground=self.bg, command=lambda v=var, t=0, e=disable_widgets: show_widget(v,t,e))
+        vn_only.grid(row=row, column=0, columnspan=2, padx=(5,0), sticky='w')
+
+    # Get current config settings to be saved
+    def get_config(self):
+
+        # Ensures widget_status is updated
+        if self.active.get():
+            self.get_widget_status()
+
+        # Collect settings
+        config = {}
+        config['active'] = self.active.get()
+        config['qs'] = [self.qs[0].get(), self.qs[1].get()]
+        config['inflections_no'] = self.inflections_no.get()
+        config['case_vars'] = []
+        for i in range(len(self.case_vars)):
+            config['case_vars'].append(self.case_vars[i].get())
+        config['word_list'] = self.word_list.get()
+        config['freq_no'] = self.freq_no.get()
+        config['custom_list'] = self.custom_list
+        config['widget_status'] = self.widget_status
+
+        return config
 
 class menu_display(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -269,8 +340,8 @@ class menu_display(tk.Frame):
         
         # Get current config settings for each trainer
         config = {}
-        trainers = ['adj']# , 'noun', 'verb', 'misc']
-        trainer_frames = [parent.adj_frame]# , parent.noun_frame, parent.verb_frame, parent.misc_frame]
+        trainers = ['adj' , 'noun']#, 'verb', 'misc']
+        trainer_frames = [parent.adj_frame , parent.noun_frame]#, parent.verb_frame, parent.misc_frame]
         for trainer, trainer_frame in zip(trainers, trainer_frames):
             config[trainer] = trainer_frame.get_config()
 

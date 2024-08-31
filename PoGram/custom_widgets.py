@@ -36,6 +36,7 @@ class Entry_pl(tk.Entry):
 class Entrybutton(tk.Frame):
     def __init__(self, *args, **kwargs):
         self.text = kwargs.pop('text', None)
+        self.textvariable = kwargs.pop('textvariable', None)
         self.radio = kwargs.pop('radio', False)
         self.variable = kwargs.pop('variable', None)
         self.value = kwargs.pop('value', None)
@@ -68,7 +69,8 @@ class Entrybutton(tk.Frame):
 
     # Loads Entry widget
     def get_entry(self):
-        self.entry = Entry_pl(self, width=self.e_width, justify=self.justify, validate='key', validatecommand=self.vcmd)
+        self.entry = Entry_pl(self, textvariable=self.textvariable, width=self.e_width, justify=self.justify, 
+                              bg='SystemWindow', disabledbackground=self.bg, validate='key', validatecommand=self.vcmd)
 
     # Apply requested restrictions on Entry widget
     def validate(self, action, value_if_allowed):
@@ -93,21 +95,32 @@ class Entrybutton(tk.Frame):
     # Expands configure() functionality to these widgets
     def configure(self, *args, **kwargs):
 
-        # Load in options
-        self.bg = kwargs.get('bg', self.btn.cget('bg'))
-        self.variable = kwargs.pop('variable', self.btn.cget('variable'))
-
-        # Update options
-        self.btn.configure(bg=self.bg)
-        self.btn.configure(activebackground=self.bg)
-        self.btn.configure(variable=self.variable)
+        # Configure individual widgets
+        self.btn.configure(*args, **kwargs)
+        self.entry.configure(*args, **kwargs)
+        self.entry.configure(bg='SystemWindow')
 
         # Call parent configure()
         tk.Frame.configure(self, *args, **kwargs)
 
+    # Override widget type
+    def winfo_class(self):
+        return 'Entrybutton'
+
     # Access input from Entry widget
     def get(self, *args, **kwargs):
         return self.entry.get()
+    
+# Create line border for homepage
+class Lineborder(tk.Frame):
+    def __init__(self, *args, **kwargs):
+        tk.Frame.__init__(self, *args, bg='black', height=1, bd=0, **kwargs)
+
+    # Ensure parameters we set never change
+    def configure(self, *args, **kwargs):
+        tk.Frame.configure(self, *args, **kwargs)
+        tk.Frame.configure(self, bg='black', height=1, bd=0)
+
         
 # Enables/disables widget
 def show_widget(var, onvalue, widgets):

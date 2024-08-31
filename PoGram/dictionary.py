@@ -65,10 +65,7 @@ if __name__ == '__main__':
 
     # Load dictionary
     data_path = os.path.join('data', 'wiki_entries.pgz')
-    gc.disable()
-    with gzip.open(data_path, "rb") as f:
-        dictionary = pickle.load(f)
-    gc.enable()
+    dictionary = load_dictionary(data_path)
 
     # # Test case
     # cases = ['n', 'g', 'd', 'a', 'i', 'l', 'v']

@@ -5,7 +5,7 @@ from homepage import HomePage
   
 class tkinterApp(tk.Tk):
      
-    # __init__ function for class tkinterApp 
+    # __init__ function for class tkinterApp
     def __init__(self, *args, **kwargs): 
          
         # __init__ function for class Tk
@@ -37,5 +37,6 @@ class tkinterApp(tk.Tk):
 
 # Driver Code
 if __name__ == '__main__':
+
     app = tkinterApp()
     app.mainloop()

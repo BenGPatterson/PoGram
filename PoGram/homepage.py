@@ -49,7 +49,6 @@ class trainer_frame(tk.Frame):
         toggle.grid(row=row, column=0, columnspan=2)
         label = tk.Label(self, text=text, bg=self.bg, font=('Segoe UI', 22))
         label.grid(row=row+1, column=0, columnspan=2)
-        self.line_border(row+2)
 
     # Toggles active state of trainer
     def toggle_active(self, widget_status=None):
@@ -140,7 +139,6 @@ class trainer_frame(tk.Frame):
         inflections = Entrybutton(self, variable=self.qs[1], text=f'Ask {inflection_type}', textvariable=self.inflections_no,
                                   e_width=2, justify='right', int_only=True, bounded=True, bg=self.bg)
         inflections.grid(row=row+1, column=0, columnspan=2, padx=(5,0), sticky='nsew')
-        self.line_border(row+2)
 
         # Ensure at least one is selected
         for var, widget in zip(self.qs, [definitions, inflections]):
@@ -160,7 +158,6 @@ class trainer_frame(tk.Frame):
             dcol_btns[-1].grid(row=row+int(i/2), column=i%2, padx=((1-i%2)*5,0),  sticky='w')
             dcol_btns[-1].bind('<Button-3>', lambda *args, w=dcol_btns[-1], vs=vars, idx=i: self.multi_select(*args, w, vs, idx))
             vars[i].trace_add('write', lambda *args, w=dcol_btns[-1], vs=vars: self.dcol_check(w, vs, args[0]))
-        self.line_border(row+int(i/2)+1)
         if return_btns:
             return dcol_btns
         
@@ -228,15 +225,18 @@ class adj_trainer(trainer_frame):
 
         # Load title and question settings
         self.load_title(0, 'Adjectives')
+        self.line_border(2)
         self.load_questions(3, 'declensions')
+        self.line_border(5)
 
         # Load case settings
         cases = ['Nom.', 'Gen.', 'Dat.', 'Acc.', 'Ins.', 'Loc.', 'Voc.']
         self.case_vars = [tk.IntVar(value=self.config['case_vars'][0]), []]
         for i in range(len(cases)):
             self.case_vars[1].append(tk.IntVar(value=self.config['case_vars'][1][i]))
-        case_btns=self.load_dcol(7, cases, self.case_vars[1], return_btns=True)
-        self.load_vn_only(6, self.case_vars[0], case_btns)
+        case_btns=self.load_dcol(6, cases, self.case_vars[1], return_btns=True)
+        self.line_border(10)
+        self.load_vn_only(11, self.case_vars[0], case_btns)
 
         # Load word lists
         self.load_word_lists(12)
@@ -279,17 +279,20 @@ class noun_trainer(trainer_frame):
 
         # Load title and question settings
         self.load_title(0, 'Nouns')
+        self.line_border(2)
         self.load_questions(3, 'declensions')
+        self.line_border(5)
 
         # Load case settings
         cases = ['Nom.', 'Gen.', 'Dat.', 'Acc.', 'Ins.', 'Loc.', 'Voc.']
         self.case_vars = []
         for i in range(len(cases)):
             self.case_vars.append(tk.IntVar(value=self.config['case_vars'][i]))
-        self.load_dcol(7, cases, self.case_vars)
+        self.load_dcol(6, cases, self.case_vars)
+        self.line_border(10)
 
         # Load word lists
-        self.load_word_lists(12)
+        self.load_word_lists(11)
 
         # Finish loading
         self.toggle_active(widget_status=self.config['widget_status'])

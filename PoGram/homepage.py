@@ -1,6 +1,9 @@
+# -*- coding: utf-8 -*-
+
 import json
 import tkinter as tk
 from trainer_panels import misc_trainer, verb_trainer, adj_trainer, noun_trainer
+from menu_panel import menu_display
 
 # Home page showing trainer settings
 class HomePage(tk.Frame):
@@ -26,35 +29,14 @@ class HomePage(tk.Frame):
         self.adj_frame.grid(row=1, column=2, padx=5, pady=(10, 20), sticky='nsew')
         self.noun_frame = noun_trainer(self, bga='#baffc9', config=trainer_config['noun'])
         self.noun_frame.grid(row=1, column=3, padx=5, pady=(10, 20), sticky='nsew')
-        menu_frame = menu_display(self, bga='#bae1ff')
-        menu_frame.grid(row=1, column=4, padx=30, pady=(10, 50), sticky='nsew')
+        self.menu_frame = menu_display(self, controller, bga='#bae1ff', config=trainer_config['menu'])
+        self.menu_frame.grid(row=1, column=4, padx=30, pady=(10, 30), sticky='nsew')
 
-class menu_display(tk.Frame):
-    def __init__(self, parent, *args, **kwargs):
-        self.bga = kwargs.pop('bga', None)
-        tk.Frame.__init__(self, parent, *args, **kwargs)
-        self.bg = self.cget('bg')
+# Loading page when program first opens
+class LoadingPage(tk.Frame):
+    def __init__(self, parent, controller): 
+        tk.Frame.__init__(self, parent)
 
-        # Load play button
-        self.load_play(parent)
-
-    # Load play button
-    def load_play(self, parent):
-        play_btn = tk.Button(self, text='Play', command=lambda: self.save_config(parent), bg=self.bga, activebackground=self.bga)
-        play_btn.pack(fill='x', side='bottom')
-
-    def save_config(self, parent):
-        
-        # Get current config settings for each trainer
-        config = {}
-        trainers = ['adj' , 'noun', 'verb', 'misc']
-        trainer_frames = [parent.adj_frame , parent.noun_frame, parent.verb_frame, parent.misc_frame]
-        for trainer, trainer_frame in zip(trainers, trainer_frames):
-            config[trainer] = trainer_frame.get_config()
-
-        # Save new config
-        with open('trainer_config.json', 'w') as outfile: 
-            json.dump(config, outfile)
-
-        print('Saved')
-
+        # Loading text
+        label = tk.Label(self, text='Loading...', font=('Segoe UI', 64))
+        label.place(relx=0.5, rely=0.5, anchor=tk.CENTER)

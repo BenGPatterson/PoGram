@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 
 import os
 import tkinter as tk
@@ -113,7 +114,7 @@ class trainer_frame(tk.Frame):
         derived_words.grid(row=row+1, column=0, columnspan=2, padx=(5,0), sticky='w')
         self.inflections_no = tk.StringVar(value=self.config['inflections_no'])
         inflections = Entrybutton(self, variable=self.qs[2], text=f'Ask {inflection_type}', textvariable=self.inflections_no,
-                                  e_width=2, justify='right', int_only=True, bounded=True, bg=self.bg)
+                                  btn_type='check', e_width=2, justify='right', int_only=True, bounded=True, bg=self.bg)
         inflections.grid(row=row+2, column=0, columnspan=2, padx=(5,0), sticky='nsew')
 
         if return_btns:
@@ -137,7 +138,7 @@ class trainer_frame(tk.Frame):
         word_list_all.grid(row=row, column=0, columnspan=2, padx=(5,0), sticky='sw')
         self.freq_no = tk.StringVar(value=self.config['freq_no'])
         word_list_freq = Entrybutton(self, text='Most frequent', variable=self.word_list, textvariable=self.freq_no, value='freq',
-                                     radio=True, e_width=5, justify='right', int_only=True, bounded=True, bg=self.bg)
+                                     btn_type='radio', e_width=5, justify='right', int_only=True, bounded=True, bg=self.bg)
         word_list_freq.grid(row=row+1, column=0, columnspan=2, padx=(5,0), sticky='w')
         self.custom_list = self.config['custom_list']
         word_list_label = tk.Label(self, text=os.path.split(self.custom_list)[-1], font=('Segoe UI italic', 9), bg=self.bg)
@@ -204,6 +205,119 @@ class trainer_frame(tk.Frame):
         line = Lineborder(self)
         line.grid(row=row, column=0, columnspan=2, padx=3, pady=8, sticky='ew')
 
+# Train miscellaneous  
+class misc_trainer(trainer_frame):
+    def __init__(self, *args, **kwargs):
+        trainer_frame.__init__(self, *args, **kwargs)
+
+        # Load title
+        self.load_title(0, 'Misc.')
+        self.line_border(2)
+
+        # Load pronoun questions
+        text_list = ['Personal', 'Possessive', 'Demonstrative', 'Interrogative', 'Derived interrogative', 'Other', 'Prepositions']
+        self.qs = []
+        for i in range(len(text_list)):
+            self.qs.append(tk.IntVar(value=self.config['qs'][i]))
+        other_rows = {3: 'Pronouns:', 10: None, 11: 'Numerals and quantifiers:', 12: '(coming soon)', 13: None}
+        misc_btns = self.load_scol(3, text_list, self.qs, other_rows=other_rows, return_btns=True)
+
+        # Enforce at least one option select, and multi-select functionality
+        self.link_buttons(self.qs, misc_btns)
+
+        # Finish loading
+        self.toggle_active(widget_status=self.config['widget_status'])
+
+    # Load single columned list of settings
+    def load_scol(self, row, texts, vars, other_rows={}, return_btns=False):
+        scol_btns = []
+        for i, case in enumerate(texts):
+            while row+i in list(other_rows.keys()):
+                if other_rows[row+i] is None:
+                    self.line_border(row+i)
+                else:
+                    label = tk.Label(self, text=other_rows[row+i], bg=self.bg)
+                    label.grid(row=row+i, column=0, columnspan=2, padx=(5,0), sticky='w')
+                row+=1
+            scol_btns.append(tk.Checkbutton(self, variable=vars[i], onvalue=1, offvalue=0, text=case, bg=self.bg, activebackground=self.bg))
+            scol_btns[-1].grid(row=row+i, column=0, columnspan=2, padx=(5,0),  sticky='w')
+        if return_btns:
+            return scol_btns
+
+    # Get current config settings to be saved
+    def get_config(self):
+
+        # Ensures widget_status is updated
+        if self.active.get():
+            self.get_widget_status()
+
+        # Collect settings
+        config = {}
+        config['active'] = self.active.get()
+        config['qs'] = []
+        for i in range(len(self.qs)):
+            config['qs'].append(self.qs[i].get())
+        config['widget_status'] = self.widget_status
+
+        return config
+    
+# Train verbs  
+class verb_trainer(trainer_frame):
+    def __init__(self, *args, **kwargs):
+        trainer_frame.__init__(self, *args, **kwargs)
+
+        # Load title and question settings
+        self.load_title(0, 'Verbs')
+        self.line_border(2)
+        q_btns = self.load_questions(3, 'verb pairs', 'conjugations', return_btns=True)
+        self.line_border(6)
+
+        # Load tense settings
+        tenses = ['Pres.', 'Past', 'Fut.', 'Cond.', 'Imp.', 'Part.', 'V. noun']
+        self.tense_vars = []
+        for i in range(len(tenses)):
+            self.tense_vars.append(tk.IntVar(value=self.config['tense_vars'][i]))
+        conj_btns = self.load_dcol(7, tenses, self.tense_vars, return_btns=True)
+        self.line_border(11)
+
+        # Enforce disabling restrictions
+        vars_list = [[self.qs[2]]]
+        ts_list = [[[1]]]
+        widgets_list = [conj_btns]
+        self.disable_restrictions(vars_list, ts_list, widgets_list)
+
+        # Enforce at least one option select, and multi-select functionality
+        self.link_buttons(self.qs, q_btns)
+        self.link_buttons(self.tense_vars, conj_btns)
+
+        # Load word lists
+        self.load_word_lists(12)
+
+        # Finish loading
+        self.toggle_active(widget_status=self.config['widget_status'])
+
+    # Get current config settings to be saved
+    def get_config(self):
+
+        # Ensures widget_status is updated
+        if self.active.get():
+            self.get_widget_status()
+
+        # Collect settings
+        config = {}
+        config['active'] = self.active.get()
+        config['qs'] = [self.qs[0].get(), self.qs[1].get(), self.qs[2].get()]
+        config['inflections_no'] = self.inflections_no.get()
+        config['tense_vars'] = []
+        for i in range(len(self.tense_vars)):
+            config['tense_vars'].append(self.tense_vars[i].get())
+        config['word_list'] = self.word_list.get()
+        config['freq_no'] = self.freq_no.get()
+        config['custom_list'] = self.custom_list
+        config['widget_status'] = self.widget_status
+
+        return config
+    
 # Train adjectives  
 class adj_trainer(trainer_frame):
     def __init__(self, *args, **kwargs):
@@ -331,119 +445,6 @@ class noun_trainer(trainer_frame):
         config['word_list'] = self.word_list.get()
         config['freq_no'] = self.freq_no.get()
         config['custom_list'] = self.custom_list
-        config['widget_status'] = self.widget_status
-
-        return config
-    
-# Train verbs  
-class verb_trainer(trainer_frame):
-    def __init__(self, *args, **kwargs):
-        trainer_frame.__init__(self, *args, **kwargs)
-
-        # Load title and question settings
-        self.load_title(0, 'Verbs')
-        self.line_border(2)
-        q_btns = self.load_questions(3, 'verb pairs', 'conjugations', return_btns=True)
-        self.line_border(6)
-
-        # Load tense settings
-        tenses = ['Pres.', 'Past', 'Fut.', 'Cond.', 'Imp.', 'Part.', 'V. noun']
-        self.tense_vars = []
-        for i in range(len(tenses)):
-            self.tense_vars.append(tk.IntVar(value=self.config['tense_vars'][i]))
-        conj_btns = self.load_dcol(7, tenses, self.tense_vars, return_btns=True)
-        self.line_border(11)
-
-        # Enforce disabling restrictions
-        vars_list = [[self.qs[2]]]
-        ts_list = [[[1]]]
-        widgets_list = [conj_btns]
-        self.disable_restrictions(vars_list, ts_list, widgets_list)
-
-        # Enforce at least one option select, and multi-select functionality
-        self.link_buttons(self.qs, q_btns)
-        self.link_buttons(self.tense_vars, conj_btns)
-
-        # Load word lists
-        self.load_word_lists(12)
-
-        # Finish loading
-        self.toggle_active(widget_status=self.config['widget_status'])
-
-    # Get current config settings to be saved
-    def get_config(self):
-
-        # Ensures widget_status is updated
-        if self.active.get():
-            self.get_widget_status()
-
-        # Collect settings
-        config = {}
-        config['active'] = self.active.get()
-        config['qs'] = [self.qs[0].get(), self.qs[1].get(), self.qs[2].get()]
-        config['inflections_no'] = self.inflections_no.get()
-        config['tense_vars'] = []
-        for i in range(len(self.tense_vars)):
-            config['tense_vars'].append(self.tense_vars[i].get())
-        config['word_list'] = self.word_list.get()
-        config['freq_no'] = self.freq_no.get()
-        config['custom_list'] = self.custom_list
-        config['widget_status'] = self.widget_status
-
-        return config
-    
-# Train miscellaneous  
-class misc_trainer(trainer_frame):
-    def __init__(self, *args, **kwargs):
-        trainer_frame.__init__(self, *args, **kwargs)
-
-        # Load title
-        self.load_title(0, 'Misc.')
-        self.line_border(2)
-
-        # Load pronoun questions
-        text_list = ['Personal', 'Possessive', 'Demonstrative', 'Interrogative', 'Derived interrogative', 'Other', 'Prepositions']
-        self.qs = []
-        for i in range(len(text_list)):
-            self.qs.append(tk.IntVar(value=self.config['qs'][i]))
-        other_rows = {3: 'Pronouns:', 10: None, 11: 'Numerals and quantifiers:', 12: '(coming soon)', 13: None}
-        misc_btns = self.load_scol(3, text_list, self.qs, other_rows=other_rows, return_btns=True)
-
-        # Enforce at least one option select, and multi-select functionality
-        self.link_buttons(self.qs, misc_btns)
-
-        # Finish loading
-        self.toggle_active(widget_status=self.config['widget_status'])
-
-    # Load single columned list of settings
-    def load_scol(self, row, texts, vars, other_rows={}, return_btns=False):
-        scol_btns = []
-        for i, case in enumerate(texts):
-            while row+i in list(other_rows.keys()):
-                if other_rows[row+i] is None:
-                    self.line_border(row+i)
-                else:
-                    label = tk.Label(self, text=other_rows[row+i], bg=self.bg)
-                    label.grid(row=row+i, column=0, columnspan=2, padx=(5,0), sticky='w')
-                row+=1
-            scol_btns.append(tk.Checkbutton(self, variable=vars[i], onvalue=1, offvalue=0, text=case, bg=self.bg, activebackground=self.bg))
-            scol_btns[-1].grid(row=row+i, column=0, columnspan=2, padx=(5,0),  sticky='w')
-        if return_btns:
-            return scol_btns
-
-    # Get current config settings to be saved
-    def get_config(self):
-
-        # Ensures widget_status is updated
-        if self.active.get():
-            self.get_widget_status()
-
-        # Collect settings
-        config = {}
-        config['active'] = self.active.get()
-        config['qs'] = []
-        for i in range(len(self.qs)):
-            config['qs'].append(self.qs[i].get())
         config['widget_status'] = self.widget_status
 
         return config

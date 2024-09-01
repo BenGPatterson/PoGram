@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import tkinter as tk
 
 # Wrapper to tk.Entry to allow polish characters
@@ -37,7 +39,7 @@ class Entrybutton(tk.Frame):
     def __init__(self, *args, **kwargs):
         self.text = kwargs.pop('text', None)
         self.textvariable = kwargs.pop('textvariable', None)
-        self.radio = kwargs.pop('radio', False)
+        self.btn_type = kwargs.pop('btn_type', 'check')
         self.variable = kwargs.pop('variable', None)
         self.value = kwargs.pop('value', None)
         self.e_width = kwargs.pop('e_width', None)
@@ -48,7 +50,8 @@ class Entrybutton(tk.Frame):
         tk.Frame.__init__(self, *args, **kwargs)
 
         # Apply optional restictions on Entry widget
-        self.vcmd = (self.register(self.validate), '%d', '%P')
+        validate_fn = lambda *args, i=self.int_only, b=self.bounded, e=self.e_width: validate(*args, i, b, e)
+        self.vcmd = (self.register(validate_fn), '%d', '%P')
 
         # Load Check/Radio button and entry widgets
         self.get_entry()
@@ -56,41 +59,24 @@ class Entrybutton(tk.Frame):
         self.btn.pack(side=tk.LEFT)
         self.entry.pack(side=tk.LEFT)
         
-    # Loads Check/Radio button
+    # Loads Check/Radio/Label button
     def get_button(self):
-        if self.radio:
+        if self.btn_type == 'radio':
             self.btn = tk.Radiobutton(self, variable=self.variable, value=self.value, text=self.text, bg=self.bg, 
                                       activebackground=self.bg)
-        else:
+        elif self.btn_type == 'check':
             self.btn = tk.Checkbutton(self, variable=self.variable, onvalue=1, offvalue=0, text=self.text,
                        bg=self.bg, activebackground=self.bg)
             self.value = 1
+        elif self.btn_type == 'label':
+            self.btn = tk.Label(self, text=self.text, bg=self.bg)
+            return
         self.variable.trace_add('write', lambda *args, v=[self.variable], t=[[self.value]], e=[self.entry]: show_widget(v,t,e))
 
     # Loads Entry widget
     def get_entry(self):
         self.entry = Entry_pl(self, textvariable=self.textvariable, width=self.e_width, justify=self.justify, 
                               bg='SystemWindow', disabledbackground=self.bg, validate='key', validatecommand=self.vcmd)
-
-    # Apply requested restrictions on Entry widget
-    def validate(self, action, value_if_allowed):
-
-        # Ensures only integers
-        if self.int_only and action=='1':
-            if value_if_allowed:
-                try:
-                    float(value_if_allowed)
-                except ValueError:
-                    return False
-            else:
-                return False
-            
-        # Ensures text stays within bounds
-        if self.bounded:
-            if len(value_if_allowed) > self.e_width:
-                return False
-        
-        return True
     
     # Expands configure() functionality to these widgets
     def configure(self, *args, **kwargs):
@@ -130,6 +116,25 @@ class Lineborder(tk.Frame):
         tk.Frame.configure(self, *args, **kwargs)
         tk.Frame.configure(self, bg='black', height=1, bd=0)
 
+# Apply requested restrictions on Entry widget
+def validate(action, value_if_allowed, int_only, bounded, e_width):
+
+    # Ensures only integers
+    if int_only and action=='1':
+        if value_if_allowed:
+            try:
+                float(value_if_allowed)
+            except ValueError:
+                return False
+        else:
+            return False
+        
+    # Ensures text stays within bounds
+    if bounded:
+        if len(value_if_allowed) > e_width:
+            return False
+    
+    return True
         
 # Enables/disables widget
 def show_widget(vars, onvalues, widgets):

@@ -1,9 +1,12 @@
-Code 'game' functions which take settings as input and play (cli) for now
+Code 'game' functions which take settings as input and play (cli) for now.
 
-Make other trainer UIs.
-Need to decide on better formatting/color scheme - at the moment does not look great.
+Need to decide on numerals, quantifiers categories to put in misc trainer.
 
-Done:
+Change trainer panels so default bg is respective colour, then remove functions to switch colour.
+
+Dictionary is currently ~2.5GB when loaded in, may want to recreate it with more pruning to reduce this.
+
+Compeleted workflows processes:
 
 Processed wiki entries downloaded from https://kaikki.org/dictionary/Polish/words/index.html.
 http://morfeusz.sgjp.pl/en and https://github.com/kawu/concraft-pl/tree/master/bindings/python used to identify lemmas of words in sentences (with probability). 

@@ -1,42 +1,21 @@
+# -*- coding: utf-8 -*-
+
 import os
 import pickle
 import gzip
 import gc
-import sys
-import time
 
+# Loads dictionary from pickled file
 def load_dictionary(path):
-    """
-    Loads dictionary of wiki pages.
-
-    Parameters:
-        path: Path to pickled dictionary object.
-
-    Returns:
-        Dictionary of wiki pages.
-    """
-
     gc.disable()
-    with gzip.open(data_path, "rb") as f:
-        dictionary = pickle.load(f)
+    with gzip.open(path, "rb") as f:
+        word_dict = pickle.load(f)
     gc.enable()
 
-    return dictionary
+    return word_dict
 
+# Gets declined form of word from dictionary
 def get_declension(dictionary, lemma, pos, numgen, case):
-    """
-    Gets specified declension of lemma from dictionary.
-
-    Parameters:
-        dictionary: Dictionary of word information.
-        lemma: Lemma to decline.
-        pos: Part of speech lemma belongs to.
-        numgen: Letter code specifying singular/plural and gender (if relevant).
-        case: Single letter defining grammatical case.
-
-    Returns:
-        List of possible declensions.
-    """
     
     # Produce tags
     tags = set()
@@ -63,21 +42,10 @@ def get_declension(dictionary, lemma, pos, numgen, case):
 
 if __name__ == '__main__':
 
-    # Load dictionary
+    # Test case
     data_path = os.path.join('data', 'wiki_entries.pgz')
-    dictionary = load_dictionary(data_path)
+    word_dict = load_dictionary(data_path)
 
-    # # Test case
-    # cases = ['n', 'g', 'd', 'a', 'i', 'l', 'v']
-    # numgens = ['sma', 'smi', 'sf', 'sn', 'pv', 'pnv']
-    # for case in cases:
-    #     row = []
-    #     for ng in numgens:
-    #         row.append(get_declension(dictionary, 'elektryczny', 'adj', ng, case))
-    #     print(row)
-    zmk = get_declension(dictionary, 'zamek', 'adj', 'pv', 'n')
+    zmk = get_declension(word_dict, 'zamek', 'noun', 'p', 'n')
     print(zmk)
-
-    # print(dictionary['entries'][0].keys())
-    # print(len(dictionary['entries'][0]['senses']), dictionary['entries'][0]['senses'])
     

@@ -3,6 +3,7 @@
 import os
 import tkinter as tk
 from homepage import HomePage, LoadingPage
+from gamepage import GamePage
   
 class tkinterApp(tk.Tk):
      
@@ -25,8 +26,8 @@ class tkinterApp(tk.Tk):
   
         # Initializing all frame pages
         self.frames = {}
-        page_names = ['loading', 'home']
-        page_frames = [LoadingPage, HomePage]
+        page_names = ['loading', 'home', 'game']
+        page_frames = [LoadingPage, HomePage, GamePage]
         for name, F in zip(page_names, page_frames):
             frame = F(container, self)
             self.frames[name] = frame
@@ -42,7 +43,6 @@ class tkinterApp(tk.Tk):
     def load_dict(self):
         self.frames['home'].menu_frame.load_dict(os.path.join('data', 'wiki_entries.pgz'))
         self.show_frame('home')
-        # app.unbind('<Visibility>')
 
 # Driver Code
 if __name__ == '__main__':

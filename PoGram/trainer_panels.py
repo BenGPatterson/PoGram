@@ -9,9 +9,8 @@ from custom_widgets import Entrybutton, Lineborder, show_widget
 class trainer_frame(tk.Frame):
     def __init__(self, *args, **kwargs):
         self.config = kwargs.pop('config')
-        self.bga = kwargs.pop('bga', None)
         tk.Frame.__init__(self, *args, **kwargs)
-        self.bg = self.cget('bg')
+        self.bg = kwargs.get('bg', self.cget('bg'))
         self.widget_status = self.config['widget_status']
         self.grid_columnconfigure((0,1), weight=1, uniform='column')
 
@@ -21,16 +20,11 @@ class trainer_frame(tk.Frame):
         toggle = tk.Checkbutton(self, variable=self.active, onvalue=1, offvalue=0, bg=self.bg, activebackground=self.bg, 
                                 command=self.toggle_active)
         toggle.grid(row=row, column=0, columnspan=2)
-        label = tk.Label(self, text=text, bg=self.bg, font=('Segoe UI', 22))
-        label.grid(row=row+1, column=0, columnspan=2)
-
-    # Toggles active state of trainer
-    def toggle_active(self, widget_status=None):
-        self.toggle_status(widget_status=widget_status)
-        self.toggle_colour()
+        title = tk.Label(self, text=text, bg=self.bg, font=('Segoe UI', 22))
+        title.grid(row=row+1, column=0, columnspan=2)
 
     # Enables/disables widgets depending on active state of trainer
-    def toggle_status(self, widget_status=None):
+    def toggle_active(self, widget_status=None):
 
         # Turning on
         if self.active.get():
@@ -39,7 +33,7 @@ class trainer_frame(tk.Frame):
                 if wtype == 'Entrybutton':
                     for j, entrychild in enumerate(child.winfo_children()):
                         entrychild.configure(state=self.widget_status[i][j])
-                elif wtype not in ('Frame','Labelframe','TFrame','TLabelframe') and i!=1:
+                elif wtype not in ('Frame','Labelframe','TFrame','TLabelframe'):
                     child.configure(state=self.widget_status[i])
 
         # Turning off, saving current state
@@ -53,7 +47,7 @@ class trainer_frame(tk.Frame):
                 if wtype == 'Entrybutton':
                     for entrychild in child.winfo_children():
                         entrychild.configure(state='disable')
-                elif wtype not in ('Frame','Labelframe','TFrame','TLabelframe') and i!=1:
+                elif wtype not in ('Frame','Labelframe','TFrame','TLabelframe'):
                     child.configure(state='disable')
 
         # Ensure active toggle is always enabled
@@ -68,38 +62,10 @@ class trainer_frame(tk.Frame):
                 self.widget_status.append([])
                 for entrychild in child.winfo_children():
                     self.widget_status[-1].append(entrychild['state'])
-            elif wtype not in ('Frame','Labelframe','TFrame','TLabelframe') and i!=1:
+            elif wtype not in ('Frame','Labelframe','TFrame','TLabelframe'):
                 self.widget_status.append(child['state'])
             else:
                 self.widget_status.append(None)
-
-    # Toggle colour of widgets depending on active state of trainer
-    def toggle_colour(self):
-
-        # Turning on
-        if self.active.get():
-            for child in self.winfo_children():
-                if child.winfo_class() == 'Entrybutton':
-                    for entrychild in child.winfo_children():
-                        self.configure_colour(entrychild, self.bga)
-                self.configure_colour(child, self.bga)
-            self.configure(bg=self.bga)
-        
-        # Turning off
-        else:
-            for child in self.winfo_children():
-                if child.winfo_class() == 'Entrybutton':
-                    for entrychild in child.winfo_children():
-                        self.configure_colour(entrychild, self.bg)
-                self.configure_colour(child, self.bg)
-            self.configure(bg=self.bg)
-
-    # Change colours of a widget
-    def configure_colour(self, widget, colour):
-        try:
-            widget.configure({'bg': colour, 'activebackground': colour})
-        except:
-            widget.configure({'bg': colour})
 
     # Load question settings
     def load_questions(self, row, derivation, inflection_type, return_btns=False):

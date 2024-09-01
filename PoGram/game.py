@@ -2,18 +2,15 @@
 
 import tkinter as tk
 
-def run_game(parent, controller):
-    print('Game launched')
+def launch_game(parent, controller):
 
     # Sense check settings and find active trainers
     active = sense_check(parent)
     if active is None:
         return
-    print(active)
 
-    # Get useful parameters
-    word_dict = parent.menu_frame.word_dict
-    q_no = parent.menu_frame.q_no
+    # Load game page
+    controller.show_frame('game')
 
 # Checks valid trainer settings and gets active trainers
 def sense_check(parent):
@@ -46,8 +43,8 @@ def sense_check(parent):
                 return None
             
     # Check question number entry
-    q_no = parent.menu_frame.q_no.get()
-    if not check_pos_int_entry(q_no):
+    w_no = parent.menu_frame.w_no.get()
+    if not check_pos_int_entry(w_no):
         return None
     
     return active

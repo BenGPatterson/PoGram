@@ -4,46 +4,41 @@ import json
 import tkinter as tk
 from custom_widgets import Entrybutton
 from dictionary import load_dictionary
-from game import run_game
+from game import launch_game
 
 class menu_display(tk.Frame):
     def __init__(self, parent, controller, *args, **kwargs):
         self.config = kwargs.pop('config')
-        self.bga = kwargs.pop('bga', None)
         tk.Frame.__init__(self, parent, *args, **kwargs)
-        self.bg = self.cget('bg')
+        self.bg = kwargs.get('bg', self.cget('bg'))
+        self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure((0,1), weight=1, uniform='column')
 
-        # Row weights
-        self.grid_rowconfigure(0, weight=50)
-        self.grid_rowconfigure(1, weight=1)
-        self.grid_rowconfigure(2, weight=1)
-
         # Load general settings
-        self.q_no = tk.StringVar(value=self.config['q_no'])
-        q_no = Entrybutton(self, variable=None, text=f'Questions:', textvariable=self.q_no,
+        self.w_no = tk.StringVar(value=self.config['w_no'])
+        w_no = Entrybutton(self, variable=None, text=f'Words:', textvariable=self.w_no,
                                   btn_type='label', e_width=2, justify='right', int_only=True, bounded=True, bg=self.bg)
-        q_no.grid(row=1, column=0, columnspan=2, padx=(5,0), sticky='w')
+        w_no.grid(row=2, column=0, columnspan=2, padx=(30,0), pady=(0,10), sticky='w')
 
         # Load play button
-        self.play_btn = tk.Button(self, text='Play', command=lambda: self.launch_game(parent, controller), bg=self.bga, activebackground=self.bga)
-        self.play_btn.grid(row=2, column=0, columnspan=2, padx=(5,0), sticky='ew')
+        self.play_btn = tk.Button(self, text='Play', command=lambda: self.start_game(parent, controller))
+        self.play_btn.grid(row=3, column=0, columnspan=2, padx=30, pady=(0,10), sticky='ew')
 
     # Load dictionary when instructed in start up
     def load_dict(self, path):
         self.word_dict = 'test' # load_dictionary(path)
 
     # Launch game
-    def launch_game(self, parent, controller):
+    def start_game(self, parent, controller):
         self.save_config(parent)
-        run_game(parent, controller)
+        launch_game(parent, controller)
 
     # Get current config settings to be saved
     def get_config(self):
 
         # Collect settings
         config = {}
-        config['q_no'] = self.q_no.get()
+        config['w_no'] = self.w_no.get()
 
         return config
 

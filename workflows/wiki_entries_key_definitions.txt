@@ -1,0 +1,29 @@
+keep:
+
+pos: part of speech
+head_templates: further information about pos, including adverb
+forms: declined forms
+sounds: pronunciation
+hyphenation: split pronunciation into syllables
+word: word
+senses: definition(s) (BUT only need 'glosses' kwarg)
+
+discard:
+
+inflection_templates: information about pattern of declensions
+etymology: etymology
+etymology_templates: etymology category
+lang: language
+lang_code: language
+derived: words derived from this one
+related: related terms
+etymology_number: distinguish different etymologies
+synonyms: synonyms
+wikipedia: wikiedia link
+coordinate_terms: 'linguistically siblings' words
+descendants: words in other languages derived from this one
+categories: wiktionary categories word belongs in
+antonyms: antonyms
+hyponyms: hyponyms (a word whose meaning is included in the meaning of another word: "Horse" is a hyponym of "animal")
+source: source of synonyms
+hypernyms: hypernyms (reverse of hyponym)

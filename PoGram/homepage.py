@@ -15,7 +15,7 @@ class HomePage(tk.Frame):
         self.grid_columnconfigure((0, 1, 2, 3, 4), weight=1, uniform='column')
 
         # Title
-        title = tk.Label(self, text='PoGram', font=('Segoe UI', 22))
+        title = tk.Label(self, text='Options', font=('Segoe UI', 22))
         title.grid(row=0, column=0, columnspan=5, padx=10, pady=0, sticky='nw')
         
         # Create trainer and menu frames

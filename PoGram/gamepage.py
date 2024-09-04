@@ -1,5 +1,6 @@
 import tkinter as tk
 import webbrowser
+from custom_widgets import Scrollable
 
 # Game page showing word and questions
 class GamePage(tk.Frame):
@@ -8,21 +9,17 @@ class GamePage(tk.Frame):
         tk.Frame.__init__(self, parent)
 
         # Grid weights
-        self.grid_rowconfigure((0,2), weight=1)
-        self.grid_rowconfigure(1, weight=6)
+        self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
+
 
         # Make title panel
         self.title_frame = title_panel(self, controller, bg='#ffffba')
-        self.title_frame.grid(row=0, column=0, padx=0, pady=0, sticky='nsew')
+        self.title_frame.grid(row=0, column=0, ipady=30, sticky='nsew')
         
         # Make question panel
-        temp = tk.Label(self, text='questions', font=('Segoe UI', 22))
-        temp.grid(row=1, column=0)
-
-        # Make next word panel
-        temp = tk.Label(self, text='next word', font=('Segoe UI', 12))
-        temp.grid(row=2, column=0)
+        self.question_frame = question_panel(self, controller)
+        self.question_frame.grid(row=1, column=0, sticky='nsew')
 
 # Title panel showing word
 class title_panel(tk.Frame):
@@ -52,6 +49,46 @@ class title_panel(tk.Frame):
         word = self.word['text']
         url = f'https://en.wiktionary.org/wiki/{word}#Polish'
         webbrowser.open(url, new=0, autoraise=True)
+
+# Question panel showing questions
+class question_panel(tk.Frame):
+    def __init__(self, parent, controller, *args, **kwargs):
+        tk.Frame.__init__(self, parent, *args, **kwargs)
+        self.parent = parent
+        self.controller = controller
+
+        # Grid weights
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+
+        # Create scrollable frame
+        self.count = 0
+        self.q_frame = Scrollable(self, width=20)
+        wiki_btn = tk.Button(self.q_frame, text='add_label', command=self.add_label)
+        wiki_btn.pack(side=tk.TOP)
+        # for i in range(20):
+        #     temp = tk.Label(self.q_frame, text=f'questions {i}', font=('Segoe UI', 22))
+        #     temp.pack(side=tk.TOP)
+        self.q_frame_update()
+
+    def add_label(self):
+        self.count += 1
+        temp = tk.Label(self.q_frame, text=f'questions {self.count}', font=('Segoe UI', 22))
+        temp.pack(side=tk.TOP)
+        self.q_frame_update()
+
+    # Updates question panel after widget added
+    def q_frame_update(self):
+        self.q_frame.update()
+        free_space = self.controller.winfo_height() - self.q_frame.winfo_height()\
+                     - self.parent.title_frame.word.winfo_height() - 2*self.parent.title_frame.grid_info()['ipady']
+        pad_amount = max(0, int(free_space/2))
+        self.q_frame.canvas.grid_configure(pady=(pad_amount,0))
+
+
+        
+
+    
 
         
 

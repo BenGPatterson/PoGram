@@ -135,7 +135,75 @@ def validate(action, value_if_allowed, int_only, bounded, e_width):
             return False
     
     return True
-        
+
+# A scrollbar that hides itself if it's not needed.
+class AutoScrollbar(tk.Scrollbar):
+    def set(self, lo, hi, fakescrollbar):
+        if float(lo) <= 0.0 and float(hi) >= 1.0:
+            self.tk.call("grid", "remove", self)
+            fakescrollbar.tk.call("grid", "remove", fakescrollbar)
+            self.active = 0
+        else:
+            self.grid()
+            fakescrollbar.grid()
+            self.active = 1
+        tk.Scrollbar.set(self, lo, hi)
+
+# Creates frame with scrollbar
+class Scrollable(tk.Frame):
+    def __init__(self, frame, width=16):
+
+        # Grid weights
+        frame.grid_columnconfigure(0, weight=0, pad=width)
+        frame.grid_columnconfigure(1, weight=1)
+
+        # Scroll bar
+        self.scrollbar = AutoScrollbar(frame, width=width)
+        self.scrollbar.grid(row=0, column=2, sticky='ns')
+
+        # Ensures canvas is centred
+        fakescrollbar = tk.Frame(frame, width=0)
+        fakescrollbar.grid(row=0, column=0, sticky='ns')
+
+        # Create canvas and bind scroll bar to it
+        self.canvas = tk.Canvas(frame, yscrollcommand=lambda *args, fs=fakescrollbar: self.scrollbar.set(*args, fs))
+        self.canvas.grid(row=0, column=1, sticky='nsew')
+        self.scrollbar.config(command=self.canvas.yview)
+        self.canvas.bind('<Configure>', self.__fill_canvas)
+
+        # Base class initialization
+        tk.Frame.__init__(self, frame)
+
+        # Assign this obj (the inner frame) to the windows item of the canvas
+        self.windows_item = self.canvas.create_window(0,0, window=self, anchor=tk.NW)
+
+        # Binds scroll on mousewheel
+        self.bind('<Enter>', self._bound_to_mousewheel)
+        self.bind('<Leave>', self._unbound_to_mousewheel)
+
+    # Enlarge the windows item to the canvas width
+    def __fill_canvas(self, event):
+        canvas_width = event.width
+        self.canvas.itemconfig(self.windows_item, width=canvas_width)
+
+    # Binds mousewheel to scroll when hovering over
+    def _bound_to_mousewheel(self, event):
+        self.canvas.bind_all("<MouseWheel>", self._on_mousewheel)
+
+    # Uninds mousewheel from scroll when mo longer hovering over
+    def _unbound_to_mousewheel(self, event):
+        self.canvas.unbind_all("<MouseWheel>")
+
+    # Scroll frame with mousewheel
+    def _on_mousewheel(self, event):
+        if self.scrollbar.active:
+            self.canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+
+    # Update the canvas and the scrollregion
+    def update(self):
+        self.update_idletasks()
+        self.canvas.config(scrollregion=self.canvas.bbox(self.windows_item))
+
 # Enables/disables widget
 def show_widget(vars, onvalues, widgets):
     var_gets = []

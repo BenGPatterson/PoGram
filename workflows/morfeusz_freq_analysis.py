@@ -1,5 +1,5 @@
 from morfeusz2 import Morfeusz
-from concraft_pl2 import Concraft, Server # Requires concraft_pl2.py (https://github.com/kawu/concraft-pl) in the same directory
+from workflows.concraft_pl2 import Concraft, Server # Requires concraft_pl2.py (https://github.com/kawu/concraft-pl) in the same directory
 import os
 import pandas as pd
 import gc

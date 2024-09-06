@@ -2,6 +2,7 @@
 
 import json
 import tkinter as tk
+import os
 from trainer_panels import misc_trainer, verb_trainer, adj_trainer, noun_trainer
 from menu_panel import menu_display
 
@@ -19,7 +20,8 @@ class HomePage(tk.Frame):
         title.grid(row=0, column=0, columnspan=5, padx=10, pady=0, sticky='nw')
         
         # Create trainer and menu frames
-        with open('trainer_config.json') as json_file:
+        config_path = os.path.join('PoGram', 'trainer_config.json')
+        with open(config_path) as json_file:
             trainer_config = json.load(json_file)
         self.misc_frame = misc_trainer(self, bg='#ffb3ba', config=trainer_config['misc'])
         self.misc_frame.grid(row=1, column=0, padx=(10, 5), pady=(10, 20), sticky='nsew')

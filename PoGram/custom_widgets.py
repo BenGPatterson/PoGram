@@ -203,6 +203,7 @@ class Scrollable(tk.Frame):
     def update(self):
         self.update_idletasks()
         self.canvas.config(scrollregion=self.canvas.bbox(self.windows_item))
+        self.canvas.yview_moveto(1)
 
 # Enables/disables widget
 def show_widget(vars, onvalues, widgets):

@@ -2,9 +2,10 @@
 
 import json
 import tkinter as tk
+import os
 from custom_widgets import Entrybutton
 from dictionary import load_dictionary
-from game import launch_game
+from game import Game
 
 class menu_display(tk.Frame):
     def __init__(self, parent, controller, *args, **kwargs):
@@ -30,8 +31,7 @@ class menu_display(tk.Frame):
 
     # Launch game
     def start_game(self, parent, controller):
-        self.save_config(parent)
-        launch_game(parent, controller)
+        controller.current_game = Game(parent, controller)
 
     # Get current config settings to be saved
     def get_config(self):
@@ -53,5 +53,6 @@ class menu_display(tk.Frame):
             config[trainer] = trainer_frame.get_config()
 
         # Save new config
-        with open('trainer_config.json', 'w') as outfile: 
+        config_path = os.path.join('PoGram', 'trainer_config.json')
+        with open(config_path, 'w') as outfile: 
             json.dump(config, outfile)

@@ -12,7 +12,6 @@ class GamePage(tk.Frame):
         self.grid_rowconfigure(1, weight=1)
         self.grid_columnconfigure(0, weight=1)
 
-
         # Make title panel
         self.title_frame = title_panel(self, controller, bg='#ffffba')
         self.title_frame.grid(row=0, column=0, ipady=30, sticky='nsew')
@@ -66,9 +65,6 @@ class question_panel(tk.Frame):
         self.q_frame = Scrollable(self, width=20)
         wiki_btn = tk.Button(self.q_frame, text='add_label', command=self.add_label)
         wiki_btn.pack(side=tk.TOP)
-        # for i in range(20):
-        #     temp = tk.Label(self.q_frame, text=f'questions {i}', font=('Segoe UI', 22))
-        #     temp.pack(side=tk.TOP)
         self.q_frame_update()
 
     def add_label(self):

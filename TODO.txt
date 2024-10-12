@@ -1,10 +1,4 @@
-Need to make scrollable frame for questions of a word on game page. Following links could be helpful here:
- - https://stackoverflow.com/questions/1873575/how-could-i-get-a-frame-with-a-scrollbar-in-tkinter
- - https://stackoverflow.com/questions/16188420/tkinter-scrollbar-for-frame
-
 Need to decide on numerals, quantifiers categories to put in misc trainer.
-
-Dictionary is currently ~2.5GB when loaded in, may want to recreate it with more pruning to reduce this.
 
 Compeleted workflows processes:
 

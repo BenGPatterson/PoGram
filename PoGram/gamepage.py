@@ -32,8 +32,9 @@ class title_panel(tk.Frame):
 
         # Make word label
         self.grid_columnconfigure(1, weight=1)
-        self.word = tk.Label(self, text='dżdżownica', font=('Segoe UI', 22), bg=self.bg)
-        self.word.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+        self.word = tk.StringVar(value='dżdżownica')
+        self.word_lbl = tk.Label(self, textvariable=self.word, font=('Segoe UI', 22), bg=self.bg)
+        self.word_lbl.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
         # Make button to open wiktionary for word
         wiki_btn = tk.Button(self, text='wiktionary.org', padx=5, pady=5, command=self.open_wiki)
@@ -45,7 +46,7 @@ class title_panel(tk.Frame):
 
     # Open wiktionary page for word
     def open_wiki(self):
-        word = self.word['text']
+        word = str(self.word.get())
         url = f'https://en.wiktionary.org/wiki/{word}#Polish'
         webbrowser.open(url, new=0, autoraise=True)
 
@@ -63,21 +64,12 @@ class question_panel(tk.Frame):
         # Create scrollable frame
         self.count = 0
         self.q_frame = Scrollable(self, width=20)
-        wiki_btn = tk.Button(self.q_frame, text='add_label', command=self.add_label)
-        wiki_btn.pack(side=tk.TOP)
-        self.q_frame_update()
-
-    def add_label(self):
-        self.count += 1
-        temp = tk.Label(self.q_frame, text=f'questions {self.count}', font=('Segoe UI', 22))
-        temp.pack(side=tk.TOP)
-        self.q_frame_update()
 
     # Updates question panel after widget added
     def q_frame_update(self):
         self.q_frame.update()
         free_space = self.controller.winfo_height() - self.q_frame.winfo_height()\
-                     - self.parent.title_frame.word.winfo_height() - 2*self.parent.title_frame.grid_info()['ipady']
+                     - self.parent.title_frame.word_lbl.winfo_height() - 2*self.parent.title_frame.grid_info()['ipady']
         pad_amount = max(0, int(free_space/2))
         self.q_frame.canvas.grid_configure(pady=(pad_amount,0))
 

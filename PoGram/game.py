@@ -19,6 +19,8 @@ class Game():
         # Load game page and get canvas
         controller.show_frame('game')
         self.q_panel = controller.frames['game'].question_frame
+        for widget in self.q_panel.q_frame.winfo_children():
+            widget.destroy()
         self.q_panel.q_frame_update()
 
         # Set initial variables and load first question
@@ -40,7 +42,8 @@ class Game():
         
         # Select trainer to choose word from and load relevant word list
         train_key = list(self.trainers.keys())[random.randint(0,len(self.trainers)-1)]
-        self.load_word_list(train_key, controller)
+        if train_key not in self.word_lists.keys():
+            self.load_word_list(train_key, controller)
 
         # Load question
         self.load_question(train_key)
@@ -74,11 +77,11 @@ class Game():
 
     # Load question
     def load_question(self, key):
-        question_loaders = {'adj': adj_question}
+        question_loaders = {'misc': adj_question, 'verb': adj_question, 'adj': adj_question, 'noun': adj_question}
         if key != 'misc':
-            question_loaders[key](self, self.q_panel, self.trainers[key], self.word_lists[key])
+            question_loaders[key](self.q_panel, self.trainers[key], self.word_lists[key])
         else:
-            question_loaders[key](self, self.q_panel, self.trainers[key])
+            question_loaders[key](self.q_panel, self.trainers[key])
 
     # Checks valid trainer settings and gets active trainers
     def sense_check(self, parent):

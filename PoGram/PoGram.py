@@ -15,7 +15,7 @@ class tkinterApp(tk.Tk):
 
         # Window settings
         self.title('PoGram')
-        self.geometry('874x540')
+        self.geometry(f'874x540')
         self.resizable(False,False)
          
         # Creating a container
@@ -41,12 +41,11 @@ class tkinterApp(tk.Tk):
 
     # Tell menu frame to load dictionary
     def load_dict(self):
-        self.frames['home'].menu_frame.load_dict(os.path.join('data', 'wiki_entries.pgz'))
+        self.frames['home'].menu_frame.load_dict(os.path.join('PoGram', 'data', 'wiki_entries.pgz'))
         self.show_frame('home')
 
 # Driver Code
 if __name__ == '__main__':
-
     app = tkinterApp()
     app.after(250, app.load_dict)
     app.mainloop()

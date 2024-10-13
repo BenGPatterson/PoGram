@@ -1,5 +1,14 @@
 Need to decide on numerals, quantifiers categories to put in misc trainer.
 
+Currently have all lemmas saved in lower case - should change this because of e.g. Polska
+
+Need to add option to verbs for impersonal forms
+Also to exlude 1p/3p imperative forms
+
+Add back luck protection to conjugations/declensions etc.
+
+Tested verb conjugations up to present+past
+
 Compeleted workflows processes:
 
 Processed wiki entries downloaded from https://kaikki.org/dictionary/Polish/words/index.html.

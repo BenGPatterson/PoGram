@@ -4,11 +4,14 @@ import tkinter as tk
 import random
 import os
 import pandas as pd
-from questions import adj_question
+from questions import verb_question, adj_question, noun_question
 
 # Game instance
 class Game():
-    def __init__(self, parent, controller):
+    def __init__(self, dictionary, parent, controller):
+        self.dict = dictionary
+        self.parent = parent
+        self.controller = controller
 
         # Sense check settings and find active trainers
         self.sense_check(parent)
@@ -19,8 +22,6 @@ class Game():
         # Load game page and get canvas
         controller.show_frame('game')
         self.q_panel = controller.frames['game'].question_frame
-        for widget in self.q_panel.q_frame.winfo_children():
-            widget.destroy()
         self.q_panel.q_frame_update()
 
         # Set initial variables and load first question
@@ -28,22 +29,23 @@ class Game():
         self.total_correct = 0
         self.total_questions = 0
         self.word_lists = {}
-        self.next_question(parent, controller)
+        self.next_question()
 
     # Loads next question
-    def next_question(self, parent, controller):
+    def next_question(self):
         
         # Update word counter, exit if limit reached
         self.current_word_no += 1
-        if self.current_word_no > int(parent.menu_frame.w_no.get()):
+        if self.current_word_no > int(self.parent.menu_frame.w_no.get()):
             tk.messagebox.showinfo('Score', f'{self.total_correct} questions correct out of {self.total_questions}.')
-            controller.show_frame('home')
+            self.controller.show_frame('home')
+            self.parent.menu_frame.play_btn.focus_set()
             return
         
         # Select trainer to choose word from and load relevant word list
         train_key = list(self.trainers.keys())[random.randint(0,len(self.trainers)-1)]
         if train_key not in self.word_lists.keys():
-            self.load_word_list(train_key, controller)
+            self.load_word_list(train_key, self.controller)
 
         # Load question
         self.load_question(train_key)
@@ -77,11 +79,11 @@ class Game():
 
     # Load question
     def load_question(self, key):
-        question_loaders = {'misc': adj_question, 'verb': adj_question, 'adj': adj_question, 'noun': adj_question}
+        question_loaders = {'misc': adj_question, 'verb': verb_question, 'adj': adj_question, 'noun': noun_question}
         if key != 'misc':
-            question_loaders[key](self.q_panel, self.trainers[key], self.word_lists[key])
+            question_loaders[key](self, self.q_panel, self.trainers[key], self.word_lists[key], self.dict)
         else:
-            question_loaders[key](self.q_panel, self.trainers[key])
+            question_loaders[key](self. self.q_panel, self.trainers[key], self.dict)
 
     # Checks valid trainer settings and gets active trainers
     def sense_check(self, parent):

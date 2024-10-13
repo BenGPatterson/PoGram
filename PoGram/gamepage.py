@@ -13,7 +13,7 @@ class GamePage(tk.Frame):
         self.grid_columnconfigure(0, weight=1)
 
         # Make title panel
-        self.title_frame = title_panel(self, controller, bg='#ffffba')
+        self.title_frame = title_panel(self, controller, bg='#baffc9')
         self.title_frame.grid(row=0, column=0, ipady=30, sticky='nsew')
         
         # Make question panel

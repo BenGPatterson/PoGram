@@ -1,13 +1,14 @@
 Need to decide on numerals, quantifiers categories to put in misc trainer.
 
 Currently have all lemmas saved in lower case - should change this because of e.g. Polska
+Add verification for verbs, adj, nouns that must have most basic conjugation/declension to add to all_pos.csv lists
 
-Need to add option to verbs for impersonal forms
-Also to exlude 1p/3p imperative forms
+Need to add option to verbs to include/exclude impersonal forms
+Also option to exclude niech imperative forms
 
 Add back luck protection to conjugations/declensions etc.
-
-Tested verb conjugations up to present+past
+Should find answers at same time so can skip selecting qs w/o answers
+Also solves: Only select singular form for nouns without plural forms
 
 Compeleted workflows processes:
 

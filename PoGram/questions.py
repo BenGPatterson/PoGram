@@ -137,6 +137,8 @@ class question():
 
         # Update frame
         self.q_panel.q_frame_update()
+        self.q_panel.q_frame_update()
+
 
     # Check if definition is correct
     def def_correct(self, widget, answer, correct):
@@ -292,9 +294,9 @@ class verb_question(question):
             if tense == 'par':
                 if self.word == 'być':
                     tense = ['par-act', 'par-cont', 'par-ant'][random.randint(0,2)]
-                elif aspect == 'impf':
+                elif 'i' in aspect:
                     tense = ['par-act', 'par-pas', 'par-cont'][random.randint(0,2)]
-                elif aspect == 'pf':
+                elif 'p' in aspect:
                     tense = ['par-pas', 'par-ant'][random.randint(0,1)]
             elif tense == 'pr' and 'p' in aspect:
                 tense = 'f'

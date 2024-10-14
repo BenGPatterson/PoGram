@@ -217,7 +217,7 @@ if __name__ == '__main__':
     data_path = os.path.join('PoGram', 'data', 'wiki_entries.pgz')
     word_dict = load_dictionary(data_path)
     
-    print(get_conjugation(word_dict, 'mieć', 'verb', 'v', '2p', 'pa'))
+    # print(get_conjugation(word_dict, 'mieć', 'verb', 'v', '2p', 'pa'))
     # for sense in word_dict['mieć']['verb']:
     #     print(sense['head_templates'][0]['args']['1'])
-    # print(word_dict['mieć']['verb'])
+    print(word_dict['znany'].keys())

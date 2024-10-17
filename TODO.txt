@@ -1,14 +1,21 @@
-Need to decide on numerals, quantifiers categories to put in misc trainer.
+To do:
 
-Currently have all lemmas saved in lower case - should change this because of e.g. Polska
-Add verification for verbs, adj, nouns that must have most basic conjugation/declension to add to all_pos.csv lists
+Add back luck protection to conjugations/declensions etc.
+Should find answers at same time so can skip selecting qs w/o answers
+Also solves this issue: Only select singular form for nouns without plural forms
+Complete for adj+noun declensions, still need for verb conjugations plus words.
+
+Can currently deselect all cases/tenses causing error on game start
 
 Need to add option to verbs to include/exclude impersonal forms
 Also option to exclude niech imperative forms
 
-Add back luck protection to conjugations/declensions etc.
-Should find answers at same time so can skip selecting qs w/o answers
-Also solves: Only select singular form for nouns without plural forms
+Currently have all lemmas saved in lower case - should change this because of e.g. Polska
+Add verification for verbs, adj, nouns that must have most basic conjugation/declension to add to all_pos.csv lists
+
+Need to decide on numerals, quantifiers categories to put in misc trainer.
+
+Customisable keybind settings
 
 Compeleted workflows processes:
 

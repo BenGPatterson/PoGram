@@ -107,13 +107,15 @@ def get_declension(dictionary, lemma, pos, numgen, case):
     # Backup parts of speech for adjectives
     backups = [pos]
     if pos == 'adj':
-        backups += ['particle', 'num']
+        backups += ['particle', 'num', 'verb']
 
     # Find corresponding declension(s)
     declensions = set()
-    for pos in backups:
+    for pos_ in backups:
         try:
-            for sense in dictionary[lemma.lower()][pos]:
+            for sense in dictionary[lemma.lower()][pos_]:
+                if pos == 'adj' and pos_ == 'verb' and sense['head_templates'][0]['name'] != 'pl-participle':
+                    continue
                 declension = next((item['form'] for item in sense['forms'] if set(item['tags']) == tags), None)
                 declensions.add(declension)
             if None in declensions and len(declensions) > 1:
@@ -220,4 +222,5 @@ if __name__ == '__main__':
     # print(get_conjugation(word_dict, 'mieć', 'verb', 'v', '2p', 'pa'))
     # for sense in word_dict['mieć']['verb']:
     #     print(sense['head_templates'][0]['args']['1'])
-    print(word_dict['znany'].keys())
+    for sense in word_dict['będę'].keys():
+        print(word_dict['będę'][sense])

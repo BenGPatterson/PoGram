@@ -12,10 +12,50 @@ class question():
         self.choose_word()
 
     # Choose word and update title
-    def choose_word(self):
+    def choose_word(self):#
+        self.skip = False
         self.word = self.word_list[random.randint(0,len(self.word_list)-1)].lower()
         self.q_panel.parent.title_frame.word.set(self.word)
         self.q_panel.parent.title_frame.update()
+
+    # Keeps only declensions with answers available
+    def choose_poss_declensions(self, pos):
+
+        # Get all correct answers
+        self.correct_forms = []
+        for form in self.forms:
+            numgen, case = form.split('_')
+            try:
+                self.correct_forms.append(get_declension(self.dict, self.word, pos, numgen, case))
+            except:
+                self.correct_forms.append([None])
+
+        # Remove forms without answers
+        for i in range(len(self.forms)-1,-1,-1):
+            if self.correct_forms[i] == [None]:
+                self.correct_forms.pop(i)
+                self.forms.pop(i)
+
+    # Selects order of form subquestions
+    def add_poss_forms(self):
+
+        # Skips if no forms possible
+        if len(self.forms) == 0:
+            self.skip = True
+            return
+        
+        # Randomises list order and adds to subquestions
+        non_form_len = len(self.sub_qs)
+        form_zip = list(zip(self.forms, self.correct_forms))
+        self.correct = []
+        while len(self.sub_qs) < int(self.trainer.inflections_no.get()) + non_form_len:
+            random.shuffle(form_zip)
+            random_form, random_correct = zip(*form_zip)
+            self.sub_qs += list(random_form)
+            self.correct += list(random_correct)
+        if len(self.sub_qs) > int(self.trainer.inflections_no.get()) + non_form_len:
+            self.correct = self.correct[:int(self.trainer.inflections_no.get()) + non_form_len - len(self.sub_qs)]
+            self.sub_qs = self.sub_qs[:int(self.trainer.inflections_no.get()) + non_form_len - len(self.sub_qs)]
 
     # Load definition subquestion
     def load_definition(self, pos):
@@ -96,28 +136,18 @@ class question():
         self.sub_qs = self.sub_qs[1:]
     
     # Load declension subquestion
-    def load_declension(self, pos):
-            
-        # Try to get declension, skips otherwise
-        numgen, case = self.sub_qs[0].split('_')
-        try:
-            correct = get_declension(self.dict, self.word, pos, numgen, case)
-        except: 
-            correct = [None]
-        if None in correct:
-            print(f'Cannot find {self.sub_qs[0]} declension of {pos}: {self.word}')
-            self.sub_qs = self.sub_qs[1:]
-            self.next_subquestion()
-            return
+    def load_declension(self):
         
         # Loads subquestion
         gen_text = {'s': 'Singular', 'p': 'Plural', 'sma': 'Masculine (animate)', 'smi': 'Masculine (inanimate)', 
                     'sf': 'Feminine', 'sn': 'Neuter', 'pv': 'Virile', 'pnv': 'Non-virile'}
         case_text = {'n': 'nominative', 'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
                      'i': 'instrumental', 'l': 'locative', 'v': 'vocative'}
+        numgen, case = self.sub_qs[0].split('_')
         q_text = gen_text[numgen] + ', ' + case_text[case] + ':'
-        self.load_subquestion(q_text, correct, self.simple_correct)
+        self.load_subquestion(q_text, self.correct[0], self.simple_correct)
         self.sub_qs = self.sub_qs[1:]
+        self.correct = self.correct[1:]
 
     # Load subquestion
     def load_subquestion(self, text, correct, command):
@@ -283,7 +313,7 @@ class verb_question(question):
             if case_var.get():
                 tenses.append(all_tenses[i])
         
-        # Choose declension for each sub question
+        # Choose conjugation for each sub question
         for i in range(int(self.trainer.inflections_no.get())):
 
             # Get aspect
@@ -378,35 +408,38 @@ class adj_question(question):
     # Choose declensions to ask
     def choose_declensions(self):
 
+        self.get_all_declensions()
+        self.choose_poss_declensions('adj')
+        self.add_poss_forms()
+
+    # Gets all requested declensions
+    def get_all_declensions(self):
+
+        # List of all requested declensions
+        self.forms = []
+
         # Virile nominative only
         if self.trainer.case_vars[0].get():
-            self.sub_qs += ['pv_n']*int(self.trainer.inflections_no.get())
-            return
-        
-        # Get active cases
-        all_cases = ['n', 'g', 'd', 'a', 'i', 'l', 'v']
-        cases = []
-        for i, case_var in enumerate(self.trainer.case_vars[1]):
-            if case_var.get():
-                cases.append(all_cases[i])
-        
-        # Choose declension for each sub question
-        for i in range(int(self.trainer.inflections_no.get())):
+            self.forms = ['pv_n']
 
-            # Choose gender
-            gen = ['sm', 'sf', 'sn', 'pv', 'pnv'][random.randint(0,4)]
-            if gen == 'sm':
-                gen += ['a', 'i'][random.randint(0,1)]
+        else:
+            # Get active cases
+            all_cases = ['n', 'g', 'd', 'a', 'i', 'l', 'v']
+            cases = []
+            for i, case_var in enumerate(self.trainer.case_vars[1]):
+                if case_var.get():
+                    cases.append(all_cases[i])
             
-            # Choose case and combine
-            cas = cases[random.randint(0,len(cases)-1)]
-            self.sub_qs.append(gen+'_'+cas)
+            # Form all combinations
+            for case in cases:
+                for gen in ['sma', 'smi', 'sf', 'sn', 'pv', 'pnv']:
+                    self.forms.append(gen+'_'+case)
     
     # Load next subquestion
     def next_subquestion(self):
 
         # Check if end of sub questions
-        if len(self.sub_qs) == 0:
+        if len(self.sub_qs) == 0 or self.skip==True:
             self.end_question()
             return
         
@@ -420,7 +453,7 @@ class adj_question(question):
 
         # Inflection question
         elif '_' in self.sub_qs[0]:
-            self.load_declension('adj')
+            self.load_declension()
 
 # Load noun questions
 class noun_question(question):
@@ -448,6 +481,16 @@ class noun_question(question):
 
     # Choose declensions to ask
     def choose_declensions(self):
+
+        self.get_all_declensions()
+        self.choose_poss_declensions('noun')
+        self.add_poss_forms()
+
+    # Choose declensions to ask
+    def get_all_declensions(self):
+
+        # List of all requested declensions
+        self.forms = []
         
         # Get active cases
         all_cases = ['n', 'g', 'd', 'a', 'i', 'l', 'v']
@@ -456,21 +499,12 @@ class noun_question(question):
             if case_var.get():
                 cases.append(all_cases[i])
         
-        # Choose declension for each sub question
-        for i in range(int(self.trainer.inflections_no.get())):
-
-            # Choose gender
-            if self.trainer.excl_singnom.get() and cases == ['n']:
-                gen = 'p'
-            else:
-                gen = ['s', 'p'][random.randint(0,1)]
-            
-            # Choose case and combine
-            if self.trainer.excl_singnom.get() and gen == 's' and 'n' in cases:
-                cas = cases[random.randint(1,len(cases)-1)]
-            else:
-                cas = cases[random.randint(0,len(cases)-1)]
-            self.sub_qs.append(gen+'_'+cas)
+        # Form all combinations
+        for case in cases:
+            for gen in ['s', 'p']:
+                self.forms.append(gen+'_'+case)
+        if self.trainer.excl_singnom.get() and 's_n' in self.forms:
+            self.forms.remove('s_n')
     
     # Load next subquestion
     def next_subquestion(self):
@@ -490,7 +524,7 @@ class noun_question(question):
 
         # Inflection question
         elif '_' in self.sub_qs[0]:
-            self.load_declension('noun')
+            self.load_declension()
 
 
             

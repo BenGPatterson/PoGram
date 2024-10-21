@@ -222,5 +222,5 @@ if __name__ == '__main__':
     # print(get_conjugation(word_dict, 'mieć', 'verb', 'v', '2p', 'pa'))
     # for sense in word_dict['mieć']['verb']:
     #     print(sense['head_templates'][0]['args']['1'])
-    for sense in word_dict['będę'].keys():
-        print(word_dict['będę'][sense])
+    for sense in word_dict['musieć'].keys():
+        print(word_dict['musieć'][sense])

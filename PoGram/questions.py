@@ -6,17 +6,45 @@ from dictionary import get_definition, get_derived_word, get_conjugation, get_de
 
 # Base class for all question loaders
 class question():
-    def __init__(self, *args, **kwargs):
+    def __init__(self, pos, *args, **kwargs):
         for widget in self.q_panel.q_frame.winfo_children():
             widget.destroy()
-        self.choose_word()
+        self.skip = False
+        self.choose_word(pos)
 
     # Choose word and update title
-    def choose_word(self):#
-        self.skip = False
-        self.word = self.word_list[random.randint(0,len(self.word_list)-1)].lower()
+    def choose_word(self, pos):
+        
+        # Randomise new word list if current empty
+        if len(self.game.current_word_lists[pos]) == 0:
+            random.shuffle(self.game.word_lists[pos])
+            self.game.current_word_lists[pos] = self.game.word_lists[pos].copy()
+
+        # Pick next word in list
+        self.word = self.game.current_word_lists[pos][0]
+        self.game.current_word_lists[pos] = self.game.current_word_lists[pos][1:]
+
+        # Update title with new word
         self.q_panel.parent.title_frame.word.set(self.word)
         self.q_panel.parent.title_frame.update()
+
+    # Keeps only conjugations with answers available
+    def choose_poss_conjugations(self, pos):
+
+        # Get all correct answers
+        self.correct_forms = []
+        for form in self.forms:
+            gen, voice, tense = form.split('_')
+            try:
+                self.correct_forms.append(get_conjugation(self.dict, self.word, pos, gen, voice, tense))
+            except:
+                self.correct_forms.append([None])
+
+        # Remove forms without answers
+        for i in range(len(self.forms)-1,-1,-1):
+            if self.correct_forms[i] == [None]:
+                self.correct_forms.pop(i)
+                self.forms.pop(i)
 
     # Keeps only declensions with answers available
     def choose_poss_declensions(self, pos):
@@ -97,25 +125,14 @@ class question():
         self.sub_qs = self.sub_qs[1:]
 
     # Load conjugation subquestion
-    def load_conjugation(self, pos):
-            
-        # Try to get declension, skips otherwise
-        gen, voice, tense = self.sub_qs[0].split('_')
-        try:
-            correct = get_conjugation(self.dict, self.word, pos, gen, voice, tense)
-        except: 
-            correct = [None]
-        if None in correct:
-            print(f'Cannot find {self.sub_qs[0]} conjugation of {pos}: {self.word}')
-            self.sub_qs = self.sub_qs[1:]
-            self.next_subquestion()
-            return
+    def load_conjugation(self):
         
         # Loads subquestion
         tense_text = {'pr': 'Present', 'pa': 'Past', 'f': 'Future', 'c': 'Conditional', 'i': 'Imperative', 'v': 'Verbal noun',
                       'par-act': 'Active adjectival participle', 'par-pas': 'passive adjectival participle',
                       'par-cont': 'Contemporary adverbial participle', 'par-ant': 'anterior adverbial participle'}
         gen_text = {'m': 'masculine', 'f': 'feminine', 'n': 'neuter', 'v': 'virile', 'nv': 'non-virile'}
+        gen, voice, tense = self.sub_qs[0].split('_')
         if gen == '-':
             voice_text = {'1s': '1st person singular', '2s': '2nd person singular', '3s': '3rd person singular',
                           '1p': '1st person plural', '2p': '2nd person plural', '3p': '3rd person plural',
@@ -132,8 +149,9 @@ class question():
             q_text += f' ({gen_text[gen]}):'
         elif gen != '-' and voice != '-':
             q_text += f' ({gen_text[gen]}) ({voice_text[voice]}):'
-        self.load_subquestion(q_text, correct, self.simple_correct)
+        self.load_subquestion(q_text, self.correct[0], self.simple_correct)
         self.sub_qs = self.sub_qs[1:]
+        self.correct = self.correct[1:]
     
     # Load declension subquestion
     def load_declension(self):
@@ -168,7 +186,6 @@ class question():
         # Update frame
         self.q_panel.q_frame_update()
         self.q_panel.q_frame_update()
-
 
     # Check if definition is correct
     def def_correct(self, widget, answer, correct):
@@ -281,15 +298,14 @@ class question():
 
 # Load verb questions
 class verb_question(question):
-    def __init__(self, game, q_panel, trainer, word_list, dictionary, *args, **kwargs):
+    def __init__(self, game, q_panel, trainer, dictionary, *args, **kwargs):
         self.game = game
         self.q_panel = q_panel
         self.trainer = trainer
-        self.word_list = word_list
         self.dict = dictionary
         self.q_panel.parent.title_frame.configure(bg='#ffdfba')
         self.q_panel.parent.title_frame.word_lbl.configure(bg='#ffdfba')
-        question.__init__(self, *args, **kwargs)
+        question.__init__(self, 'verb', *args, **kwargs)
 
         # Decide subquestions
         self.sub_qs = []
@@ -305,6 +321,16 @@ class verb_question(question):
 
     # Choose declensions to ask
     def choose_conjugations(self):
+
+        self.get_all_conjugations()
+        self.choose_poss_conjugations('verb')
+        self.add_poss_forms()
+    
+    # Gets all requested conjugations
+    def get_all_conjugations(self):
+
+        # List of all requested conjugations
+        self.forms = []
         
         # Get active tenses
         all_tenses = ['pr', 'pa', 'f', 'c', 'i', 'par', 'v']
@@ -312,52 +338,58 @@ class verb_question(question):
         for i, case_var in enumerate(self.trainer.tense_vars):
             if case_var.get():
                 tenses.append(all_tenses[i])
+
+        # Get aspect
+        aspect = get_derived_word(self.dict, self.word, 'verb', 'asp')
         
-        # Choose conjugation for each sub question
-        for i in range(int(self.trainer.inflections_no.get())):
+        # Choose possible participle tense
+        if 'par' in tenses:
+            tenses.remove('par')
+            if self.word == 'być':
+                tenses.append(['par-act', 'par-cont', 'par-ant'][random.randint(0,2)])
+            elif 'i' in aspect:
+                tenses.append(['par-act', 'par-pas', 'par-cont'][random.randint(0,2)])
+            elif 'p' in aspect:
+                tenses.append(['par-pas', 'par-ant'][random.randint(0,1)])
 
-            # Get aspect
-            aspect = get_derived_word(self.dict, self.word, 'verb', 'asp')
-            
-            # Choose tense
-            tense = tenses[random.randint(0,len(tenses)-1)]
-            if tense == 'par':
-                if self.word == 'być':
-                    tense = ['par-act', 'par-cont', 'par-ant'][random.randint(0,2)]
-                elif 'i' in aspect:
-                    tense = ['par-act', 'par-pas', 'par-cont'][random.randint(0,2)]
-                elif 'p' in aspect:
-                    tense = ['par-pas', 'par-ant'][random.randint(0,1)]
-            elif tense == 'pr' and 'p' in aspect:
-                tense = 'f'
+        # Loop tenses
+        for tense in tenses:
 
-            # Choose voice
+            # Choose possible voices
             if tense in ['pr', 'pa', 'f', 'c']:
-                if self.word == 'być':
-                    voice = ['1s', '2s', '3s', '1p', '2p', '3p'][random.randint(0,5)]
+                if self.word == 'być' or self.trainer.excl_impers.get():
+                    voices = ['1s', '2s', '3s', '1p', '2p', '3p']
                 else:
-                    voice = ['1s', '2s', '3s', '1p', '2p', '3p', 'i'][random.randint(0,6)]
+                    voices = ['1s', '2s', '3s', '1p', '2p', '3p', 'i']
             elif tense == 'i':
-                voice = ['1s', '2s', '3s', '1p', '2p', '3p'][random.randint(0,5)]
-            else:
-                voice = '-'
-            
-            # Choose gender
-            if tense in ['pa', 'f', 'c', 'par-act', 'par-pas'] and voice != 'i':
-                if tense == 'f' and ('p' in aspect or self.word == 'być'):
-                    gen = '-'
+                if self.trainer.excl_niech.get():
+                    voices = ['2s', '1p', '2p']
                 else:
-                    if 's' in voice:
-                        gen = ['m', 'f', 'n'][random.randint(0,2)]
-                    elif 'p' in voice:
-                        gen = ['v', 'nv'][random.randint(0,1)]
-                    else:
-                        gen = ['m', 'f', 'n', 'v', 'nv'][random.randint(0,4)]
+                    voices = ['1s', '2s', '3s', '1p', '2p', '3p']
             else:
-                gen = '-'
-            
-            # Combine
-            self.sub_qs.append(gen+'_'+voice+'_'+tense)
+                voices = ['-']
+
+            # Loop voices
+            for voice in voices:
+
+                # Choose gender
+                if tense in ['pa', 'f', 'c'] and voice != 'i':
+                    if tense == 'f' and ('p' in aspect or self.word == 'być'):
+                        gens = ['-']
+                    elif 's' in voice:
+                        gens = ['m', 'f', 'n']
+                    elif 'p' in voice:
+                        gens = ['v', 'nv']
+                    else:
+                        gens = ['m', 'f', 'n', 'v', 'nv']
+                elif tense in ['par-act', 'par-pas']:
+                    gens = ['m', 'f', 'n', 'v', 'nv'][random.randint(0,4)]
+                else:
+                    gens = ['-']
+
+                # Loop genders and form all combinations
+                for gen in gens:
+                    self.forms.append(gen+'_'+voice+'_'+tense)
     
     # Load next subquestion
     def next_subquestion(self):
@@ -377,19 +409,18 @@ class verb_question(question):
 
         # Inflection question
         elif '_' in self.sub_qs[0]:
-            self.load_conjugation('verb')
+            self.load_conjugation()
 
 # Load adjective questions
 class adj_question(question):
-    def __init__(self, game, q_panel, trainer, word_list, dictionary, *args, **kwargs):
+    def __init__(self, game, q_panel, trainer, dictionary, *args, **kwargs):
         self.game = game
         self.q_panel = q_panel
         self.trainer = trainer
-        self.word_list = word_list
         self.dict = dictionary
         self.q_panel.parent.title_frame.configure(bg='#ffffba')
         self.q_panel.parent.title_frame.word_lbl.configure(bg='#ffffba')
-        question.__init__(self, *args, **kwargs)
+        question.__init__(self, 'adj', *args, **kwargs)
 
         # Decide subquestions
         self.sub_qs = []
@@ -457,15 +488,14 @@ class adj_question(question):
 
 # Load noun questions
 class noun_question(question):
-    def __init__(self, game, q_panel, trainer, word_list, dictionary, *args, **kwargs):
+    def __init__(self, game, q_panel, trainer, dictionary, *args, **kwargs):
         self.game = game
         self.q_panel = q_panel
         self.trainer = trainer
-        self.word_list = word_list
         self.dict = dictionary
         self.q_panel.parent.title_frame.configure(bg='#baffc9')
         self.q_panel.parent.title_frame.word_lbl.configure(bg='#baffc9')
-        question.__init__(self, *args, **kwargs)
+        question.__init__(self, 'noun', *args, **kwargs)
 
         # Decide subquestions
         self.sub_qs = []

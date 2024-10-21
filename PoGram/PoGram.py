@@ -46,6 +46,7 @@ class tkinterApp(tk.Tk):
 
 # Driver Code
 if __name__ == '__main__':
+        
     app = tkinterApp()
     app.after(250, app.load_dict)
     app.mainloop()

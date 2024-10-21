@@ -29,6 +29,7 @@ class Game():
         self.total_correct = 0
         self.total_questions = 0
         self.word_lists = {}
+        self.current_word_lists = {}
         self.next_question()
 
     # Loads next question
@@ -53,7 +54,7 @@ class Game():
     # Load word list
     def load_word_list(self, key, controller):
 
-        # No word list required for miscallenous questions
+        # No word list required for miscellaneous questions
         if key != 'misc':
 
             # Load custom list if requested
@@ -76,14 +77,13 @@ class Game():
 
             # Save word list
             self.word_lists[key] = list(file['lemma'])
+            self.current_word_lists[key] = []
 
     # Load question
     def load_question(self, key):
         question_loaders = {'misc': adj_question, 'verb': verb_question, 'adj': adj_question, 'noun': noun_question}
-        if key != 'misc':
-            question_loaders[key](self, self.q_panel, self.trainers[key], self.word_lists[key], self.dict)
-        else:
-            question_loaders[key](self. self.q_panel, self.trainers[key], self.dict)
+        question_loaders[key](self, self.q_panel, self.trainers[key], self.dict)
+
 
     # Checks valid trainer settings and gets active trainers
     def sense_check(self, parent):

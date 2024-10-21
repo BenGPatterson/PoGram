@@ -128,7 +128,7 @@ class trainer_frame(tk.Frame):
         elif self.custom_list is None:
             self.word_list.set('freq')
 
-    # Enfore disabling restrictions on settings
+    # Enforce disabling restrictions on settings
     def disable_restrictions(self, vars_list, ts_list, widgets_list):
         for i in range(len(vars_list)):
             for j in range(len(vars_list[i])):
@@ -141,7 +141,7 @@ class trainer_frame(tk.Frame):
                 widget.bind('<Button-3>', lambda *args, w=widget, vs=vars, idx=i: self.multi_select(*args, w, vs, idx), target_widget='btn')
             else:
                 widget.bind('<Button-3>', lambda *args, w=widget, vs=vars, idx=i: self.multi_select(*args, w, vs, idx))
-            var.trace_add('write', lambda *args, w=widget, vs=self.qs: self.min_check(w, vs, args[0]))
+            var.trace_add('write', lambda *args, w=widget, vs=vars: self.min_check(w, vs, args[0]))
 
     # At least one option must be selected
     def min_check(self, widget, vars, var):
@@ -246,10 +246,20 @@ class verb_trainer(trainer_frame):
         conj_btns = self.load_dcol(7, tenses, self.tense_vars, return_btns=True)
         self.line_border(11)
 
+        # Load additional settings
+        self.excl_impers = tk.IntVar(value=self.config['excl_impers'])
+        impers_btn = tk.Checkbutton(self, variable=self.excl_impers, onvalue=1, offvalue=0,
+                                    text='Exclude impersonal', bg=self.bg, activebackground=self.bg)
+        impers_btn.grid(row=12, column=0, columnspan=2, padx=(5,0), sticky='w')
+        self.excl_niech = tk.IntVar(value=self.config['excl_niech'])
+        niech_btn = tk.Checkbutton(self, variable=self.excl_niech, onvalue=1, offvalue=0,
+                                   text='Exclude niech imp.', bg=self.bg, activebackground=self.bg)
+        niech_btn.grid(row=13, column=0, columnspan=2, padx=(5,0), sticky='w')
+
         # Enforce disabling restrictions
         vars_list = [[self.qs[2]]]
         ts_list = [[[1]]]
-        widgets_list = [conj_btns]
+        widgets_list = [[*conj_btns, impers_btn, niech_btn]]
         self.disable_restrictions(vars_list, ts_list, widgets_list)
 
         # Enforce at least one option select, and multi-select functionality
@@ -257,7 +267,7 @@ class verb_trainer(trainer_frame):
         self.link_buttons(self.tense_vars, conj_btns)
 
         # Load word lists
-        self.load_word_lists(12)
+        self.load_word_lists(14)
 
         # Finish loading
         self.toggle_active(widget_status=self.config['widget_status'])
@@ -277,6 +287,8 @@ class verb_trainer(trainer_frame):
         config['tense_vars'] = []
         for i in range(len(self.tense_vars)):
             config['tense_vars'].append(self.tense_vars[i].get())
+        config['excl_impers'] = self.excl_impers.get()
+        config['excl_niech'] = self.excl_niech.get()
         config['word_list'] = self.word_list.get()
         config['freq_no'] = self.freq_no.get()
         config['custom_list'] = self.custom_list

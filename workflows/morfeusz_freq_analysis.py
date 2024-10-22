@@ -1,11 +1,10 @@
 from morfeusz2 import Morfeusz
-from workflows.concraft_pl2 import Concraft, Server # Requires concraft_pl2.py (https://github.com/kawu/concraft-pl) in the same directory
+from concraft_pl2 import Concraft, Server # Requires concraft_pl2.py (https://github.com/kawu/concraft-pl) in the same directory
 import os
 import pandas as pd
-import gc
-import gzip
-import pickle
 import time
+from importlib.machinery import SourceFileLoader
+dict_fns = SourceFileLoader('dict_fns', os.path.join('PoGram', 'dictionary.py')).load_module()
 
 # Convert Morfeusz pos to wiktionary pos
 pos_conv = {'adv': 'adv', 'imps': 'verb', 'inf': 'verb', 'prep': 'prep', 'praet': 'verb', 'bedzie': 'verb', 'pact': 'verb', 'ppas': 'verb', 
@@ -47,7 +46,7 @@ try:
             for item in res:
                 try:
                     wiki_pos = pos_conv[item[2][2].split(':')[0]]
-                    lemma = item[2][1].split(':')[0].lower()
+                    lemma = item[2][1].split(':')[0]
                     prob = float(item[3])
                     try:
                         word_freqs[wiki_pos][lemma] += prob
@@ -60,6 +59,7 @@ try:
             count += 1
             if count%100 == 0:
                 print(f'\rAnalysed {count} sentences', end='')
+
 finally:
     server.terminate()
 end = time.time()
@@ -67,15 +67,26 @@ print(f'\nAnalysis complete in {end-start} seconds')
 
 # Load wiki pages for post-processing sanity checks
 print('Loading dictionary')
-data_path = os.path.join('data', 'wiki_entries.pgz')
-gc.disable()
-with gzip.open(data_path, "rb") as f:
-    dictionary = pickle.load(f)
-gc.enable()
+data_path = os.path.join('PoGram', 'data', 'wiki_entries.pgz')
+dictionary = dict_fns.load_dictionary(data_path)
 
+# Start pruning words
 del_word_freqs = []
 del_word_lemmas = []
 print('Performing sanity checks and saving data')
+
+# Redirect specified lemmas (e.g. to musieć from outdated spelling musić)
+redirects = {('verb', 'musić'): ['verb', 'musieć']}
+for r_key in redirects.keys():
+    if r_key[0] in word_freqs.keys():
+        if r_key[1] in word_freqs[r_key[0]].keys():
+            item = redirects[r_key]
+            word_freqs[item[0]][item[1]] += word_freqs[r_key[0]][r_key[1]]
+            del_word_freqs.append(word_freqs[r_key[0]][r_key[1]])
+            del_word_lemmas.append(r_key[1])
+            del word_freqs[r_key[0]][r_key[1]]
+
+# Loop through all keys and lemmas
 for key in word_freqs:
     del_words = []
     for lemma in word_freqs[key]:
@@ -92,11 +103,32 @@ for key in word_freqs:
             del_word_freqs.append(word_freqs[key][lemma])
             del_word_lemmas.append(lemma)
             del_words.append(lemma)
+
         else:                
-            # Check word is in dictionary
+            # Check words meet checks
+            valid = True
             try:
+                # Check word in dictionary
                 test_word = dictionary[lemma][wiki_pos]
+
+                # Check most basic form of lemma exists
+                check_form = True
+                if wiki_pos == 'verb':
+                    basic_form = dict_fns.get_conjugation(dictionary, lemma, 'verb', '-', '1s', 'pr')
+                elif wiki_pos == 'adj':
+                    basic_form = dict_fns.get_declension(dictionary, lemma, 'adj', 'sma', 'n')
+                elif wiki_pos == 'noun':
+                    basic_form = dict_fns.get_declension(dictionary, lemma, 'noun', 's', 'n')
+                else:
+                    check_form = False
+                if check_form:
+                    if basic_form == [None]:
+                        valid = False             
+
+            # Mark invalid words to be deleted        
             except KeyError:
+                valid = False
+            if not valid:
                 del_word_freqs.append(word_freqs[key][lemma])
                 del_word_lemmas.append(lemma)
                 del_words.append(lemma)
@@ -110,7 +142,7 @@ for key in word_freqs:
     freq_list = list(word_freqs[key].values())
     df = pd.DataFrame({'lemma': lemma_list, 'freq': freq_list})
     df = df.sort_values('freq', ascending=False)
-    df_save_path = os.path.join('data', f'all_{key}.csv')
+    df_save_path = os.path.join('PoGram', 'data', f'all_{key}.csv')
     df.to_csv(df_save_path, sep=',', index=False, encoding='utf-8')
 
 # Save frequencies of deleted lemmas for testing

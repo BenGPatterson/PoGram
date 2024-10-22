@@ -1,11 +1,14 @@
 To do:
 
-Currently have all lemmas saved in lower case - should change this because of e.g. Polska
-Add verification for verbs, adj, nouns that must have most basic conjugation/declension to add to all_pos.csv lists
-Also redirect musić (outdated spelling) to musieć
+all_winien.csv now empty after new morfeusz_freq_analysis.py - probably got mistakenly flagged by a new sanity check introduced
 
 Can probably merge both interrogative pronoun settings
-Need to decide on numerals, quantifiers categories to put in misc trainer.
+Need to decide on numerals, quantifiers categories to put in misc trainer:
+- cardinals ('word' is e.g. 100, ask for polish name and 3 declensions - trzy, cztery don't have declensions in wiki data, may need to hardcode)
+- ordinals ('word' is e.g. 100., ask for polish name and 3 declensions - should we include plural declensions?)
+- there are also collective numerals, and quantifiers
+- also complex rules around case of noun or whether noun phrase is singular/pronoun, may want to ask question here
+  (not sure whether different question type or subq of above qs (with option to inc/exclude?))
 
 Customisable keybind settings
 

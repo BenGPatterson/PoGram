@@ -27,7 +27,7 @@ def process_wiki_pages(source, destination):
     for sense_raw in raw_data:
 
         # Used to store sense in processed dictionary
-        word = sense_raw['word'].lower()
+        word = sense_raw['word']
         pos = sense_raw['pos']
 
         # Keeps only certain information
@@ -63,8 +63,6 @@ def process_wiki_pages(source, destination):
 
 if __name__ == '__main__':
 
-    print(os.getcwd())
-
-    source_file = os.path.join('..', 'workflows', 'raw_wiki_entries.json')
-    destination_file = os.path.join('data', 'wiki_entries.pgz')
+    source_file = os.path.join('workflows', 'raw_wiki_entries.json')
+    destination_file = os.path.join('PoGram', 'data', 'wiki_entries.pgz')
     process_wiki_pages(source_file, destination_file)

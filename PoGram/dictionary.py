@@ -50,7 +50,7 @@ def get_conjugation(dictionary, lemma, pos, gen, voice, tense):
 
     # Find corresponding conjugation(s)
     conjugations = set()
-    for sense in dictionary[lemma.lower()][pos]:
+    for sense in dictionary[lemma][pos]:
         try:
             conjugation = set(item['form'] for item in sense['forms'] if set(item['tags']) == tags)
             conjugations.update(conjugation)
@@ -62,7 +62,7 @@ def get_conjugation(dictionary, lemma, pos, gen, voice, tense):
     # Retry with 1st/2nd person tag removed
     if '1' in str(voice) and None in conjugations:
         tags.remove('first-person')
-        for sense in dictionary[lemma.lower()][pos]:
+        for sense in dictionary[lemma][pos]:
             try:
                 conjugation = list(item['form'] for item in sense['forms'] if set(item['tags']) == tags)
                 conjugation = set(conjugation[:int(len(conjugation)/2)])
@@ -71,7 +71,7 @@ def get_conjugation(dictionary, lemma, pos, gen, voice, tense):
                 pass
     elif '2' in str(voice) and None in conjugations:
         tags.remove('second-person')
-        for sense in dictionary[lemma.lower()][pos]:
+        for sense in dictionary[lemma][pos]:
             try:
                 conjugation = list(item['form'] for item in sense['forms'] if set(item['tags']) == tags)
                 conjugation = set(conjugation[int(len(conjugation)/2):])
@@ -113,7 +113,7 @@ def get_declension(dictionary, lemma, pos, numgen, case):
     declensions = set()
     for pos_ in backups:
         try:
-            for sense in dictionary[lemma.lower()][pos_]:
+            for sense in dictionary[lemma][pos_]:
                 if pos == 'adj' and pos_ == 'verb' and sense['head_templates'][0]['name'] != 'pl-participle':
                     continue
                 declension = next((item['form'] for item in sense['forms'] if set(item['tags']) == tags), None)
@@ -142,7 +142,7 @@ def get_derived_word(dictionary, lemma, pos, form):
                    'impf': ['i', 'imperfective'],
                    'pf': ['p', 'perfective'],
                    'pl': []}
-        for sense in dictionary[lemma.lower()][pos]:
+        for sense in dictionary[lemma][pos]:
             aspect = sense['head_templates'][0]['args']['1']
             derived.update(aspects[aspect])
 
@@ -153,7 +153,7 @@ def get_derived_word(dictionary, lemma, pos, form):
                    'asp_if': 'freq',
                    'asp_i': 'impf',
                    'asp_p': 'pf'}
-        for sense in dictionary[lemma.lower()][pos]:
+        for sense in dictionary[lemma][pos]:
             target = aspects[form]
             all_aspects = list(sense['head_templates'][0]['args'].keys())
             if target == 'indet':
@@ -175,7 +175,7 @@ def get_derived_word(dictionary, lemma, pos, form):
 
     # Handle adverbs differently
     elif form == 'adv':
-        for sense in dictionary[lemma.lower()][pos]:
+        for sense in dictionary[lemma][pos]:
             try:
                 if sense['head_templates'][0]['args']['adv'] == '-':
                     derived.add(None)
@@ -193,7 +193,7 @@ def get_derived_word(dictionary, lemma, pos, form):
         tags = derived_tags[form]
 
         # Find comparative or superlative
-        for sense in dictionary[lemma.lower()][pos]:
+        for sense in dictionary[lemma][pos]:
             derive = next((item['form'] for item in sense['forms'] if set(item['tags']) == tags), None)
             derived.add(derive)
         while None in derived and len(derived) > 1:
@@ -222,5 +222,5 @@ if __name__ == '__main__':
     # print(get_conjugation(word_dict, 'mieć', 'verb', 'v', '2p', 'pa'))
     # for sense in word_dict['mieć']['verb']:
     #     print(sense['head_templates'][0]['args']['1'])
-    for sense in word_dict['musieć'].keys():
-        print(word_dict['musieć'][sense])
+    for sense in word_dict['dwa'].keys():
+        print(word_dict['dwa'][sense])

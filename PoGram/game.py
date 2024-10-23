@@ -84,7 +84,6 @@ class Game():
         question_loaders = {'misc': adj_question, 'verb': verb_question, 'adj': adj_question, 'noun': noun_question}
         question_loaders[key](self, self.q_panel, self.trainers[key], self.dict)
 
-
     # Checks valid trainer settings and gets active trainers
     def sense_check(self, parent):
         
@@ -101,8 +100,6 @@ class Game():
         
         # Checks all entry variables for positive integers
         for key in self.trainers.keys():
-            if key == 'misc':
-                continue
 
             # Check inflections entry if selected
             if self.trainers[key].qs[2].get():
@@ -112,15 +109,17 @@ class Game():
                     return
             
             # Check word list freq entry if selected
-            if self.trainers[key].word_list.get() == 'freq':
-                freq_no = self.trainers[key].inflections_no.get()
-                if not self.check_pos_int_entry(freq_no):
-                    self.trainers = None
-                    return
+            if key != 'misc':
+                if self.trainers[key].word_list.get() == 'freq':
+                    freq_no = self.trainers[key].freq_no.get()
+                    if not self.check_pos_int_entry(freq_no):
+                        self.trainers = None
+                        return
                 
         # Check question number entry
         w_no = parent.menu_frame.w_no.get()
         if not self.check_pos_int_entry(w_no):
+            self.trainers = None
             return None
 
     # Checks entry string for positive integer

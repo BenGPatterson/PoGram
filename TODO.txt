@@ -1,19 +1,32 @@
 To do:
 
 all_winien.csv now empty after new morfeusz_freq_analysis.py - probably got mistakenly flagged by a new sanity check introduced
+found and fixed issue, just need to rerun script
 
-Can probably merge both interrogative pronoun settings
-Need to decide on numerals, quantifiers categories to put in misc trainer:
-- cardinals ('word' is e.g. 100, ask for polish name and 3 declensions - trzy, cztery don't have declensions in wiki data, may need to hardcode)
-- ordinals ('word' is e.g. 100., ask for polish name and 3 declensions - should we include plural declensions?)
-- there are also collective numerals, and quantifiers
-- also complex rules around case of noun or whether noun phrase is singular/pronoun, may want to ask question here
-  (not sure whether different question type or subq of above qs (with option to inc/exclude?))
+Updated menu settings page to have planned misc options:
+
+- Personal pronouns (ja, ty, on, etc.) (include polite forms)
+- Possessive pronouns (mój, twój, nasz, etc.) (only include 1p and 2p - 3p do not inflect)
+- Demonstrative pronouns (ten, tamten)
+- Interrogative pronouns (co, kto, coś, ktoś, ktokolwiek, cokolwiek, nikt, nic)
+- Other pronouns (który, wszystek, każdy, żaden)
+
+- Cardinal numerals (jeden, dwa, trzy, etc.) (dwa, trzy, cztery and possible others do not have declensions in wiki data, may need to hardcode)
+- Collective numerals (dwoje, troje, czworo, etc.)
+- Quantifiers (kilka, parę, wiele, ile, tyle) (kilkanaście, kilkadziesiąt, kilkaset, etc.) (oba, obydwa, dwa, oboje, obydwoje, dwoje)
+- Whether to ask about noun phrase for above (case noun takes, gender/plurality of noun phrase)
+- Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
+Should add option for number of digits for number (e.g. 2 digit numbers, 3 digits numbers etc.)
+
+- Prepositions (ask for definiton and case(s) following them)
+- Winien-like verbs (winien, powinien)
+
+- Inflections (number of inflections to ask for in each of above questions)
 
 Customisable keybind settings
 
 Compeleted workflows processes:
 
-Processed wiki entries downloaded from https://kaikki.org/dictionary/Polish/words/index.html.
-http://morfeusz.sgjp.pl/en and https://github.com/kawu/concraft-pl/tree/master/bindings/python used to identify lemmas of words in sentences (with probability). 
-Applied to (Web com 2018 1M) corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.
+- Processed wiki entries downloaded from https://kaikki.org/dictionary/Polish/words/index.html.
+- http://morfeusz.sgjp.pl/en and https://github.com/kawu/concraft-pl/tree/master/bindings/python used to identify lemmas of words in sentences (with probability). 
+- Applied to (Web com 2018 1M) corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.

@@ -113,11 +113,11 @@ for key in word_freqs:
 
                 # Check most basic form of lemma exists
                 check_form = True
-                if wiki_pos == 'verb':
+                if key == 'verb':
                     basic_form = dict_fns.get_conjugation(dictionary, lemma, 'verb', '-', '1s', 'pr')
-                elif wiki_pos == 'adj':
+                elif key == 'adj':
                     basic_form = dict_fns.get_declension(dictionary, lemma, 'adj', 'sma', 'n')
-                elif wiki_pos == 'noun':
+                elif key == 'noun':
                     basic_form = dict_fns.get_declension(dictionary, lemma, 'noun', 's', 'n')
                 else:
                     check_form = False

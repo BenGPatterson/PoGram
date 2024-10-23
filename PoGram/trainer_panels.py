@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+from itertools import product
 import tkinter as tk
 from tkinter import filedialog
 from custom_widgets import Entrybutton, Lineborder, show_widget
@@ -87,11 +88,14 @@ class trainer_frame(tk.Frame):
             return definitions, derived_words, inflections
     
     # Load double columned list of settings
-    def load_dcol(self, row, texts, vars, return_btns=False):
+    def load_dcol(self, row, texts, vars, return_btns=False, last_span=False):
         dcol_btns = []
-        for i, case in enumerate(texts):
-            dcol_btns.append(tk.Checkbutton(self, variable=vars[i], onvalue=1, offvalue=0, text=case, bg=self.bg, activebackground=self.bg))
-            dcol_btns[-1].grid(row=row+int(i/2), column=i%2, padx=((1-i%2)*5,0),  sticky='w')
+        for i, text in enumerate(texts):
+            dcol_btns.append(tk.Checkbutton(self, variable=vars[i], onvalue=1, offvalue=0, text=text, bg=self.bg, activebackground=self.bg))
+            if last_span and i == len(texts)-1:
+                dcol_btns[-1].grid(row=row+int(i/2), column=i%2, columnspan=2, padx=((1-i%2)*5,0), sticky='w')
+            else:
+                dcol_btns[-1].grid(row=row+int(i/2), column=i%2, padx=((1-i%2)*5,0), sticky='w')
         if return_btns:
             return dcol_btns
          
@@ -169,7 +173,7 @@ class trainer_frame(tk.Frame):
     # Draw horizontal line border at specified position
     def line_border(self, row):
         line = Lineborder(self)
-        line.grid(row=row, column=0, columnspan=2, padx=3, pady=8, sticky='ew')
+        line.grid(row=row, column=0, columnspan=2, padx=3, pady=6, sticky='ew')
 
 # Train miscellaneous  
 class misc_trainer(trainer_frame):
@@ -181,15 +185,31 @@ class misc_trainer(trainer_frame):
         self.line_border(2)
 
         # Load pronoun questions
-        text_list = ['Personal', 'Possessive', 'Demonstrative', 'Interrogative', 'Derived interrogative', 'Other', 'Prepositions']
+        text_list = ['Personal pronouns', 'Possessive pron.', 'Demonstrative pron.', 'Interrogative pron.', 'Other pronouns', 
+                     'Cardinal numerals', 'Collective numerals', 'Quantifiers', 'Ask about noun phrase', 'Ordinal numerals',
+                     'Prepositions', 'Winien-like verbs']
         self.qs = []
         for i in range(len(text_list)):
             self.qs.append(tk.IntVar(value=self.config['qs'][i]))
-        other_rows = {3: 'Pronouns:', 10: None, 11: 'Numerals and quantifiers:', 12: '(coming soon)', 13: None}
+        other_rows = {8: None, 14: None}
         misc_btns = self.load_scol(3, text_list, self.qs, other_rows=other_rows, return_btns=True)
 
+        # Load option to select number of inflections
+        self.line_border(17)
+        self.inflections_no = tk.StringVar(value=self.config['inflections_no'])
+        inf_no = Entrybutton(self, variable=None, text=f'Inflections:', textvariable=self.inflections_no, btn_type='label', 
+                           e_width=2, justify='right', int_only=True, bounded=True, bg=self.bg)
+        inf_no.grid(row=18, column=0, columnspan=2, padx=(10,0), pady=(7,0), sticky='w')
+
+        # Enforce disabling restrictions
+        vars_list = [[*self.qs[5:8]]]
+        noun_phrase_ts = [[*seq] for seq in product((True, False), repeat=3)][:-1]
+        ts_list = [noun_phrase_ts]
+        widgets_list = [[misc_btns[8]]]
+        self.disable_restrictions(vars_list, ts_list, widgets_list)
+
         # Enforce at least one option select, and multi-select functionality
-        self.link_buttons(self.qs, misc_btns)
+        self.link_buttons([*self.qs[:8], *self.qs[9:]], [*misc_btns[:8], *misc_btns[9:]])
 
         # Finish loading
         self.toggle_active(widget_status=self.config['widget_status'])
@@ -223,6 +243,7 @@ class misc_trainer(trainer_frame):
         config['qs'] = []
         for i in range(len(self.qs)):
             config['qs'].append(self.qs[i].get())
+        config['inflections_no'] = self.inflections_no.get()
         config['widget_status'] = self.widget_status
 
         return config
@@ -239,11 +260,11 @@ class verb_trainer(trainer_frame):
         self.line_border(6)
 
         # Load tense settings
-        tenses = ['Pres.', 'Past', 'Fut.', 'Cond.', 'Imp.', 'Part.', 'V. noun']
+        tenses = ['Pres.', 'Past', 'Fut.', 'Cond.', 'Imp.', 'Part.', 'Verbal noun']
         self.tense_vars = []
         for i in range(len(tenses)):
             self.tense_vars.append(tk.IntVar(value=self.config['tense_vars'][i]))
-        conj_btns = self.load_dcol(7, tenses, self.tense_vars, return_btns=True)
+        conj_btns = self.load_dcol(7, tenses, self.tense_vars, return_btns=True, last_span=True)
         self.line_border(11)
 
         # Load additional settings
@@ -257,9 +278,10 @@ class verb_trainer(trainer_frame):
         niech_btn.grid(row=13, column=0, columnspan=2, padx=(5,0), sticky='w')
 
         # Enforce disabling restrictions
-        vars_list = [[self.qs[2]]]
-        ts_list = [[[1]]]
-        widgets_list = [[*conj_btns, impers_btn, niech_btn]]
+        vars_list = [[self.qs[2]], [*self.tense_vars[0:4], self.qs[2]], [self.tense_vars[4], self.qs[2]]]
+        impers_ts = [[*seq, 1] for seq in product((True, False), repeat=4)][:-1]
+        ts_list = [[[1]], impers_ts, [[1,1]]]
+        widgets_list = [conj_btns, [impers_btn], [niech_btn]]
         self.disable_restrictions(vars_list, ts_list, widgets_list)
 
         # Enforce at least one option select, and multi-select functionality

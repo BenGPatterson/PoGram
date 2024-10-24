@@ -3,27 +3,32 @@ To do:
 all_winien.csv now empty after new morfeusz_freq_analysis.py - probably got mistakenly flagged by a new sanity check introduced
 found and fixed issue, just need to rerun script
 
-Updated menu settings page to have planned misc options:
+Updated menu settings page to have planned misc options
+Planned marked by '-', implemented marked as 'x':
 
 - Personal pronouns (ja, ty, on, etc.) (include polite forms)
 - Possessive pronouns (mój, twój, nasz, etc.) (only include 1p and 2p - 3p do not inflect)
 - Demonstrative pronouns (ten, tamten)
 - Interrogative pronouns (co, kto, coś, ktoś, ktokolwiek, cokolwiek, nikt, nic)
-- Other pronouns (który, wszystek, każdy, żaden)
+- Other pronouns (który, wszystek, każdy, żaden, się)
 
 - Cardinal numerals (jeden, dwa, trzy, etc.) (dwa, trzy, cztery and possible others do not have declensions in wiki data, may need to hardcode)
 - Collective numerals (dwoje, troje, czworo, etc.)
-- Quantifiers (kilka, parę, wiele, ile, tyle) (kilkanaście, kilkadziesiąt, kilkaset, etc.) (oba, obydwa, dwa, oboje, obydwoje, dwoje)
+- Dwa/Oba/Obydwa (oba, obydwa, dwa, oboje, obydwoje, dwoje)
+- Other quantifiers (kilka, parę, wiele, ile, tyle) (kilkanaście, kilkadziesiąt, kilkaset)
 - Whether to ask about noun phrase for above (case noun takes, gender/plurality of noun phrase)
-- Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
-Should add option for number of digits for number (e.g. 2 digit numbers, 3 digits numbers etc.)
 
-- Prepositions (ask for definiton and case(s) following them)
 - Winien-like verbs (winien, powinien)
+- Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
+- Prepositions (ask for definiton and case(s) following them)
 
-- Inflections (number of inflections to ask for in each of above questions)
+- Forms (number of inflections to ask for in each of above questions)
+- Digits (number of digits for numeral questions e.g. 2 digit numbers, 3 digits numbers etc.)
+
+Avoid 'two in a row' when bad luck protection moves to next word list/inflection list
 
 Customisable keybind settings
+Info page explaining different options
 
 Compeleted workflows processes:
 

@@ -43,6 +43,7 @@ class Entrybutton(tk.Frame):
         self.variable = kwargs.pop('variable', None)
         self.value = kwargs.pop('value', None)
         self.e_width = kwargs.pop('e_width', None)
+        self.e_allow = kwargs.pop('e_allow', self.e_width)
         self.justify = kwargs.pop('justify', 'left')
         self.int_only = kwargs.pop('int_only', False)
         self.bounded = kwargs.pop('bounded', False)
@@ -50,7 +51,7 @@ class Entrybutton(tk.Frame):
         tk.Frame.__init__(self, *args, **kwargs)
 
         # Apply optional restictions on Entry widget
-        validate_fn = lambda *args, i=self.int_only, b=self.bounded, e=self.e_width: validate(*args, i, b, e)
+        validate_fn = lambda *args, i=self.int_only, b=self.bounded, e=self.e_allow: validate(*args, i, b, e)
         self.vcmd = (self.register(validate_fn), '%d', '%P')
 
         # Load Check/Radio button and entry widgets
@@ -117,7 +118,7 @@ class Lineborder(tk.Frame):
         tk.Frame.configure(self, bg='black', height=1, bd=0)
 
 # Apply requested restrictions on Entry widget
-def validate(action, value_if_allowed, int_only, bounded, e_width):
+def validate(action, value_if_allowed, int_only, bounded, e_allow):
 
     # Ensures only integers
     if int_only and action=='1':
@@ -131,7 +132,7 @@ def validate(action, value_if_allowed, int_only, bounded, e_width):
         
     # Ensures text stays within bounds
     if bounded:
-        if len(value_if_allowed) > e_width:
+        if len(value_if_allowed) > e_allow:
             return False
     
     return True

@@ -44,7 +44,7 @@ class tkinterApp(tk.Tk):
         self.frames['home'].menu_frame.load_dict(os.path.join('PoGram', 'data', 'wiki_entries.pgz'))
         self.show_frame('home')
 
-# Driver Code
+# Driver code
 if __name__ == '__main__':
         
     app = tkinterApp()

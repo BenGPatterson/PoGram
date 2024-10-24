@@ -72,11 +72,3 @@ class question_panel(tk.Frame):
                      - self.parent.title_frame.word_lbl.winfo_height() - 2*self.parent.title_frame.grid_info()['ipady']
         pad_amount = max(0, int(free_space/2))
         self.q_frame.canvas.grid_configure(pady=(pad_amount,0))
-
-
-        
-
-    
-
-        
-

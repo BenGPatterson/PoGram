@@ -173,7 +173,7 @@ class trainer_frame(tk.Frame):
     # Draw horizontal line border at specified position
     def line_border(self, row):
         line = Lineborder(self)
-        line.grid(row=row, column=0, columnspan=2, padx=3, pady=6, sticky='ew')
+        line.grid(row=row, column=0, columnspan=2, padx=3, pady=4, sticky='ew')
 
 # Train miscellaneous  
 class misc_trainer(trainer_frame):
@@ -185,31 +185,49 @@ class misc_trainer(trainer_frame):
         self.line_border(2)
 
         # Load pronoun questions
-        text_list = ['Personal pronouns', 'Possessive pron.', 'Demonstrative pron.', 'Interrogative pron.', 'Other pronouns', 
-                     'Cardinal numerals', 'Collective numerals', 'Quantifiers', 'Ask about noun phrase', 'Ordinal numerals',
-                     'Prepositions', 'Winien-like verbs']
-        self.qs = []
-        for i in range(len(text_list)):
-            self.qs.append(tk.IntVar(value=self.config['qs'][i]))
+        text_dict = {'Pers': 'Personal pronouns', 'Poss': 'Possessive pron.', 'Demo': 'Demonstrative pron.', 
+                     'Inte': 'Interrogative pron.', 'Opro': 'Other pronouns', 
+                     'Card': 'Cardinal numerals', 'Coll': 'Collective numerals', 'Dwa': 'Dwa/Oba/Obydwa', 
+                     'Oqua': 'Other quantifiers', 'Nphr': 'Ask about noun phrase',
+                     'Wini': 'Winien-like verbs', 'Ordi': 'Ordinal numerals', 'Prep': 'Prepositions'}
+        q_order = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Dwa', 'Oqua', 'Nphr', 'Wini', 'Ordi', 'Prep']
+        self.qs = {}
+        for key in text_dict.keys():
+            self.qs[key] = tk.IntVar(value=self.config['qs'][key])
         other_rows = {8: None, 14: None}
-        misc_btns = self.load_scol(3, text_list, self.qs, other_rows=other_rows, return_btns=True)
+        btns_list = self.load_scol(3, [text_dict[key] for key in q_order], [self.qs[key] for key in q_order], other_rows=other_rows, return_btns=True)
+        misc_btns = {}
+        for i, key in enumerate(q_order):
+            misc_btns[key] = btns_list[i]
 
-        # Load option to select number of inflections
-        self.line_border(17)
+        # Load option to select number of inflections and number of digits
+        self.line_border(18)
         self.inflections_no = tk.StringVar(value=self.config['inflections_no'])
-        inf_no = Entrybutton(self, variable=None, text=f'Inflections:', textvariable=self.inflections_no, btn_type='label', 
+        inf_no = Entrybutton(self, variable=None, text=f'Forms:', textvariable=self.inflections_no, btn_type='label', 
                            e_width=2, justify='right', int_only=True, bounded=True, bg=self.bg)
-        inf_no.grid(row=18, column=0, columnspan=2, padx=(10,0), pady=(7,0), sticky='w')
+        inf_no.grid(row=19, column=0, columnspan=1, padx=(10,0), pady=(4,0), sticky='w')
+        self.digits_no = tk.StringVar(value=self.config['digits_no'])
+        dig_no = Entrybutton(self, variable=None, text=f'Digits:', textvariable=self.digits_no, btn_type='label', 
+                           e_width=2, e_allow=1, justify='right', int_only=True, bounded=True, bg=self.bg)
+        dig_no.grid(row=19, column=1, columnspan=1, pady=(4,0), sticky='w')
 
         # Enforce disabling restrictions
-        vars_list = [[*self.qs[5:8]]]
-        noun_phrase_ts = [[*seq] for seq in product((True, False), repeat=3)][:-1]
-        ts_list = [noun_phrase_ts]
-        widgets_list = [[misc_btns[8]]]
+        noun_phrase_keys = ['Card', 'Coll', 'Dwa', 'Oqua']
+        inf_no_keys = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Dwa', 'Oqua', 'Wini', 'Ordi']
+        dig_no_keys = ['Card', 'Coll', 'Ordi']
+        vars_list = [[self.qs[key] for key in noun_phrase_keys], 
+                     [self.qs[key] for key in inf_no_keys], 
+                     [self.qs[key] for key in dig_no_keys]]
+        noun_phrase_ts = [[*seq] for seq in product((True, False), repeat=len(noun_phrase_keys))][:-1]
+        inf_no_ts = [[*seq] for seq in product((True, False), repeat=len(inf_no_keys))][:-1]
+        dig_no_ts = [[*seq] for seq in product((True, False), repeat=len(dig_no_keys))][:-1]
+        ts_list = [noun_phrase_ts, inf_no_ts, dig_no_ts]
+        widgets_list = [[misc_btns['Nphr']], inf_no.winfo_children(), dig_no.winfo_children()]
         self.disable_restrictions(vars_list, ts_list, widgets_list)
 
         # Enforce at least one option select, and multi-select functionality
-        self.link_buttons([*self.qs[:8], *self.qs[9:]], [*misc_btns[:8], *misc_btns[9:]])
+        self.link_keys = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Dwa', 'Oqua', 'Wini', 'Ordi', 'Prep']
+        self.link_buttons([self.qs[key] for key in self.link_keys], [misc_btns[key] for key in self.link_keys])
 
         # Finish loading
         self.toggle_active(widget_status=self.config['widget_status'])
@@ -240,10 +258,11 @@ class misc_trainer(trainer_frame):
         # Collect settings
         config = {}
         config['active'] = self.active.get()
-        config['qs'] = []
-        for i in range(len(self.qs)):
-            config['qs'].append(self.qs[i].get())
+        config['qs'] = {}
+        for key in self.qs.keys():
+            config['qs'][key] = self.qs[key].get()
         config['inflections_no'] = self.inflections_no.get()
+        config['digits_no'] = self.digits_no.get()
         config['widget_status'] = self.widget_status
 
         return config

@@ -5,6 +5,7 @@ import random
 import os
 import pandas as pd
 from questions import verb_question, adj_question, noun_question
+from misc_questions import misc_question
 
 # Game instance
 class Game():
@@ -28,8 +29,10 @@ class Game():
         self.current_word_no = 0
         self.total_correct = 0
         self.total_questions = 0
-        self.word_lists = {}
-        self.current_word_lists = {}
+        self.word_lists = {'misc': {}}
+        self.current_word_lists = {'misc': {}}
+        self.misc_qtypes = []
+        self.current_misc_qtypes = []
         self.next_question()
 
     # Loads next question
@@ -81,7 +84,7 @@ class Game():
 
     # Load question
     def load_question(self, key):
-        question_loaders = {'misc': adj_question, 'verb': verb_question, 'adj': adj_question, 'noun': noun_question}
+        question_loaders = {'misc': misc_question, 'verb': verb_question, 'adj': adj_question, 'noun': noun_question}
         question_loaders[key](self, self.q_panel, self.trainers[key], self.dict)
 
     # Checks valid trainer settings and gets active trainers
@@ -102,7 +105,7 @@ class Game():
         for key in self.trainers.keys():
 
             # Check inflections entry if selected
-            if self.trainers[key].qs[2].get():
+            if key == 'misc' or self.trainers[key].qs[2].get():
                 inflections_no = self.trainers[key].inflections_no.get()
                 if not self.check_pos_int_entry(inflections_no):
                     self.trainers = None
@@ -115,6 +118,11 @@ class Game():
                     if not self.check_pos_int_entry(freq_no):
                         self.trainers = None
                         return
+            else:
+                digits_no = self.trainers[key].digits_no.get()
+                if not self.check_pos_int_entry(digits_no):
+                    self.trainers = None
+                    return
                 
         # Check question number entry
         w_no = parent.menu_frame.w_no.get()

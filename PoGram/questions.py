@@ -10,7 +10,8 @@ class question():
         for widget in self.q_panel.q_frame.winfo_children():
             widget.destroy()
         self.skip = False
-        self.choose_word(pos)
+        if pos != 'misc':
+            self.choose_word(pos)
 
     # Choose word and update title
     def choose_word(self, pos):
@@ -294,7 +295,7 @@ class question():
         next_word.pack(side=tk.TOP)
         next_word.bind('<Return>', lambda event: self.game.next_question())
         next_word.focus_set()
-        self.q_panel.q_frame_update()
+        self.q_panel.q_frame_update()            
 
 # Load verb questions
 class verb_question(question):
@@ -555,7 +556,3 @@ class noun_question(question):
         # Inflection question
         elif '_' in self.sub_qs[0]:
             self.load_declension()
-
-
-            
-        

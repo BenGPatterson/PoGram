@@ -1,8 +1,5 @@
 To do:
 
-all_winien.csv now empty after new morfeusz_freq_analysis.py - probably got mistakenly flagged by a new sanity check introduced
-found and fixed issue, just need to rerun script
-
 Updated menu settings page to have planned misc options
 Planned marked by '-', implemented marked as 'x':
 

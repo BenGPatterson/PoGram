@@ -133,7 +133,7 @@ for key in word_freqs:
                 del_word_lemmas.append(lemma)
                 del_words.append(lemma)
     
-    # Delete non-existent words
+    # Delete non-existent words 
     for del_word in del_words:
         del word_freqs[key][del_word]
 

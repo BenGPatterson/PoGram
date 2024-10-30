@@ -86,6 +86,12 @@ def get_conjugation(dictionary, lemma, pos, gen, voice, tense):
                     
 # Gets declined form of word from dictionary
 def get_declension(dictionary, lemma, pos, numgen, case):
+
+    # If numgen or case not specified set to singular/nominative
+    if numgen == '-':
+        numgen = 's'
+    if case == '-':
+        case  = 'n'
     
     # Produce tags
     tags = set()
@@ -101,8 +107,20 @@ def get_declension(dictionary, lemma, pos, numgen, case):
     number_dict = {'s': ['singular'], 'p': ['plural'], 'sma': ['singular', 'masculine', 'animate'], 'smi': ['singular', 'masculine', 'inanimate'], 
                    'sf': ['singular', 'feminine'], 'sn': ['singular', 'neuter'], 'pv': ['plural', 'virile'], 'pnv': ['plural', 'error-unrecognized-form']}
     tags.update(number_dict[numgen.lower()])
+
+    # Remove tags for specific cases
     if case != 'a':
         tags -= {'animate', 'inanimate'}
+    if case not in ['n', 'a', 'v']:
+        tags -= {'virile', 'nonvirile', 'error-unrecognized-form'}
+
+    # Certain irregular words
+    if pos == 'pron' and lemma in ['ten'] and 'error-unrecognized-form' in tags:
+        tags -= {'error-unrecognized-form'}
+        tags.add('nonvirile')
+    if pos == 'pron' and lemma in ['one'] and 'plural' in tags:
+        tags -= {'plural'}
+        tags.add('error-unrecognized-form')
 
     # Backup parts of speech for adjectives
     backups = [pos]
@@ -116,14 +134,15 @@ def get_declension(dictionary, lemma, pos, numgen, case):
             for sense in dictionary[lemma][pos_]:
                 if pos == 'adj' and pos_ == 'verb' and sense['head_templates'][0]['name'] != 'pl-participle':
                     continue
-                declension = next((item['form'] for item in sense['forms'] if set(item['tags']) == tags), None)
-                declensions.add(declension)
+                declension = set(item['form'] for item in sense['forms'] if tags.issubset(set(item['tags'])))
+                declensions.update(declension)
             if None in declensions and len(declensions) > 1:
                 declensions.remove(None)
             if None not in declensions and len(declensions) > 0:
                 break
         except:
             pass
+    declensions -= {'-'}
     if len(declensions) == 0:
         declensions = [None]
     
@@ -220,7 +239,6 @@ if __name__ == '__main__':
     word_dict = load_dictionary(data_path)
     
     # print(get_conjugation(word_dict, 'mieć', 'verb', 'v', '2p', 'pa'))
-    # for sense in word_dict['mieć']['verb']:
-    #     print(sense['head_templates'][0]['args']['1'])
-    for sense in word_dict['jeden'].keys():
-        print(word_dict['jeden'][sense])
+    # for sense in word_dict['one']['pron']:
+    #     print(sense)
+    print(get_declension(word_dict, 'one', 'pron', 'p', 'g'))

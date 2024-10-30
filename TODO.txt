@@ -1,26 +1,26 @@
 To do:
 
 Updated menu settings page to have planned misc options
-Planned marked by '-', implemented marked as 'x':
+Planned marked by 'o', implemented marked as 'x':
 
-- Personal pronouns (ja, ty, on, etc.) (include polite forms)
-- Possessive pronouns (mój, twój, nasz, etc.) (only include 1p and 2p - 3p do not inflect)
-- Demonstrative pronouns (ten, tamten)
-- Interrogative pronouns (co, kto, coś, ktoś, ktokolwiek, cokolwiek, nikt, nic)
-- Other pronouns (który, wszystek, każdy, żaden, się)
+x Personal pronouns (ja, ty, on, etc.) (include polite forms) (think only need to hardcode 'on' form)
+x Possessive pronouns (mój, twój, nasz, etc.) (only include 1p and 2p - 3p do not inflect)
+x Demonstrative pronouns (ten, tamten)
+x Interrogative pronouns (co, kto, coś, ktoś, cokolwiek, ktokolwiek, nic, nikt)
+x Other pronouns (który, wszystek, każdy, żaden, się)
 
-- Cardinal numerals (jeden, dwa, trzy, etc.) (dwa, trzy, cztery and possible others do not have declensions in wiki data, may need to hardcode)
-- Collective numerals (dwoje, troje, czworo, etc.)
-- Dwa/Oba/Obydwa (oba, obydwa, dwa, oboje, obydwoje, dwoje)
-- Other quantifiers (kilka, parę, wiele, ile, tyle) (kilkanaście, kilkadziesiąt, kilkaset)
-- Whether to ask about noun phrase for above (case noun takes, gender/plurality of noun phrase)
+o Cardinal numerals (jeden, dwa, trzy, etc.) (dwa, trzy, cztery and possible others do not have declensions in wiki data, may need to hardcode)
+o Collective numerals (dwoje, troje, czworo, etc.)
+o Dwa/Oba/Obydwa (oba, obydwa, dwa, oboje, obydwoje, dwoje)
+o Other quantifiers (kilka, parę, wiele, ile, tyle) (kilkanaście, kilkadziesiąt, kilkaset)
+o Whether to ask about noun phrase for above (case noun takes, gender/plurality of noun phrase)
 
-- Winien-like verbs (winien, powinien)
-- Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
-- Prepositions (ask for definiton and case(s) following them)
+o Winien-like verbs (winien, powinien)
+o Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
+o Prepositions (ask for definiton and case(s) following them)
 
-- Forms (number of inflections to ask for in each of above questions)
-- Digits (number of digits for numeral questions e.g. 2 digit numbers, 3 digits numbers etc.)
+x Forms (number of inflections to ask for in each of above questions)
+x Digits (number of digits for numeral questions e.g. 2 digit numbers, 3 digits numbers etc.)
 
 Avoid 'two in a row' when bad luck protection moves to next word list/inflection list
 

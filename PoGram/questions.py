@@ -58,6 +58,10 @@ class question():
                 self.correct_forms.append(get_declension(self.dict, self.word, pos, numgen, case))
             except:
                 self.correct_forms.append([None])
+        
+        for f, cf in zip(self.forms, self.correct_forms):
+            print(f'{f}: {cf}, ', end='')
+        print('\n')
 
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):
@@ -155,16 +159,27 @@ class question():
         self.correct = self.correct[1:]
     
     # Load declension subquestion
-    def load_declension(self):
+    def load_declension(self, disable_numgen=False):
         
-        # Loads subquestion
-        gen_text = {'s': 'Singular', 'p': 'Plural', 'sma': 'Masculine (animate)', 'smi': 'Masculine (inanimate)', 
-                    'sf': 'Feminine', 'sn': 'Neuter', 'pv': 'Virile', 'pnv': 'Non-virile'}
+        # Forms subquestion text
+        gen_text = {'s': 'singular', 'p': 'plural', 'sma': 'masculine (animate)', 'smi': 'masculine (inanimate)', 
+                    'sf': 'feminine', 'sn': 'neuter', 'pv': 'virile', 'pnv': 'non-virile', '-': ''}
         case_text = {'n': 'nominative', 'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
-                     'i': 'instrumental', 'l': 'locative', 'v': 'vocative'}
-        numgen, case = self.sub_qs[0].split('_')
-        q_text = gen_text[numgen] + ', ' + case_text[case] + ':'
-        self.load_subquestion(q_text, self.correct[0], self.simple_correct)
+                     'i': 'instrumental', 'l': 'locative', 'v': 'vocative', '-': ''}
+        lcp_text = {'l': 'stressed form', 'c': 'clitic form', 'p': 'after prepositions', '-': ''}
+        if len(self.sub_qs[0].split('_')) == 2:
+            self.sub_qs[0] += '_-'
+        numgen, case, lcp = self.sub_qs[0].split('_')
+        if disable_numgen:
+            numgen = '-'
+        q_text = ''
+        for text, text_dict in zip([numgen, case, lcp], [gen_text, case_text, lcp_text]):
+            if len(text_dict[text]) > 0:
+                q_text += text_dict[text] +', '
+        q_text = q_text[:-2] + ':'
+
+        # Loads subquestion
+        self.load_subquestion(q_text.capitalize(), self.correct[0], self.simple_correct)
         self.sub_qs = self.sub_qs[1:]
         self.correct = self.correct[1:]
 

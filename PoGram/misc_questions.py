@@ -1,5 +1,6 @@
 import random
 from questions import question
+from dictionary import get_declension
 
 # Load misc questions
 class misc_question(question):
@@ -15,6 +16,13 @@ class misc_question(question):
         # Decide question type and word
         self.choose_qtype()
         self.choose_word()
+
+        # Decide subquestions
+        self.sub_qs = []
+        self.choose_subqs()
+
+        # Load first subquestion
+        self.next_subquestion()
 
     # Choose question type from those active
     def choose_qtype(self):
@@ -99,5 +107,189 @@ class misc_question(question):
     def load_prep_dict(self):
         pass
         # Get data from https://courseofpolish.com/grammar/cases/cases-after-prepositions/list-of-prepositions
+
+    # Choose subquestions to ask
+    def choose_subqs(self):
+
+        # Choose sub questions depending on question type
+        match self.qtype:
+            case 'Pers':
+                self.get_all_pers_declensions()
+                self.choose_poss_pers_declensions()
+            case 'Poss'|'Demo':
+                self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['sma', 'smi', 'sf', 'sn', 'pv', 'pnv'])
+                self.choose_poss_declensions('pron')
+            case 'Inte':
+                self.choose_inte_subqs()
+            case 'Opro':
+                self.choose_opron_subqs()
+            case 'Card'|'Coll'|'Ordi':
+                pass
+            case 'Dwa':
+                pass
+            case 'Oqua':
+                pass
+            case 'Wini':
+                pass
+            case 'Prep':
+                pass
+
+        # Add to subquestions list
+        self.add_poss_forms()
+
+    # Get all declensions for requested cases and genders
+    def get_all_case_gen_declensions(self, cases, gens):
+
+        # List of all requested declensions
+        self.forms = []
+        
+        # Form all combinations
+        for case in cases:
+            for gen in gens:
+                self.forms.append(gen+'_'+case)
+
+    # Get all declensions of personal pronouns
+    def get_all_pers_declensions(self):
+
+        # Get all declensions for polite forms
+        if self.word in ['pan', 'pani']:
+            self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l', 'v'], ['s'])
+        elif self.word in ['panowie', 'państwo', 'panie']:
+            self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l', 'v'], ['p'])
+        else:
+
+            # Add long/clitic/preposition options for familiar forms
+            self.forms = []
+            cases = ['n', 'g', 'd', 'a', 'i', 'l', 'v']
+            if self.word in ['ja', 'ty', 'on', 'ono', 'ona']:
+                gens = ['s']
+            elif self.word in ['my', 'wy', 'oni', 'one']:
+                gens = ['p']
+            for form in ['l', 'c', 'p']:
+                for case in cases:
+                    for gen in gens:
+                        self.forms.append(gen+'_'+case+'_'+form)
+
+    # Keeps only declensions with answers available for personal pronouns
+    def choose_poss_pers_declensions(self):
+
+        # Lemmas to use for polite forms
+        pol_lemma_dict = {'pan': 'pan', 'pani': 'pani', 'panowie': 'pan', 
+                          'państwo': 'państwo', 'panie': 'pani'}
+
+        # Correct answers for familiar 3rd person masculine singular pronoun 'on'
+        on_correct_dict = {'n_l': ['on'], 'n_c': ['on'], 'n_p': ['on'],
+                           'g_l': ['jego'], 'g_c': ['go'], 'g_p': ['niego'],
+                           'd_l': ['jemu'], 'd_c': ['mu'], 'd_p': ['niemu'],
+                           'a_l': ['jego'], 'a_c': ['go'], 'a_p': ['niego'],
+                           'i_l': ['nim'], 'i_c': ['nim'], 'i_p': ['nim'],
+                           'l_l': ['nim'], 'l_c': ['nim'], 'l_p': ['nim'],
+                           'v_l': [None], 'v_c': [None], 'v_p': [None]}
+
+        # Get all correct answers
+        self.correct_forms = []
+        for form in self.forms:
+
+            # Polite form
+            if self.word in ['pan', 'pani', 'panowie', 'państwo', 'panie']:
+                numgen, case = form.split('_')
+                try:
+                    self.correct_forms.append(get_declension(self.dict, pol_lemma_dict[self.word], 'pron', numgen, case))
+                except:
+                    self.correct_forms.append([None])
+
+            # Hardcoded for 'on' only
+            elif self.word == 'on':
+                self.correct_forms.append(on_correct_dict[form[2:]])
+
+            # Includes long/clitic/preposition form
+            else:
+                numgen, case, lcp = form.split('_')
+                try:
+                    lcp_forms = get_declension(self.dict, self.word, 'pron', numgen, case)
+
+                    if len(lcp_forms) == 1: # If all are the same
+                        lcp_dict = {'l': 0, 'c': 0, 'p': 0}
+                    elif len(lcp_forms) == 2 and self.word in ['ja', 'ty']: # If long clitic different, no preposition form
+                        c = lcp_forms.index(min(lcp_forms, key=len))
+                        lcp_dict = {'l': 1-c, 'c': c, 'p': 1-c}
+                    elif len(lcp_forms) == 2 and self.word in ['ono', 'ona', 'oni', 'one']: # If long, clitic same, separate preposition form
+                        p = [lcp_forms.index(x) for x in lcp_forms if x[0] == 'n'][0]
+                        lcp_dict = {'l': 1-p, 'c': 1-p, 'p': p}
+                    elif len(lcp_forms) == 3: # If all are different
+                        c = lcp_forms.index(min(lcp_forms, key=len))
+                        p = [lcp_forms.index(x) for x in lcp_forms if x[0] == 'n'][0]
+                        lcp_dict = {'l': 3-c-p, 'c': c, 'p': p}
+
+                    # Add correct form
+                    self.correct_forms.append([lcp_forms[lcp_dict[lcp]]])
+                except:
+                    self.correct_forms.append([None])
+
+                # 'mię' is now considered dated or dialectal
+                if self.correct_forms[-1] == ['mię']:
+                    self.correct_forms[-1].append('mnie')
+
+        for f, cf in zip(self.forms, self.correct_forms):
+            print(f'{f}: {cf}, ', end='')
+        print('\n')
+
+        # Remove forms without answers
+        for i in range(len(self.forms)-1,-1,-1):
+            if self.correct_forms[i] == [None]:
+                self.correct_forms.pop(i)
+                self.forms.pop(i)
+
+    # Choose subquestions for other pronouns word type
+    def choose_opron_subqs(self):
+
+        # Get all declensions
+        if self.word == 'się':
+            self.get_all_case_gen_declensions(['g', 'd', 'a', 'i', 'l'], ['-'])
+        else:
+            self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['sma', 'smi', 'sf', 'sn', 'pv', 'pnv'])
+
+        # Get answers and keep only possible declensions
+        if self.word in ['wszystek', 'żaden']:
+            self.choose_poss_declensions('adj')
+        else:
+            self.choose_poss_declensions('pron')
+
+    # Choose subquestions for interrogative pronouns word type
+    def choose_inte_subqs(self):
+
+        # Get all declensions
+        self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l', 'v'], ['s'])
+
+        # Get answers and keep only possible declensions
+        if self.word in ['kto', 'nic', 'nikt']:
+            self.choose_poss_declensions('noun')
+        else:
+            self.choose_poss_declensions('pron')
+
+    # Load next subquestion
+    def next_subquestion(self):
+
+        # Check if end of sub questions
+        if len(self.sub_qs) == 0 or self.skip==True:
+            self.end_question()
+            return
+        
+        # Load subquestion depending on question type
+        match self.qtype:
+            case 'Pers':
+                self.load_declension(disable_numgen=True)
+            case 'Poss'|'Demo'|'Inte'|'Opro':
+                self.load_declension()
+            case 'Card'|'Coll'|'Ordi':
+                pass
+            case 'Dwa':
+                pass
+            case 'Oqua':
+                pass
+            case 'Wini':
+                pass
+            case 'Prep':
+                pass
 
     

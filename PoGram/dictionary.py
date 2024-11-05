@@ -114,6 +114,19 @@ def get_declension(dictionary, lemma, pos, numgen, case):
     if case not in ['n', 'a', 'v']:
         tags -= {'virile', 'nonvirile', 'error-unrecognized-form'}
 
+    # Exclude certain tags for other quantifiers
+    excl_tags = set()
+    if pos == 'oqua':
+        if case in ['n', 'a'] and numgen == 'pnv':
+            tags -= {'error-unrecognized-form'}
+            excl_tags.add('virile')
+        if lemma in ['kilka', 'kilkanaście', 'kilkadziesiąt', 'paręnaście', 'parędziesiąt']:
+            pos = 'det'
+        elif lemma in ['wiele', 'tyle']:
+            pos = 'num'
+        elif lemma in ['ile', 'kilkaset', 'paręset']:
+            pos='pron'
+
     # Certain irregular words
     if pos == 'pron' and lemma in ['ten'] and 'error-unrecognized-form' in tags:
         tags -= {'error-unrecognized-form'}
@@ -134,7 +147,7 @@ def get_declension(dictionary, lemma, pos, numgen, case):
             for sense in dictionary[lemma][pos_]:
                 if pos == 'adj' and pos_ == 'verb' and sense['head_templates'][0]['name'] != 'pl-participle':
                     continue
-                declension = set(item['form'] for item in sense['forms'] if tags.issubset(set(item['tags'])))
+                declension = set(item['form'] for item in sense['forms'] if tags.issubset(set(item['tags'])) and excl_tags.isdisjoint(set(item['tags'])))
                 declensions.update(declension)
             if None in declensions and len(declensions) > 1:
                 declensions.remove(None)
@@ -239,6 +252,6 @@ if __name__ == '__main__':
     word_dict = load_dictionary(data_path)
     
     # print(get_conjugation(word_dict, 'mieć', 'verb', 'v', '2p', 'pa'))
-    # for sense in word_dict['one']['pron']:
-    #     print(sense)
-    print(get_declension(word_dict, 'one', 'pron', 'p', 'g'))
+    for sense in word_dict['paręset']['pron']:
+        print(sense)
+    # print(get_declension(word_dict, 'one', 'pron', 'p', 'g'))

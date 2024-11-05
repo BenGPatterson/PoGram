@@ -124,8 +124,8 @@ class question():
         
         # Loads subquestion
         derived_text = {'comp': 'Comparative:', 'super': 'Superlative:', 'adv': 'Adverb:', 'dim': 'Diminutive:', 'asp': 'Aspect:',
-                        'asp_ii': 'Indeterminate:', 'asp_id': 'Determinate', 'asp_if': 'Frequentative', 
-                        'asp_i': 'Imperfective', 'asp_p': 'Perfective'}
+                        'asp_ii': 'Indeterminate:', 'asp_id': 'Determinate:', 'asp_if': 'Frequentative:', 
+                        'asp_i': 'Imperfective:', 'asp_p': 'Perfective:'}
         self.load_subquestion(derived_text[self.sub_qs[0]], correct, self.simple_correct)
         self.sub_qs = self.sub_qs[1:]
 

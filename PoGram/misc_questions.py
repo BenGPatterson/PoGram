@@ -128,7 +128,8 @@ class misc_question(question):
             case 'Dwa':
                 pass
             case 'Oqua':
-                pass
+                self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pnv'])
+                self.choose_poss_oqua_declensions()
             case 'Wini':
                 pass
             case 'Prep':
@@ -136,6 +137,10 @@ class misc_question(question):
 
         # Add to subquestions list
         self.add_poss_forms()
+
+        # Ask about noun phrase after numerals/quantifiers
+        if self.trainer.qs['Nphr'].get() and self.qtype in ['Card', 'Coll', 'Ordi', 'Dwa', 'Oqua']:
+            self.add_noun_phrase_subq()
 
     # Get all declensions for requested cases and genders
     def get_all_case_gen_declensions(self, cases, gens):
@@ -267,6 +272,75 @@ class misc_question(question):
         else:
             self.choose_poss_declensions('pron')
 
+    # Keeps only declensions with answers available for other quantifiers
+    def choose_poss_oqua_declensions(self):
+
+        # Correct answers for 'parę'
+        parę_correct_dict = {'pv_n': ['parę'], 'pv_g': ['paru'], 'pv_d': ['paru'], 
+                             'pv_a': ['parę'], 'pv_i': ['paroma'], 'pv_l': ['paru'],
+                             'pnv_n': ['paru'], 'pnv_g': ['paru'], 'pnv_d': ['paru'], 
+                             'pnv_a': ['paru'], 'pnv_i': ['paroma'], 'pnv_l': ['paru']}
+        
+        # Get all correct answers
+        self.correct_forms = []
+        for form in self.forms:
+
+            # Hardcoded for 'parę'
+            if self.word == 'parę':
+                self.correct_forms.append(parę_correct_dict[form])
+
+            # Otherwise handle normally
+            else:
+                numgen, case = form.split('_')
+                try:
+                    self.correct_forms.append(get_declension(self.dict, self.word, 'oqua', numgen, case))
+                except:
+                    self.correct_forms.append([None])
+        
+        for f, cf in zip(self.forms, self.correct_forms):
+            print(f'{f}: {cf}, ', end='')
+        print('\n')
+
+        # Remove forms without answers
+        for i in range(len(self.forms)-1,-1,-1):
+            if self.correct_forms[i] == [None]:
+                self.correct_forms.pop(i)
+                self.forms.pop(i)
+
+    # Adds subquestion about noun phrase after numeral/quantifier
+    def add_noun_phrase_subq(self):
+
+        # Add questions
+        self.sub_qs += ['nphr_case', 'nphr_num']
+
+        # Get default settings
+        case = self.sub_qs[-3][-1]
+        if 's' in self.sub_qs[-3]:
+            num = 's'
+        else:
+            num = 'p'
+
+        # All other quantifiers are special if nominative or accusative
+        if self.qtype == 'Oqua' and case in ['n', 'a']:
+            case = 'g'
+            num = 's'
+
+        # Add correct answers
+        case_longhand = {'n': 'nominative', 'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
+                         'i': 'instrumental', 'l': 'locative', 'v': 'vocative'}
+        num_longhand = {'s': 'singular', 'p': 'plural'}
+        self.correct.append([case, case_longhand[case]])
+        self.correct.append([num, num_longhand[num]])
+
+    # Load noun phrase question
+    def load_noun_phrase(self):
+
+        # Loads subquestion
+        nphr_text = {'nphr_case': 'Case of noun:', 'nphr_num': 'Grammatical number of noun phrase:'}
+        self.load_subquestion(nphr_text[self.sub_qs[0]], self.correct[0], self.simple_correct)
+        self.sub_qs = self.sub_qs[1:]
+        self.correct = self.correct[1:]
+
     # Load next subquestion
     def next_subquestion(self):
 
@@ -275,21 +349,24 @@ class misc_question(question):
             self.end_question()
             return
         
+        # Noun phrase questions
+        if self.sub_qs[0] in ['nphr_case', 'nphr_num']:
+            self.load_noun_phrase()
+        
         # Load subquestion depending on question type
-        match self.qtype:
-            case 'Pers':
-                self.load_declension(disable_numgen=True)
-            case 'Poss'|'Demo'|'Inte'|'Opro':
-                self.load_declension()
-            case 'Card'|'Coll'|'Ordi':
-                pass
-            case 'Dwa':
-                pass
-            case 'Oqua':
-                pass
-            case 'Wini':
-                pass
-            case 'Prep':
-                pass
+        else:
+            match self.qtype:
+                case 'Pers':
+                    self.load_declension(disable_numgen=True)
+                case 'Poss'|'Demo'|'Inte'|'Opro'|'Oqua':
+                    self.load_declension()
+                case 'Card'|'Coll'|'Ordi':
+                    pass
+                case 'Dwa':
+                    pass
+                case 'Wini':
+                    pass
+                case 'Prep':
+                    pass
 
     

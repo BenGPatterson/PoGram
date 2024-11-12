@@ -141,10 +141,11 @@ class question():
         if gen == '-':
             voice_text = {'1s': '1st person singular', '2s': '2nd person singular', '3s': '3rd person singular',
                           '1p': '1st person plural', '2p': '2nd person plural', '3p': '3rd person plural',
-                          'i': 'impersonal'}
+                          '1': '1st person', '2': '2nd person', '3': '3rd person', 'i': 'impersonal'}
         else:
             voice_text = {'1s': '1st person', '2s': '2nd person', '3s': '3rd person',
-                          '1p': '1st person', '2p': '2nd person', '3p': '3rd person'}
+                          '1p': '1st person', '2p': '2nd person', '3p': '3rd person',
+                          '1': '1st person', '2': '2nd person', '3': '3rd person'}
         q_text = tense_text[tense]
         if gen == '-' and voice == '-':
             q_text += ':'

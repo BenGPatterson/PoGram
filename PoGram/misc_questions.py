@@ -1,6 +1,10 @@
+import tkinter as tk
 import random
+import pandas as pd
+import os
+from ast import literal_eval
 from questions import question
-from dictionary import get_declension
+from dictionary import get_declension, get_def_conjugation
 
 # Load misc questions
 class misc_question(question):
@@ -96,17 +100,27 @@ class misc_question(question):
             case 'Wini':
                 word_list = ['winien', 'powinien']
             case 'Prep':
-                self.load_prep_dict()
-                word_list = list(self.prep_dict.keys())
+                word_list = self.load_prep_csv()
 
         # Set word list
         self.game.word_lists['misc'][self.qtype] = word_list
         self.game.current_word_lists['misc'][self.qtype] = []
 
-    # Load dictionary of prepositions, cases, and definitions
-    def load_prep_dict(self):
-        pass
-        # Get data from https://courseofpolish.com/grammar/cases/cases-after-prepositions/list-of-prepositions
+    # Load csv of prepositions, cases, and definitions
+    def load_prep_csv(self):
+        
+        # Load raw preposition data
+        self.game.prep_data = pd.read_csv(os.path.join('PoGram', 'data', 'prep_cases.csv'), converters={'prep_en': literal_eval, 'cases': literal_eval})
+
+        # Create word list
+        word_list = []
+        for prep in list(self.game.prep_data['prep_pl']):
+            if len(list(self.game.prep_data.loc[self.game.prep_data['prep_pl']==prep]['cases'])[0]) == 1:
+                word_list.append(prep)
+            else:
+                word_list += [f'{prep} (movement)', f'{prep} (location)']
+
+        return word_list
 
     # Choose subquestions to ask
     def choose_subqs(self):
@@ -131,12 +145,14 @@ class misc_question(question):
                 self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pnv'])
                 self.choose_poss_oqua_declensions()
             case 'Wini':
-                pass
+                self.get_all_wini_conjugations()
+                self.choose_poss_wini_conjugations()
             case 'Prep':
-                pass
+                self.sub_qs += ['prep_def', 'prep_case']
 
         # Add to subquestions list
-        self.add_poss_forms()
+        if self.qtype != 'Prep':
+            self.add_poss_forms()
 
         # Ask about noun phrase after numerals/quantifiers
         if self.trainer.qs['Nphr'].get() and self.qtype in ['Card', 'Coll', 'Ordi', 'Dwa', 'Oqua']:
@@ -307,6 +323,44 @@ class misc_question(question):
                 self.correct_forms.pop(i)
                 self.forms.pop(i)
 
+    # Get all conjugations of winien-like verbs
+    def get_all_wini_conjugations(self):
+
+        # List of all requested conjugations
+        self.forms = []
+
+        # Form all combinations
+        for tense in ['pr', 'pa']:
+            for voice in ['1', '2', '3', 'i']:
+                if voice == 'i':
+                    gens = ['-']
+                else:
+                    gens = ['m', 'f', 'n', 'v', 'nv']
+                for gen in gens:
+                    self.forms.append(gen+'_'+voice+'_'+tense)
+
+    # Keeps only conjugations with answers available for winien-like verbs
+    def choose_poss_wini_conjugations(self):
+
+        # Get all correct answers
+        self.correct_forms = []
+        for form in self.forms:
+            gen, voice, case = form.split('_')
+            try:
+                self.correct_forms.append(get_def_conjugation(self.dict, self.word, gen, voice, case))
+            except:
+                self.correct_forms.append([None])
+        
+        for f, cf in zip(self.forms, self.correct_forms):
+            print(f'{f}: {cf}, ', end='')
+        print('\n')
+
+        # Remove forms without answers
+        for i in range(len(self.forms)-1,-1,-1):
+            if self.correct_forms[i] == [None]:
+                self.correct_forms.pop(i)
+                self.forms.pop(i)
+
     # Adds subquestion about noun phrase after numeral/quantifier
     def add_noun_phrase_subq(self):
 
@@ -341,6 +395,94 @@ class misc_question(question):
         self.sub_qs = self.sub_qs[1:]
         self.correct = self.correct[1:]
 
+    # Load preposition definition subquestion
+    def load_prep_def(self):
+
+        # Identifies version of preposition
+        if 'movement' in self.word:
+            self.vers = 'mov'
+            word = self.word[:-11]
+        elif 'location' in self.word:
+            self.vers = 'loc'
+            word = self.word[:-11]
+        else:
+            self.vers = None
+            word = self.word
+
+        # Get correct definition(s)
+        row = self.game.prep_data.loc[self.game.prep_data['prep_pl']==word]
+        if self.vers == 'loc':
+            correct = list(row['prep_en'])[0][1].split(',')
+        else:
+            correct = list(row['prep_en'])[0][0].split(',')
+        correct = [ans.strip() for ans in correct]
+
+        # Loads subquestion
+        self.load_subquestion('Definition:', correct, self.prep_def_correct)
+        self.sub_qs = self.sub_qs[1:]
+
+    # Check if preposition definition is correct
+    def prep_def_correct(self, widget, answer, correct):
+
+        # Only if first time called
+        if widget['state'] != 'disabled':
+
+            # Check correct
+            self.game.total_questions += 1
+            corr_bool = False
+            if answer in correct:
+                corr_bool = True
+            if corr_bool:
+                widget.configure(disabledbackground='#98fb98')
+                self.game.total_correct += 1
+                self.btn_text = tk.StringVar(value='Mark incorrect')
+            else:
+                widget.configure(disabledbackground='#fa8072')
+                self.btn_text = tk.StringVar(value='Mark correct')
+
+            # Print correct answer
+            self.def_widget = widget
+            def_text = ''
+            for ans in correct:
+                def_text += ans + ', '
+            def_text = def_text[:-2]
+            correct_label = tk.Label(self.q_panel.q_frame, text=def_text, font=('Segoe UI', 14))
+            correct_label.pack(side=tk.TOP)
+
+            # Load button to toggle correct status
+            btn_frame = tk.Frame(self.q_panel.q_frame)
+            btn_frame.pack(side=tk.TOP)
+            toggle = tk.Button(btn_frame, textvariable=self.btn_text, command=self.toggle_def, font=('Segoe UI', 10))
+            toggle.grid(row=0, column=1, padx=10, sticky='ew')
+
+            # Disable and load next question
+            widget.configure(state='disable')
+            self.q_panel.q_frame_update()
+            self.next_subquestion()
+
+    # Load preposition case subquestion
+    def load_prep_case(self):
+
+        # Identifies version of preposition
+        if self.vers == None:
+            word = self.word
+        else:
+            word = self.word[:-11]
+
+        # Get correct case
+        case_dict = {'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
+                     'i': 'instrumental', 'l': 'locative'}
+        row = self.game.prep_data.loc[self.game.prep_data['prep_pl']==word]
+        if self.vers == 'loc':
+            case = list(row['cases'])[0][1]
+        else:
+            case = list(row['cases'])[0][0]
+        correct = [case, case_dict[case]]
+        
+        # Loads subquestion
+        self.load_subquestion('Case:', correct, self.simple_correct)
+        self.sub_qs = self.sub_qs[1:]
+
     # Load next subquestion
     def next_subquestion(self):
 
@@ -349,9 +491,15 @@ class misc_question(question):
             self.end_question()
             return
         
-        # Noun phrase questions
+        # Noun phrase sub questions
         if self.sub_qs[0] in ['nphr_case', 'nphr_num']:
             self.load_noun_phrase()
+
+        # Preposition sub questions
+        elif self.sub_qs[0] == 'prep_def':
+            self.load_prep_def()
+        elif self.sub_qs[0] == 'prep_case':
+            self.load_prep_case()
         
         # Load subquestion depending on question type
         else:
@@ -365,8 +513,6 @@ class misc_question(question):
                 case 'Dwa':
                     pass
                 case 'Wini':
-                    pass
-                case 'Prep':
-                    pass
+                    self.load_conjugation()
 
     

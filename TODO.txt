@@ -16,9 +16,9 @@ x Other quantifiers (kilka, parę, wiele, ile, tyle) (kilkanaście, kilkadziesi�
 (may also need to hardcode parę - https://www.polskinawynos.com/wp-content/uploads/2015/07/deklinacja-liczebnikc3b3w-gc582c3b3wnych-nieokrec59blonych.pdf)
 o Whether to ask about noun phrase for above (case noun takes, gender/plurality of noun phrase)
 
-o Winien-like verbs (winien, powinien)
+x Winien-like verbs (winien, powinien)
 o Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
-o Prepositions (ask for definiton and case(s) following them)
+x Prepositions (ask for definiton and case(s) following them)
 
 x Forms (number of inflections to ask for in each of above questions)
 x Digits (number of digits for numeral questions e.g. 2 digit numbers, 3 digits numbers etc.)
@@ -33,3 +33,4 @@ Compeleted workflows processes:
 - Processed wiki entries downloaded from https://kaikki.org/dictionary/Polish/words/index.html.
 - http://morfeusz.sgjp.pl/en and https://github.com/kawu/concraft-pl/tree/master/bindings/python used to identify lemmas of words in sentences (with probability). 
 - Applied to (Web com 2018 1M) corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.
+- Got preposition case and definitions from https://courseofpolish.com/grammar/cases/cases-after-prepositions/list-of-prepositions

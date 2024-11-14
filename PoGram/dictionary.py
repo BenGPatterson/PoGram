@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import os
 import pickle
 import gzip
 import gc
@@ -290,50 +291,15 @@ def get_definition(dictionary, lemma, pos):
 
 if __name__ == '__main__':
 
-    # # Test case
+    # Test case
     # data_path = os.path.join('PoGram', 'data', 'wiki_entries.pgz')
     # word_dict = load_dictionary(data_path)
     
-    # print(get_conjugation(word_dict, 'mieć', 'verb', 'v', '2p', 'pa'))
-    # for sense in word_dict['winien']['verb']:
+    # for sense in word_dict['dwanaście']['num']:
     #     print(sense)
     # print(get_def_conjugation(word_dict, 'winien', 'm', 'i', 'pa'))
 
-    prep_pl = ['bez(e)', 'blisko', 'dla', 'do', 'dookoła, naokoło, wokół', 'koło', 'obok', 
-               'od(e)', 'oprócz', 'podczas', 'pośród, wśród', '(po)mimo', 'naprzeciw(ko)', 'spośród',
-               'u', 'według', 'wobec', 'wskutek', 'z(e)', 
-               'spod', 'sprzed', 'znad', 'zza', 'spomiędzy', 'zamiast',
-               'dzięki', 'przeciw(ko)', 'wbrew',
-               'przez(e)', 'w(e)', 'na', 'po', 
-               'o', 'pod(e)', 'za',
-               'poza', 'przed(e)', 'nad', 'za', 'między',
-               'przy']
-    prep_en = [['without'], ['near, close'], ['for (the good of)'], ['to, up to, until'], ['(all) around'], ['around, about'], ['next to, alongside'], 
-               ['from, away from, than'], ['besides, except'], ['during'], ['among'], ['despite'], ['across from, opposite'], ['from among, out of'],
-               ['at (someone\'s), near'], ['according to'], ['in the face of, regarding'], ['as the result of'], ['out of, from, down from, off, because off', 'with'],
-               ['from below, from under'], ['from in front'], ['from above'], ['from behind'], ['from among'], ['instead of'],
-               ['thanks to, due to'], ['against'], ['despite'],
-               ['through, via, during'], ['into', 'in, at'], ['onto, to', 'on, at'], ['for, after (to get someone), up to', 'after, over (the surface of)'], 
-               ['against, for (as in fight for)', 'about, at (a time), with (a feature)'], ['to under, beneath, below', 'under, below'], ['behind, in back of, for'],
-               ['apart from, beyond'], ['to before, in front of'], ['to over, above, on top of'], ['to behind, in back of'], ['to between'],
-               ['during, at, next to']]
-    cases = [['g'], ['g'], ['g'], ['g'], ['g'], ['g'], ['g'], 
-             ['g'], ['g'], ['g'], ['g'], ['g'], ['g'], ['g'], 
-             ['g'], ['g'], ['g'], ['g'], ['g', 'i'],
-             ['g'], ['g'], ['g'], ['g'], ['g'], ['g'],
-             ['d'], ['d'], ['d'], 
-             ['a'], ['a', 'l'], ['a', 'l'], ['a', 'l'], 
-             ['a', 'l'], ['a', 'i'],  ['a'], 
-             ['i'], ['i'], ['i'], ['i'], ['i'], 
-             ['l']]
-    
-    import pandas as pd
-    import numpy as np
-
-    data = {'prep_pl': prep_pl, 'prep_en': prep_en, 'cases': cases}
-    prep_cases = pd.DataFrame(data=data)
-    prep_cases.to_csv('PoGram/data/prep_cases.csv')
-
-    data = pd.read_csv('PoGram/data/prep_cases.csv', converters={'prep_en': literal_eval, 'cases': literal_eval})
-    row = data.loc[data['prep_pl'] == 'nad']
-    print(list(row['prep_en'])[0][1].split(','))
+    a = 'tree'
+    for i in range(4):
+        a = a[1:]
+        print(len(a))

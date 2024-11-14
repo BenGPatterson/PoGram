@@ -14,7 +14,7 @@ o Collective numerals (dwoje, troje, czworo, etc.)
 o Dwa/Oba/Obydwa (oba, obydwa, dwa, oboje, obydwoje, dwoje)
 x Other quantifiers (kilka, parę, wiele, ile, tyle) (kilkanaście, kilkadziesiąt, kilkaset) (paręnaście, parędziesiąt, paręset)
 (may also need to hardcode parę - https://www.polskinawynos.com/wp-content/uploads/2015/07/deklinacja-liczebnikc3b3w-gc582c3b3wnych-nieokrec59blonych.pdf)
-o Whether to ask about noun phrase for above (case noun takes, gender/plurality of noun phrase)
+x Whether to ask about noun phrase for above (case noun takes, gender/plurality of noun phrase)
 
 x Winien-like verbs (winien, powinien)
 o Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)

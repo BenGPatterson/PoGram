@@ -2,6 +2,7 @@ import tkinter as tk
 import random
 import pandas as pd
 import os
+import re
 from ast import literal_eval
 from questions import question
 from dictionary import get_declension, get_def_conjugation
@@ -83,15 +84,7 @@ class misc_question(question):
             case 'Opro':
                 word_list = ['który', 'wszystek', 'każdy', 'żaden', 'się']
             case 'Card'|'Coll'|'Ordi':
-                digits = int(self.trainer.digits_no.get())
-                word_list = [str(num) for num in range(10**(digits-1), 10**(digits))]
-                if digits == 1:
-                    if self.qtype in ['Card', 'Ordi']:
-                        word_list.append('0')
-                    else:
-                        word_list = word_list[1:]
-                if self.qtype == 'Ordi':
-                    word_list = [num+'.' for num in word_list]
+                word_list = self.create_num_word_list()
             case 'Dwa':
                 word_list = ['dwa', 'oba', 'obydwa', 'dwoje', 'oboje', 'obydwoje']
             case 'Oqua':
@@ -105,6 +98,40 @@ class misc_question(question):
         # Set word list
         self.game.word_lists['misc'][self.qtype] = word_list
         self.game.current_word_lists['misc'][self.qtype] = []
+
+    # Create word list for numeral options
+    def create_num_word_list(self):
+
+        # Add all possible values with 1 significant figure
+        digits = int(self.trainer.digits_no.get())
+        if digits == 1:
+            if self.qtype in ['Card', 'Ordi']:
+                low_lim = 0
+            else:
+                low_lim = 2
+        else:
+            low_lim = 1
+        word_list = [str(num*10**(digits-1)) for num in range(low_lim,10)]
+
+        # Add twice as many values equally spread across higher significant figure
+        if digits > 1:
+            while len(word_list)<27:
+                sf_dig = random.randint(2,digits)
+                valid_prop = False
+                while valid_prop == False:
+                    proposal = str(random.randint(10**(sf_dig-1), 10**(sf_dig)-1)*10**(digits-sf_dig))
+                    if proposal not in word_list or proposal[sf_dig-digits-1] != '0':
+                        valid_prop = True
+                word_list.append(proposal)
+
+        # Add digit separators
+        word_list = [re.sub("(\d)(?=(\d{3})+(?!\d))", r"\1 ", "%d" % int(num)) for num in word_list]
+
+        # Add periods for ordinal numerals
+        if self.qtype in ['Ordi']:
+            word_list = [num+'.' for num in word_list]
+
+        return word_list
 
     # Load csv of prepositions, cases, and definitions
     def load_prep_csv(self):
@@ -137,7 +164,10 @@ class misc_question(question):
                 self.choose_inte_subqs()
             case 'Opro':
                 self.choose_opron_subqs()
-            case 'Card'|'Coll'|'Ordi':
+            case 'Card':
+                self.get_all_card_declensions()
+                self.choose_poss_card_declensions()
+            case 'Coll'|'Ordi':
                 pass
             case 'Dwa':
                 pass
@@ -276,6 +306,82 @@ class misc_question(question):
         else:
             self.choose_poss_declensions('pron')
 
+    # Keeps only declensions with answers available for cardinal numerals
+    def get_all_card_declensions(self):
+
+        if self.word in ['0']:
+            self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['s', 'p'])
+        elif self.word in ['1']:
+            self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['sma', 'smi', 'sf', 'sn', 'pv', 'pnv'])
+        elif self.word[-1] == '2' and self.word[-2] != '1':
+            self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pm', 'pf', 'pn'])
+        else:
+            self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pm', 'pf', 'pn'])
+
+    # Splits number into components
+    def split_num(self):
+
+        # Sanitize word to remove digit separators, ordinal marker
+        word = re.sub('[ |.]', '', self.word)
+
+        # Handle zero case
+        if word == '0':
+            return ['zero']
+
+        # Split into groups of three
+        num_groups = []
+        while len(word) >= 3:
+            num_groups.append(word[-3:])
+            word = word[:-3]
+        if len(word) > 0:
+            num_groups.append(word)
+        num_groups.reverse()
+
+        # Identify number components for each group
+        all_comps = []
+        for i, group in enumerate(num_groups):
+            comp = []
+            while len(group) > 0:
+                while len(group) > 0 and group[0] == '0':
+                    group = group[1:]
+                if len(group) == 1:
+                    comp.append(int(group[0]))
+                    group = group[1:]
+                if len(group) == 2:
+                    if group[0] == '1' or group[1] == '0':
+                        comp.append(int(group))
+                    else:
+                        comp += [int(group[0])*10, int(group[1])]
+                    group = group[2:]
+                if len(group) == 3:
+                    comp.append(int(group[0])*100)
+                    group = group[1:]
+            if len(comp) > 0:
+                all_comps += comp
+            if len(num_groups) - i == 3 and len(comp) > 0:
+                all_comps.append(10**6)
+            elif len(num_groups) - i == 2 and len(comp) > 0:
+                all_comps.append(10**3)
+
+        # Convert components from numbers to words
+        conv_dict = {1: 'jeden', 2: 'dwa', 3: 'trzy', 4: 'cztery', 5: 'pięć', 6: 'sześć', 7: 'siedem', 8: 'osiem', 9: 'dziewięć', 10: 'dziesięć',
+                     11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szenaście', 
+                     17: 'siedemnaście', 18: 'osiemnaście', 19: 'dziewiętnaście', 20: 'dwadzieścia', 30: 'trzydzieści', 40: 'czterdzieści',
+                     50: 'pięćdzieśiąt', 60: 'sześćdzieśiąt', 70: 'siedemdzieśiąt', 80: 'osiemdzieśiąt', 90: 'dziewięćdzieśiąt', 100: 'sto',
+                     200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset', 
+                     900: 'dziewięćset', 10**3: 'tysiąc', 10**6: 'milion'}
+        all_comps = [conv_dict[num] for num in all_comps]
+
+        print(all_comps)
+
+        return all_comps
+    
+    # Works out correct declensions for cardinal numerals
+    def choose_poss_card_declensions(self):
+
+        # Split number into components
+        comps = self.split_num()
+        
     # Choose subquestions for interrogative pronouns word type
     def choose_inte_subqs(self):
 

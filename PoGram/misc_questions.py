@@ -281,10 +281,6 @@ class misc_question(question):
                 if self.correct_forms[-1] == ['mię']:
                     self.correct_forms[-1].append('mnie')
 
-        for f, cf in zip(self.forms, self.correct_forms):
-            print(f'{f}: {cf}, ', end='')
-        print('\n')
-
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):
             if self.correct_forms[i] == [None]:
@@ -453,10 +449,6 @@ class misc_question(question):
                     self.correct_forms.append(get_declension(self.dict, self.word, 'oqua', numgen, case))
                 except:
                     self.correct_forms.append([None])
-        
-        for f, cf in zip(self.forms, self.correct_forms):
-            print(f'{f}: {cf}, ', end='')
-        print('\n')
 
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):
@@ -491,10 +483,6 @@ class misc_question(question):
                 self.correct_forms.append(get_def_conjugation(self.dict, self.word, gen, voice, case))
             except:
                 self.correct_forms.append([None])
-        
-        for f, cf in zip(self.forms, self.correct_forms):
-            print(f'{f}: {cf}, ', end='')
-        print('\n')
 
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):

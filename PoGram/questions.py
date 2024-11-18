@@ -58,10 +58,7 @@ class question():
                 self.correct_forms.append(get_declension(self.dict, self.word, pos, numgen, case))
             except:
                 self.correct_forms.append([None])
-        
-        for f, cf in zip(self.forms, self.correct_forms):
-            print(f'{f}: {cf}, ', end='')
-        print('\n')
+
 
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):

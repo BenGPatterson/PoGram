@@ -7,6 +7,8 @@ from dictionary import get_definition, get_derived_word, get_conjugation, get_de
 # Base class for all question loaders
 class question():
     def __init__(self, pos, *args, **kwargs):
+
+        # Clears current frame and chooses word
         for widget in self.q_panel.q_frame.winfo_children():
             widget.destroy()
         self.skip = False

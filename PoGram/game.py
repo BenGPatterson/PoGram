@@ -25,7 +25,7 @@ class Game():
         self.q_panel = controller.frames['game'].question_frame
         self.q_panel.q_frame_update()
 
-        # Set initial variables and load first question
+        # Set initial variables and loads first question
         self.current_word_no = 0
         self.total_correct = 0
         self.total_questions = 0
@@ -33,6 +33,14 @@ class Game():
         self.current_word_lists = {'misc': {}}
         self.misc_qtypes = []
         self.current_misc_qtypes = []
+
+        # Loads on screen word counter and next question
+        self.word_counter = tk.StringVar(value=f'{self.current_word_no}/{int(self.parent.menu_frame.w_no.get())}')
+        try:
+            self.q_panel.counter_lbl.configure(textvariable=self.word_counter)
+        except:
+            self.q_panel.counter_lbl = tk.Label(self.q_panel, textvariable=self.word_counter, font=('Segoe UI', 18))
+            self.q_panel.counter_lbl.place(anchor=tk.NE, relx=0.98, rely=0.02)
         self.next_question()
 
     # Loads next question
@@ -45,6 +53,7 @@ class Game():
             self.controller.show_frame('home')
             self.parent.menu_frame.play_btn.focus_set()
             return
+        self.word_counter.set(f'{self.current_word_no}/{int(self.parent.menu_frame.w_no.get())}')
         
         # Select trainer to choose word from and load relevant word list
         train_key = list(self.trainers.keys())[random.randint(0,len(self.trainers)-1)]

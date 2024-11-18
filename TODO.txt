@@ -32,8 +32,6 @@ Potrafiać (and presumably others) is both imperfective and perfective - 'biasp'
 Change 'after prepositions' to not have nominative/vocative (maybe remove these cases altogether from personal pronouns, or only vocative for pan?)
 Should make it clearer noun phrase questions refer to last form
 
-Word counter somewhere
-
 Customisable keybind settings
 Info page explaining different options
 

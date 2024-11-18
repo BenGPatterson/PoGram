@@ -5,7 +5,7 @@ import os
 import re
 from ast import literal_eval
 from questions import question
-from dictionary import get_declension, get_def_conjugation
+from dictionary import get_declension, get_def_conjugation, get_num_comp_declension
 
 # Load misc questions
 class misc_question(question):
@@ -125,7 +125,7 @@ class misc_question(question):
                 word_list.append(proposal)
 
         # Add digit separators
-        word_list = [re.sub("(\d)(?=(\d{3})+(?!\d))", r"\1 ", "%d" % int(num)) for num in word_list]
+        word_list = [re.sub(r"(\d)(?=(\d{3})+(?!\d))", r"\1 ", "%d" % int(num)) for num in word_list]
 
         # Add periods for ordinal numerals
         if self.qtype in ['Ordi']:
@@ -316,7 +316,7 @@ class misc_question(question):
         elif self.word[-1] == '2' and self.word[-2] != '1':
             self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pm', 'pf', 'pn'])
         else:
-            self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pm', 'pf', 'pn'])
+            self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pnv'])
 
     # Splits number into components
     def split_num(self):
@@ -356,23 +356,7 @@ class misc_question(question):
                 if len(group) == 3:
                     comp.append(int(group[0])*100)
                     group = group[1:]
-            if len(comp) > 0:
-                all_comps += comp
-            if len(num_groups) - i == 3 and len(comp) > 0:
-                all_comps.append(10**6)
-            elif len(num_groups) - i == 2 and len(comp) > 0:
-                all_comps.append(10**3)
-
-        # Convert components from numbers to words
-        conv_dict = {1: 'jeden', 2: 'dwa', 3: 'trzy', 4: 'cztery', 5: 'pięć', 6: 'sześć', 7: 'siedem', 8: 'osiem', 9: 'dziewięć', 10: 'dziesięć',
-                     11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szenaście', 
-                     17: 'siedemnaście', 18: 'osiemnaście', 19: 'dziewiętnaście', 20: 'dwadzieścia', 30: 'trzydzieści', 40: 'czterdzieści',
-                     50: 'pięćdzieśiąt', 60: 'sześćdzieśiąt', 70: 'siedemdzieśiąt', 80: 'osiemdzieśiąt', 90: 'dziewięćdzieśiąt', 100: 'sto',
-                     200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset', 
-                     900: 'dziewięćset', 10**3: 'tysiąc', 10**6: 'milion'}
-        all_comps = [conv_dict[num] for num in all_comps]
-
-        print(all_comps)
+            all_comps.append(comp)
 
         return all_comps
     
@@ -381,6 +365,57 @@ class misc_question(question):
 
         # Split number into components
         comps = self.split_num()
+
+        # How to convert components from numbers to words
+        conv_dict = {1: 'jeden', 2: 'dwa', 3: 'trzy', 4: 'cztery', 5: 'pięć', 6: 'sześć', 7: 'siedem', 8: 'osiem', 9: 'dziewięć', 10: 'dziesięć',
+                     11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szenaście', 
+                     17: 'siedemnaście', 18: 'osiemnaście', 19: 'dziewiętnaście', 20: 'dwadzieścia', 30: 'trzydzieści', 40: 'czterdzieści',
+                     50: 'pięćdzieśiąt', 60: 'sześćdzieśiąt', 70: 'siedemdzieśiąt', 80: 'osiemdzieśiąt', 90: 'dziewięćdzieśiąt', 100: 'sto',
+                     200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset', 
+                     900: 'dziewięćset'}
+ 
+        # Convert components from numbers to words
+        base_comps = []
+        for group in comps:
+            base_comps.append([conv_dict[num] for num in group])
+
+        # Work out which components to inflect
+        c_infl = []
+        for group in comps:
+            g_infl = []
+            for num in group:
+                if num%100 != 0 or len(group) == 1:
+                    g_infl.append(True)
+                else:
+                    g_infl.append(False)
+            c_infl.append(g_infl)
+
+        # Work out if milion/tysiąc should override to genitive in direct cases
+        noun_num_gen_overrides = []
+        if len(comps) > 1:
+            for group in comps[:-1]:
+                if len(group) > 0:
+                    if group[-1] in [2,3,4]:
+                        noun_num_gen_overrides.append(False)
+                    elif len(group) == 1 and group[-1] == 1:
+                        noun_num_gen_overrides.append(False)
+                    else:
+                        noun_num_gen_overrides.append(True)
+                else:
+                    noun_num_gen_overrides.append('-')
+
+        # Get all correct answers
+        self.correct_forms = []
+        for form in self.forms:
+            numgen, case = form.split('_')
+            self.correct_forms.append(get_num_comp_declension(self.dict, base_comps, c_infl, 
+                                                              noun_num_gen_overrides, numgen, case))
+            
+        # Remove forms without answers
+        for i in range(len(self.forms)-1,-1,-1):
+            if self.correct_forms[i] == [None]:
+                self.correct_forms.pop(i)
+                self.forms.pop(i)
         
     # Choose subquestions for interrogative pronouns word type
     def choose_inte_subqs(self):
@@ -612,7 +647,7 @@ class misc_question(question):
             match self.qtype:
                 case 'Pers':
                     self.load_declension(disable_numgen=True)
-                case 'Poss'|'Demo'|'Inte'|'Opro'|'Oqua':
+                case 'Poss'|'Demo'|'Inte'|'Opro'|'Card'|'Oqua':
                     self.load_declension()
                 case 'Card'|'Coll'|'Ordi':
                     pass

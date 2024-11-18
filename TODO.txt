@@ -25,6 +25,9 @@ x Digits (number of digits for numeral questions e.g. 2 digit numbers, 3 digits 
 
 Avoid 'two in a row' when bad luck protection moves to next word list/inflection list
 
+Pewien in adjective list is weird - should look into
+Potrafiać (and presumably others) is both imperfective and perfective - 'biasp'
+
 Customisable keybind settings
 Info page explaining different options
 

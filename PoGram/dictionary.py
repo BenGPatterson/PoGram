@@ -289,17 +289,16 @@ def get_definition(dictionary, lemma, pos):
 
     return definitions
 
+# Get declension of components of compound cardinal numeral
+def get_num_comp_declension(dictionary, base_comps, c_infl, gen_overrides, numgen, case):
+    return(['test'])
+
 if __name__ == '__main__':
 
     # Test case
-    # data_path = os.path.join('PoGram', 'data', 'wiki_entries.pgz')
-    # word_dict = load_dictionary(data_path)
+    data_path = os.path.join('PoGram', 'data', 'wiki_entries.pgz')
+    word_dict = load_dictionary(data_path)
     
-    # for sense in word_dict['dwanaście']['num']:
-    #     print(sense)
+    for sense in word_dict['potrafić']['verb']:
+        print(sense)
     # print(get_def_conjugation(word_dict, 'winien', 'm', 'i', 'pa'))
-
-    a = 'tree'
-    for i in range(4):
-        a = a[1:]
-        print(len(a))

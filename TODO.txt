@@ -23,19 +23,28 @@ x Prepositions (ask for definiton and case(s) following them)
 x Forms (number of inflections to ask for in each of above questions)
 x Digits (number of digits for numeral questions e.g. 2 digit numbers, 3 digits numbers etc.)
 
-Avoid 'two in a row' when bad luck protection moves to next word list/inflection list
-
 Verb list does not have perfective forms due to sanity checks when collating word lists checking for present form
+Check that present form is not asked for with perfective verbs
 
 Pewien in adjective list is weird - should look into
 Potrafiać (and presumably others) is both imperfective and perfective - 'biasp'
+Posiadać has both an imperfective and perfective meaning, seems to not work for future tense
+
 Change 'after prepositions' to not have nominative/vocative (maybe remove these cases altogether from personal pronouns, or only vocative for pan?)
-Should make it clearer noun phrase questions refer to last form
+Should make it clearer noun phrase questions refer to last form (or perhaps just most basic?)
+
+Prepositions should be (no movement) instead of (location) - latter does not apply to 'z(e)' for example
+Need to check some prepositions - some later ones appear to be missing alternative cases for movement meanings
+
+Ability to press enter on options screen to start game
+Avoid 'two in a row' when bad luck protection moves to next word list/inflection list
 
 Customisable keybind settings
 Info page explaining different options
 
-Compeleted workflows processes:
+------------------------
+
+Sources used:
 
 - Processed wiki entries downloaded from https://kaikki.org/dictionary/Polish/words/index.html.
 - http://morfeusz.sgjp.pl/en and https://github.com/kawu/concraft-pl/tree/master/bindings/python used to identify lemmas of words in sentences (with probability). 

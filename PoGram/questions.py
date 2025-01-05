@@ -28,6 +28,7 @@ class question():
         self.game.current_word_lists[pos] = self.game.current_word_lists[pos][1:]
 
         # Update title with new word
+        self.word = 'zrobić'
         self.q_panel.parent.title_frame.word.set(self.word)
         self.q_panel.parent.title_frame.update()
 
@@ -214,7 +215,10 @@ class question():
             corr_bool = False
             for defn in correct:
                 pos_ans = defn.split('(')[0]
-                if answer in list(re.split(',| ', pos_ans)) and answer != '':
+                corr_ans = [ans.strip() for ans in list(re.split(',|;', pos_ans))]
+                corr_ans += list(re.split(',| ', pos_ans))
+                print(corr_ans)
+                if answer in corr_ans and answer != '':
                     corr_bool = True
             if corr_bool:
                 widget.configure(disabledbackground='#98fb98')
@@ -357,16 +361,21 @@ class verb_question(question):
 
         # Get aspect
         aspect = get_derived_word(self.dict, self.word, 'verb', 'asp')
+        if 'i' not in aspect and 'pr' in tenses:
+            tenses.remove('pr')
         
         # Choose possible participle tense
         if 'par' in tenses:
             tenses.remove('par')
             if self.word == 'być':
                 tenses.append(['par-act', 'par-cont', 'par-ant'][random.randint(0,2)])
-            elif 'i' in aspect:
-                tenses.append(['par-act', 'par-pas', 'par-cont'][random.randint(0,2)])
-            elif 'p' in aspect:
-                tenses.append(['par-pas', 'par-ant'][random.randint(0,1)])
+            else:
+                poss_tenses = ['par-pas']
+                if 'i' in aspect:
+                    poss_tenses += ['par-act', 'par-cont']
+                if 'p' in aspect:
+                    poss_tenses += ['par-ant']
+                tenses.append(poss_tenses[random.randint(0,len(poss_tenses)-1)])
 
         # Loop tenses
         for tense in tenses:
@@ -390,7 +399,7 @@ class verb_question(question):
 
                 # Choose gender
                 if tense in ['pa', 'f', 'c'] and voice != 'i':
-                    if tense == 'f' and ('p' in aspect or self.word == 'być'):
+                    if tense == 'f' and ('i' not in aspect or self.word == 'być'):
                         gens = ['-']
                     elif 's' in voice:
                         gens = ['m', 'f', 'n']

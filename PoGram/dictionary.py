@@ -19,70 +19,74 @@ def load_dictionary(path):
 def get_conjugation(dictionary, lemma, pos, gen, voice, tense):
 
     # Produce tags
-    tags = set()
+    base_tags = set()
 
     # Tense tags
     tense_dict = {'pr': 'present', 'pa': 'past', 'f': 'future', 'c': 'conditional', 'i': 'imperative', 'v': 'noun-from-verb'}
     part_dict = {'par-act': ['active', 'adjectival', 'participle'], 'par-pas': ['passive', 'adjectival', 'participle'],
                  'par-cont': ['contemporary', 'adjectival', 'participle'], 'par-ant': ['anterior', 'adverbial', 'participle']}
     if 'par' in tense:
-        tags.update(part_dict[tense])
+        base_tags.update(part_dict[tense])
     else:
-        tags.add(tense_dict[tense])
-
-    # Gender tags
-    if tense in ['pa', 'f', 'c', 'par-act', 'par-pas'] and voice != 'i':
-        if tense == 'f' and ('p' in get_derived_word(dictionary, lemma, pos, 'asp') or lemma == 'być'):
-            pass
-        else:
-            if tense in ['par-act', 'par-pas']:
-                gen_dict = {'m': ['singular', 'masculine'], 'f': ['singular', 'feminine'], 'n': ['singular', 'neuter'], 
-                            'v': ['plural', 'virile'], 'nv': ['plural', 'nonvirile']}
-            else:
-                gen_dict = {'m': ['masculine'], 'f': ['feminine'], 'n': ['neuter'], 'v': ['virile'], 'nv': ['nonvirile']}
-            tags.update(gen_dict[gen])
+        base_tags.add(tense_dict[tense])
     
     # Voice tags
     if tense in ['pr', 'pa', 'f', 'c', 'i']:
         voice_dict = {'1s': ['first-person', 'singular'], '2s': ['second-person', 'singular'], '3s': ['third-person', 'singular'], 
                       '1p': ['first-person', 'plural'], '2p': ['second-person', 'plural'], '3p': ['third-person', 'plural'],
                       'i': ['impersonal']}
-        tags.update(voice_dict[voice])
+        base_tags.update(voice_dict[voice])
 
-    # Find corresponding conjugation(s)
+    # Repeat for each aspect
     conjugations = set()
-    for sense in dictionary[lemma][pos]:
-        try:
-            conjugation = set(item['form'] for item in sense['forms'] if set(item['tags']) == tags)
-            conjugations.update(conjugation)
-        except:
-            pass
-    if len(conjugations) == 0:
-        conjugations.add(None)
+    aspects = [asp for asp in get_derived_word(dictionary, lemma, pos, 'asp') if len(asp) == 1]
+    for aspect in aspects:
+        tags = set(base_tags)
 
-    # Retry with 1st/2nd person tag removed
-    if '1' in str(voice) and None in conjugations:
-        tags.remove('first-person')
+        # Gender tags
+        if tense in ['pa', 'f', 'c', 'par-act', 'par-pas'] and voice != 'i':
+            if tense == 'f' and (aspect == 'p' or lemma == 'być'):
+                pass
+            else:
+                if tense in ['par-act', 'par-pas']:
+                    gen_dict = {'m': ['singular', 'masculine'], 'f': ['singular', 'feminine'], 'n': ['singular', 'neuter'], 
+                                'v': ['plural', 'virile'], 'nv': ['plural', 'nonvirile']}
+                else:
+                    gen_dict = {'m': ['masculine'], 'f': ['feminine'], 'n': ['neuter'], 'v': ['virile'], 'nv': ['nonvirile']}
+                tags.update(gen_dict[gen])
+
+        # Find corresponding conjugation(s)
         for sense in dictionary[lemma][pos]:
             try:
-                conjugation = list(item['form'] for item in sense['forms'] if set(item['tags']) == tags)
-                conjugation = set(conjugation[:int(len(conjugation)/2)])
+                conjugation = set(item['form'] for item in sense['forms'] if set(item['tags']) == tags)
                 conjugations.update(conjugation)
             except:
                 pass
-    elif '2' in str(voice) and None in conjugations:
-        tags.remove('second-person')
-        for sense in dictionary[lemma][pos]:
-            try:
-                conjugation = list(item['form'] for item in sense['forms'] if set(item['tags']) == tags)
-                conjugation = set(conjugation[int(len(conjugation)/2):])
-                conjugations.update(conjugation)
-            except:
-                pass
+
+        # Retry with 1st/2nd person tag removed
+        if '1' in str(voice) and None in conjugations:
+            tags.remove('first-person')
+            for sense in dictionary[lemma][pos]:
+                try:
+                    conjugation = list(item['form'] for item in sense['forms'] if set(item['tags']) == tags)
+                    conjugation = set(conjugation[:int(len(conjugation)/2)])
+                    conjugations.update(conjugation)
+                except:
+                    pass
+        elif '2' in str(voice) and None in conjugations:
+            tags.remove('second-person')
+            for sense in dictionary[lemma][pos]:
+                try:
+                    conjugation = list(item['form'] for item in sense['forms'] if set(item['tags']) == tags)
+                    conjugation = set(conjugation[int(len(conjugation)/2):])
+                    conjugations.update(conjugation)
+                except:
+                    pass
     if None in conjugations and len(conjugations) > 1:
                 conjugations.remove(None)
+    elif len(conjugations) == 0:
+        conjugations.add(None)
     
-
     return list(conjugations)
                     
 # Gets declined form of word from dictionary
@@ -217,6 +221,7 @@ def get_derived_word(dictionary, lemma, pos, form):
                    'impf-freq': ['i', 'imperfective'],
                    'impf': ['i', 'imperfective'],
                    'pf': ['p', 'perfective'],
+                   'biasp': ['i', 'imperfective', 'p', 'perfective'],
                    'pl': []}
         for sense in dictionary[lemma][pos]:
             aspect = sense['head_templates'][0]['args']['1']
@@ -243,7 +248,8 @@ def get_derived_word(dictionary, lemma, pos, form):
                     target = None
             try:
                 aspect = sense['head_templates'][0]['args'][target]
-                derived.add(aspect)
+                if 'obsolete' not in aspect:
+                    derived.add(aspect)
             except:
                 pass
         if len(derived) == 0:
@@ -299,6 +305,6 @@ if __name__ == '__main__':
     data_path = os.path.join('PoGram', 'data', 'wiki_entries.pgz')
     word_dict = load_dictionary(data_path)
     
-    for sense in word_dict['potrafić']['verb']:
+    for sense in word_dict['posiadać']['verb']:
         print(sense)
     # print(get_def_conjugation(word_dict, 'winien', 'm', 'i', 'pa'))

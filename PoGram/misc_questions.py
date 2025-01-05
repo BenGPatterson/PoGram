@@ -145,7 +145,7 @@ class misc_question(question):
             if len(list(self.game.prep_data.loc[self.game.prep_data['prep_pl']==prep]['cases'])[0]) == 1:
                 word_list.append(prep)
             else:
-                word_list += [f'{prep} (movement)', f'{prep} (location)']
+                word_list += [f'{prep} (movement)', f'{prep} (no movement)']
 
         return word_list
 
@@ -542,9 +542,14 @@ class misc_question(question):
         row = self.game.prep_data.loc[self.game.prep_data['prep_pl']==word]
         if self.vers == 'loc':
             correct = list(row['prep_en'])[0][1].split(',')
+            self.prep_correct_ans = correct + re.split(',| ', list(row['prep_en'])[0][1])
         else:
             correct = list(row['prep_en'])[0][0].split(',')
+            self.prep_correct_ans = correct +  re.split(',| ', list(row['prep_en'])[0][0])
         correct = [ans.strip() for ans in correct]
+        self.prep_correct_ans = [ans.strip() for ans in self.prep_correct_ans]
+        print(correct)
+        print(self.prep_correct_ans)
 
         # Loads subquestion
         self.load_subquestion('Definition:', correct, self.prep_def_correct)
@@ -559,7 +564,7 @@ class misc_question(question):
             # Check correct
             self.game.total_questions += 1
             corr_bool = False
-            if answer in correct:
+            if answer in self.prep_correct_ans:
                 corr_bool = True
             if corr_bool:
                 widget.configure(disabledbackground='#98fb98')

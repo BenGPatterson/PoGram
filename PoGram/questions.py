@@ -28,7 +28,6 @@ class question():
         self.game.current_word_lists[pos] = self.game.current_word_lists[pos][1:]
 
         # Update title with new word
-        self.word = 'zrobić'
         self.q_panel.parent.title_frame.word.set(self.word)
         self.q_panel.parent.title_frame.update()
 

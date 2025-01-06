@@ -62,6 +62,8 @@ def get_conjugation(dictionary, lemma, pos, gen, voice, tense):
                 conjugations.update(conjugation)
             except:
                 pass
+        if len(conjugations) == 0:
+            conjugations.add(None)
 
         # Retry with 1st/2nd person tag removed
         if '1' in str(voice) and None in conjugations:
@@ -305,6 +307,6 @@ if __name__ == '__main__':
     data_path = os.path.join('PoGram', 'data', 'wiki_entries.pgz')
     word_dict = load_dictionary(data_path)
     
-    for sense in word_dict['posiadać']['verb']:
-        print(sense)
-    # print(get_def_conjugation(word_dict, 'winien', 'm', 'i', 'pa'))
+    # for sense in word_dict['mieć']['verb']:
+    #     print(sense)
+    print(get_conjugation(word_dict, 'mieć', 'verb', '-', '1s', 'pr'))

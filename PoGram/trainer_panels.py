@@ -188,9 +188,9 @@ class misc_trainer(trainer_frame):
         text_dict = {'Pers': 'Personal pronouns', 'Poss': 'Possessive pron.', 'Demo': 'Demonstrative pron.', 
                      'Inte': 'Interrogative pron.', 'Opro': 'Other pronouns', 
                      'Card': 'Cardinal numerals', 'Coll': 'Collective numerals', 'Dwa': 'Dwa/Oba/Obydwa', 
-                     'Oqua': 'Other quantifiers', 'Nphr': 'Ask about noun phrase',
-                     'Wini': 'Winien-like verbs', 'Ordi': 'Ordinal numerals', 'Prep': 'Prepositions'}
-        q_order = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Dwa', 'Oqua', 'Nphr', 'Wini', 'Ordi', 'Prep']
+                     'Oqua': 'Other quantifiers', 'Wini': 'Winien-like verbs', 'Ordi': 'Ordinal numerals', 
+                     'Prep': 'Prepositions'}
+        q_order = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Ordi', 'Dwa', 'Oqua', 'Wini', 'Prep']
         self.qs = {}
         for key in text_dict.keys():
             self.qs[key] = tk.IntVar(value=self.config['qs'][key])
@@ -212,17 +212,14 @@ class misc_trainer(trainer_frame):
         dig_no.grid(row=19, column=1, columnspan=1, pady=(4,0), sticky='w')
 
         # Enforce disabling restrictions
-        noun_phrase_keys = ['Card', 'Coll', 'Dwa', 'Oqua']
         inf_no_keys = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Dwa', 'Oqua', 'Wini', 'Ordi']
         dig_no_keys = ['Card', 'Coll', 'Ordi']
-        vars_list = [[self.qs[key] for key in noun_phrase_keys], 
-                     [self.qs[key] for key in inf_no_keys], 
+        vars_list = [[self.qs[key] for key in inf_no_keys], 
                      [self.qs[key] for key in dig_no_keys]]
-        noun_phrase_ts = [[*seq] for seq in product((True, False), repeat=len(noun_phrase_keys))][:-1]
         inf_no_ts = [[*seq] for seq in product((True, False), repeat=len(inf_no_keys))][:-1]
         dig_no_ts = [[*seq] for seq in product((True, False), repeat=len(dig_no_keys))][:-1]
-        ts_list = [noun_phrase_ts, inf_no_ts, dig_no_ts]
-        widgets_list = [[misc_btns['Nphr']], inf_no.winfo_children(), dig_no.winfo_children()]
+        ts_list = [inf_no_ts, dig_no_ts]
+        widgets_list = [inf_no.winfo_children(), dig_no.winfo_children()]
         self.disable_restrictions(vars_list, ts_list, widgets_list)
 
         # Enforce at least one option select, and multi-select functionality

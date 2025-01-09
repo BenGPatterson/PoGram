@@ -184,10 +184,6 @@ class misc_question(question):
         if self.qtype != 'Prep':
             self.add_poss_forms()
 
-        # Ask about noun phrase after numerals/quantifiers
-        if self.trainer.qs['Nphr'].get() and self.qtype in ['Card', 'Coll', 'Ordi', 'Dwa', 'Oqua']:
-            self.add_noun_phrase_subq()
-
     # Get all declensions for requested cases and genders
     def get_all_case_gen_declensions(self, cases, gens):
 
@@ -204,14 +200,14 @@ class misc_question(question):
 
         # Get all declensions for polite forms
         if self.word in ['pan', 'pani']:
-            self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l', 'v'], ['s'])
+            self.get_all_case_gen_declensions(['g', 'd', 'a', 'i', 'l', 'v'], ['s'])
         elif self.word in ['panowie', 'państwo', 'panie']:
-            self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l', 'v'], ['p'])
+            self.get_all_case_gen_declensions(['g', 'd', 'a', 'i', 'l', 'v'], ['p'])
         else:
 
             # Add long/clitic/preposition options for familiar forms
             self.forms = []
-            cases = ['n', 'g', 'd', 'a', 'i', 'l', 'v']
+            cases = ['g', 'd', 'a', 'i', 'l']
             if self.word in ['ja', 'ty', 'on', 'ono', 'ona']:
                 gens = ['s']
             elif self.word in ['my', 'wy', 'oni', 'one']:
@@ -490,50 +486,16 @@ class misc_question(question):
                 self.correct_forms.pop(i)
                 self.forms.pop(i)
 
-    # Adds subquestion about noun phrase after numeral/quantifier
-    def add_noun_phrase_subq(self):
-
-        # Add questions
-        self.sub_qs += ['nphr_case', 'nphr_num']
-
-        # Get default settings
-        case = self.sub_qs[-3][-1]
-        if 's' in self.sub_qs[-3]:
-            num = 's'
-        else:
-            num = 'p'
-
-        # All other quantifiers are special if nominative or accusative
-        if self.qtype == 'Oqua' and case in ['n', 'a']:
-            case = 'g'
-            num = 's'
-
-        # Add correct answers
-        case_longhand = {'n': 'nominative', 'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
-                         'i': 'instrumental', 'l': 'locative', 'v': 'vocative'}
-        num_longhand = {'s': 'singular', 'p': 'plural'}
-        self.correct.append([case, case_longhand[case]])
-        self.correct.append([num, num_longhand[num]])
-
-    # Load noun phrase question
-    def load_noun_phrase(self):
-
-        # Loads subquestion
-        nphr_text = {'nphr_case': 'Case of noun:', 'nphr_num': 'Grammatical number of noun phrase:'}
-        self.load_subquestion(nphr_text[self.sub_qs[0]], self.correct[0], self.simple_correct)
-        self.sub_qs = self.sub_qs[1:]
-        self.correct = self.correct[1:]
-
     # Load preposition definition subquestion
     def load_prep_def(self):
 
         # Identifies version of preposition
-        if 'movement' in self.word:
+        if '(movement)' in self.word:
             self.vers = 'mov'
             word = self.word[:-11]
-        elif 'location' in self.word:
+        elif '(no movement)' in self.word:
             self.vers = 'loc'
-            word = self.word[:-11]
+            word = self.word[:-14]
         else:
             self.vers = None
             word = self.word
@@ -624,10 +586,6 @@ class misc_question(question):
         if len(self.sub_qs) == 0 or self.skip==True:
             self.end_question()
             return
-        
-        # Noun phrase sub questions
-        if self.sub_qs[0] in ['nphr_case', 'nphr_num']:
-            self.load_noun_phrase()
 
         # Preposition sub questions
         elif self.sub_qs[0] == 'prep_def':

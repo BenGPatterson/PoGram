@@ -362,6 +362,8 @@ class verb_question(question):
         aspect = get_derived_word(self.dict, self.word, 'verb', 'asp')
         if 'i' not in aspect and 'pr' in tenses:
             tenses.remove('pr')
+            if len(tenses) == 0:
+                tenses.append('f')
         
         # Choose possible participle tense
         if 'par' in tenses:

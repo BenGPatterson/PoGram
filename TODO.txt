@@ -23,9 +23,7 @@ x Prepositions (ask for definiton and case(s) following them)
 x Forms (number of inflections to ask for in each of above questions)
 x Digits (number of digits for numeral questions e.g. 2 digit numbers, 3 digits numbers etc.)
 
-Think about how to deal with perfective verbs when only present selected - maybe warning saying future forms will be selected for perfective verbs instead?
-
-Pewien in adjective list is weird - should look into
+Display answers even when correct as some have multiple correct options
 
 Should maybe add noun numerals? Complex forms do not seem to exist for these (and even the teens I believe are very rare), so these would not use the digit field at the bottom
 

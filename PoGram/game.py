@@ -138,6 +138,12 @@ class Game():
         if not self.check_pos_int_entry(w_no):
             self.trainers = None
             return None
+        
+        # Warning about present only for perfective verbs
+        if 'verb' in self.trainers:
+            tenses = [tense.get() for tense in self.trainers['verb'].tense_vars]
+            if self.trainers['verb'].qs[2].get() == 1 and tenses == [1,0,0,0,0,0,0]:
+                tk.messagebox.showwarning('Warning', 'Perfective verbs will ask for future tense instead of present')
 
     # Checks entry string for positive integer
     def check_pos_int_entry(self, string):

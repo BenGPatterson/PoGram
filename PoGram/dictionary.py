@@ -307,6 +307,5 @@ if __name__ == '__main__':
     data_path = os.path.join('PoGram', 'data', 'wiki_entries.pgz')
     word_dict = load_dictionary(data_path)
     
-    # for sense in word_dict['mieć']['verb']:
-    #     print(sense)
-    print(get_conjugation(word_dict, 'mieć', 'verb', '-', '1s', 'pr'))
+    for sense in word_dict['pewny']['adj']:
+        print(sense)

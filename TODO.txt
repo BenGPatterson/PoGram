@@ -23,11 +23,9 @@ x Prepositions (ask for definiton and case(s) following them)
 x Forms (number of inflections to ask for in each of above questions)
 x Digits (number of digits for numeral questions e.g. 2 digit numbers, 3 digits numbers etc.)
 
-Display answers even when correct as some have multiple correct options
+Need to check some prepositions - some later ones appear to be missing alternative cases for movement meanings (checked all_prep.csv up to and incl. powyżej)
 
 Should maybe add noun numerals? Complex forms do not seem to exist for these (and even the teens I believe are very rare), so these would not use the digit field at the bottom
-
-Need to check some prepositions - some later ones appear to be missing alternative cases for movement meanings
 
 Ability to press enter on options screen to start game
 Avoid 'two in a row' when bad luck protection moves to next word list/inflection list
@@ -42,4 +40,4 @@ Sources used:
 - Processed wiki entries downloaded from https://kaikki.org/dictionary/Polish/words/index.html.
 - http://morfeusz.sgjp.pl/en and https://github.com/kawu/concraft-pl/tree/master/bindings/python used to identify lemmas of words in sentences (with probability). 
 - Applied to (Web com 2018 1M) corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.
-- Got preposition case and definitions from https://courseofpolish.com/grammar/cases/cases-after-prepositions/list-of-prepositions
+- Adapted preposition case and definitions from https://courseofpolish.com/grammar/cases/cases-after-prepositions/list-of-prepositions

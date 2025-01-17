@@ -494,7 +494,7 @@ class misc_question(question):
             self.vers = 'mov'
             word = self.word[:-11]
         elif '(no movement)' in self.word:
-            self.vers = 'loc'
+            self.vers = 'nomov'
             word = self.word[:-14]
         else:
             self.vers = None
@@ -502,7 +502,7 @@ class misc_question(question):
 
         # Get correct definition(s)
         row = self.game.prep_data.loc[self.game.prep_data['prep_pl']==word]
-        if self.vers == 'loc':
+        if self.vers == 'nomov':
             correct = list(row['prep_en'])[0][1].split(',')
             self.prep_correct_ans = correct + re.split(',| ', list(row['prep_en'])[0][1])
         else:
@@ -510,8 +510,6 @@ class misc_question(question):
             self.prep_correct_ans = correct +  re.split(',| ', list(row['prep_en'])[0][0])
         correct = [ans.strip() for ans in correct]
         self.prep_correct_ans = [ans.strip() for ans in self.prep_correct_ans]
-        print(correct)
-        print(self.prep_correct_ans)
 
         # Loads subquestion
         self.load_subquestion('Definition:', correct, self.prep_def_correct)
@@ -560,16 +558,18 @@ class misc_question(question):
     def load_prep_case(self):
 
         # Identifies version of preposition
-        if self.vers == None:
-            word = self.word
-        else:
+        if self.vers == 'mov':
             word = self.word[:-11]
+        elif self.vers == 'nomov':
+            word = self.word[:-14]
+        else:
+            word = self.word
 
         # Get correct case
         case_dict = {'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
                      'i': 'instrumental', 'l': 'locative'}
         row = self.game.prep_data.loc[self.game.prep_data['prep_pl']==word]
-        if self.vers == 'loc':
+        if self.vers == 'nomov':
             case = list(row['cases'])[0][1]
         else:
             case = list(row['cases'])[0][0]

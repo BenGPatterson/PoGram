@@ -216,7 +216,6 @@ class question():
                 pos_ans = defn.split('(')[0]
                 corr_ans = [ans.strip() for ans in list(re.split(',|;', pos_ans))]
                 corr_ans += list(re.split(',| ', pos_ans))
-                print(corr_ans)
                 if answer in corr_ans and answer != '':
                     corr_bool = True
             if corr_bool:
@@ -283,16 +282,18 @@ class question():
                 self.game.total_correct += 1
             else:
                 widget.configure(disabledbackground='#fa8072')
-                if set(correct) == set(['imperfective', 'i']):
-                    correct_text = 'imperfective, '
-                elif set(correct) == set(['perfective', 'p']):
-                    correct_text = 'perfective, '
-                else:
-                    correct_text = ''
-                    for ans in correct:
-                        correct_text += ans + ', '
-                correct_label = tk.Label(self.q_panel.q_frame, text=correct_text[:-2], font=('Segoe UI', 14))
-                correct_label.pack(side=tk.TOP)
+
+            # Print correct answer
+            if set(correct) == set(['imperfective', 'i']):
+                correct_text = 'imperfective, '
+            elif set(correct) == set(['perfective', 'p']):
+                correct_text = 'perfective, '
+            else:
+                correct_text = ''
+                for ans in correct:
+                    correct_text += ans + ', '
+            correct_label = tk.Label(self.q_panel.q_frame, text=correct_text[:-2], font=('Segoe UI', 14))
+            correct_label.pack(side=tk.TOP)
 
             # Disable and load next subquestion
             widget.configure(state='disable')

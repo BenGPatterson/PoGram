@@ -98,7 +98,6 @@ class question():
         except:
             correct = [None]
         if None in correct:
-            print(f'Cannot find definition of {pos}: {self.word}')
             self.sub_qs = self.sub_qs[1:]
             self.next_subquestion()
             return
@@ -116,7 +115,6 @@ class question():
         except:
             correct = [None]
         if None in correct:
-            print(f'Cannot find {self.sub_qs[0]} derived word of {pos}: {self.word}')
             self.sub_qs = self.sub_qs[1:]
             self.next_subquestion()
             return

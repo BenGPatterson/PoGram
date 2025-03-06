@@ -1,47 +1,56 @@
 prep_pl,prep_en,cases
 bez(e),['without'],['g']
-blisko,"['near, close']",['g']
+blisko,"['near, close to']",['g']
+co,['every (frequency)'],['a']
 dla,"['for, for the sake of']",['g']
 do,"['to, up to, until']",['g']
-"dookoła, naokoło, wokół",['(all) around'],['g']
-koło,"['around, about']",['g']
+dzięki,"['thanks to, due to']",['d']
+koło,"['around, about, near']",['g']
+kontra,"['against (direct opposition), versus']",['n']
+ku,['toward'],['d']
+na,"['onto, to', 'on, at']","['a', 'l']"
+nad,"['to above, to over', 'above, over, on top of, by (body of water)']","['a', 'i']"
+naprzeciw(ko),"['across from, opposite']",['g']
+"nieopodal, niedaleko, opodal","['near, close to']",['g']
+o,"['against, for (as in fight for), by (a difference)', 'about, at (a time), with (a feature)']","['a', 'l']"
 obok,"['next to, beside, besides']",['g']
 od(e),"['from, away from, than']",['g']
+około,"['near, about (location/time), around (location/time)']",['g']
 oprócz,"['besides, except']",['g']
-podczas,['during'],['g']
-"wśród, pośród",['among'],['g']
-(po)mimo,['despite'],['g']
-naprzeciw(ko),"['across from, opposite']",['g']
-spośród,"['from among']",['g']
-u,"['at (someone's), at (near)']",['g']
-według,['according to'],['g']
-wobec,"['concerning, regarding']",['g']
-wskutek,['as the result of'],['g']
-z(e),"['out of, from, down from, off, because of', 'with']","['g', 'i']"
-spod,"['from below, from under']",['g']
-sprzed,['from in front'],['g']
-znad,['from above'],['g']
-zza,['from behind'],['g']
-spomiędzy,['from among'],['g']
-zamiast,['instead of'],['g']
-dzięki,"['thanks to, due to']",['d']
-przeciw(ko),['against'],['d']
-wbrew,['despite'],['d']
-przez(e),"['through, via']",['a']
-w(e),"['into', 'in, at']","['a', 'l']"
-na,"['onto, to', 'on, at']","['a', 'l']"
 po,"['for (in order to obtain), after (to get someone), up to', 'after, over (the surface of)']","['a', 'l']"
-o,"['against, for (as in fight for), by (a difference)', 'about, at (a time), with (a feature)']","['a', 'l']"
-pod(e),"['to under, toward, against (e.g. wind, current)', 'near, under, below']","['a', 'i']"
-za,"['to behind, in (time), for', 'behind, in favour of']","['a', 'i']"
-poza,"['to beyond, to outside of', 'apart from, beyond, outside of']","['a', 'i']"
-przed(e),"['to before, to in front of', 'before, in front of, ahead of, ago']","['a', 'i']"
-nad,"['to above, to over', 'above, over, on top of, by (body of water)']","['a', 'i']"
+pod(e),"['to under, toward, against (e.g. wind/current)', 'near, under, below']","['a', 'i']"
+podczas,['during'],['g']
+(po)mimo,['despite'],['g']
 (po)między,"['to between', 'between']","['a', 'i']"
-przy,"['at, next to']",['l']
+ponad,"['above (number/measurement/limit), over (number/measurement/limit)']",['a']
+poniżej,"['lower than (location/value)']",['g']
 poprzez,"['through, across, by means of']",['a']
-co,['every (frequency)'],['a']
-poniżej,"['lower (in space), lower (in value)']",['g']
-powyżej,"['hihger (in space), higher (in value)']",['g']
-ku,['toward'],['d']
-
+pośrodku,"['in the middle of']",['g']
+powyżej,"['higher than (location/value)']",['g']
+poza,"['to beyond, to outside of', 'apart from, beyond, outside of']","['a', 'i']"
+przeciw(ko),['against'],['d']
+przed(e),"['to before, to in front of', 'before, in front of, ahead of, ago']","['a', 'i']"
+przez(e),"['through, via']",['a']
+przy,"['at, next to']",['l']
+spod,"['from below, from under, from a place near']",['g']
+spomiędzy,['from among'],['g']
+spośród,"['from among']",['g']
+spoza,"['from behind, from beyond, from outside']",['g']
+sprzed,"['from in front, from before']",['g']
+u,"['at (someone\'s), at (near)']",['g']
+w(e),"['into', 'in, at']","['a', 'l']"
+wbrew,['despite'],['d']
+wedle,['according to'],['g']
+według,['according to'],['g']
+wewnątrz,"['inside']",['g']
+wobec,"['concerning, regarding']",['g']
+"wokół, dookoła, naokoło",['(all) around'],['g']
+wskutek,"['because of, as the result of']",['g']
+"wśród, pośród",['among'],['g']
+wzdłuż,"['along']",['g']
+względem,"['in regard of, regarding']",['g']
+z(e),"['out of, from, down from, off, because of', 'with']","['g', 'i']"
+za,"['to behind, in (time), for', 'behind, in favour of']","['a', 'i']"
+zamiast,['instead of'],['g']
+znad,['from above'],['g']
+zza, ['from beyond'],['g']

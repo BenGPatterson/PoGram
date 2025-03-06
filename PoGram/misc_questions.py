@@ -87,9 +87,15 @@ class misc_question(question):
                 word_list = self.create_num_word_list()
             case 'Dwa':
                 word_list = ['dwa', 'oba', 'obydwa', 'dwoje', 'oboje', 'obydwoje']
+            case 'Nnum':
+                word_list = ['jedynka', 'dwójka', 'trójka', 'czwórka', 'piątka',
+                             'szóstka', 'siódemka', 'ósemka', 'dziewiątka', 'dziesiątka',
+                             'jedenastka', 'dwunastka', 'trzynastka', 'czternastka', 'piętnastka',
+                             'szesnastka', 'siedemnastka', 'osiemnastka', 'dziewiętnastka', 'dwudziestka']
             case 'Oqua':
                 word_list = ['kilka', 'parę', 'wiele', 'ile', 'tyle', 
-                             'kilkanaście', 'kilkadziesiąt', 'kilkaset', 'paręnaście', 'parędziesiąt', 'paręset']
+                             'kilkanaście', 'kilkadziesiąt', 'kilkaset',
+                             'paręnaście', 'parędziesiąt', 'paręset']
             case 'Wini':
                 word_list = ['winien', 'powinien']
             case 'Prep':
@@ -170,6 +176,8 @@ class misc_question(question):
             case 'Coll'|'Ordi':
                 pass
             case 'Dwa':
+                pass
+            case 'Nnum':
                 pass
             case 'Oqua':
                 self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pnv'])
@@ -524,7 +532,7 @@ class misc_question(question):
             # Check correct
             self.game.total_questions += 1
             corr_bool = False
-            if answer in self.prep_correct_ans:
+            if answer in self.prep_correct_ans and answer != '':
                 corr_bool = True
             if corr_bool:
                 widget.configure(disabledbackground='#98fb98')
@@ -566,8 +574,8 @@ class misc_question(question):
             word = self.word
 
         # Get correct case
-        case_dict = {'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
-                     'i': 'instrumental', 'l': 'locative'}
+        case_dict = {'n': 'nominative', 'a': 'accusative', 'g': 'genitive',
+                     'd': 'dative', 'i': 'instrumental', 'l': 'locative'}
         row = self.game.prep_data.loc[self.game.prep_data['prep_pl']==word]
         if self.vers == 'nomov':
             case = list(row['cases'])[0][1]

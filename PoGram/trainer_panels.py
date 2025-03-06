@@ -186,15 +186,15 @@ class misc_trainer(trainer_frame):
 
         # Load pronoun questions
         text_dict = {'Pers': 'Personal pronouns', 'Poss': 'Possessive pron.', 'Demo': 'Demonstrative pron.', 
-                     'Inte': 'Interrogative pron.', 'Opro': 'Other pronouns', 
-                     'Card': 'Cardinal numerals', 'Coll': 'Collective numerals', 'Dwa': 'Dwa/Oba/Obydwa', 
-                     'Oqua': 'Other quantifiers', 'Wini': 'Winien-like verbs', 'Ordi': 'Ordinal numerals', 
+                     'Inte': 'Interrogative pron.', 'Opro': 'Other pronouns', 'Card': 'Cardinal numerals',
+                     'Coll': 'Collective numerals', 'Dwa': 'Dwa/Oba/Obydwa', 'Ordi': 'Ordinal numerals',
+                     'Nnum': 'Numeral nouns', 'Oqua': 'Other quantifiers', 'Wini': 'Winien-like verbs', 
                      'Prep': 'Prepositions'}
-        q_order = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Ordi', 'Dwa', 'Oqua', 'Wini', 'Prep']
+        q_order = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Dwa', 'Ordi', 'Nnum', 'Oqua', 'Wini', 'Prep']
         self.qs = {}
         for key in text_dict.keys():
             self.qs[key] = tk.IntVar(value=self.config['qs'][key])
-        other_rows = {8: None, 14: None}
+        other_rows = {8: None, 15: None}
         btns_list = self.load_scol(3, [text_dict[key] for key in q_order], [self.qs[key] for key in q_order], other_rows=other_rows, return_btns=True)
         misc_btns = {}
         for i, key in enumerate(q_order):
@@ -212,7 +212,7 @@ class misc_trainer(trainer_frame):
         dig_no.grid(row=19, column=1, columnspan=1, pady=(4,0), sticky='w')
 
         # Enforce disabling restrictions
-        inf_no_keys = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Dwa', 'Oqua', 'Wini', 'Ordi']
+        inf_no_keys = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Dwa', 'Ordi', 'Nnum', 'Oqua', 'Wini']
         dig_no_keys = ['Card', 'Coll', 'Ordi']
         vars_list = [[self.qs[key] for key in inf_no_keys], 
                      [self.qs[key] for key in dig_no_keys]]
@@ -223,7 +223,7 @@ class misc_trainer(trainer_frame):
         self.disable_restrictions(vars_list, ts_list, widgets_list)
 
         # Enforce at least one option select, and multi-select functionality
-        self.link_keys = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Dwa', 'Oqua', 'Wini', 'Ordi', 'Prep']
+        self.link_keys = text_dict.keys()
         self.link_buttons([self.qs[key] for key in self.link_keys], [misc_btns[key] for key in self.link_keys])
 
         # Finish loading

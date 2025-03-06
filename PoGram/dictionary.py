@@ -307,5 +307,14 @@ if __name__ == '__main__':
     data_path = os.path.join('PoGram', 'data', 'wiki_entries.pgz')
     word_dict = load_dictionary(data_path)
     
-    for sense in word_dict['pewny']['adj']:
-        print(sense)
+    for nnum in ['jedynka', 'dwójka', 'trójka', 'czwórka', 'piątka',
+                             'szóstka', 'siódemka', 'ósemka', 'dziewiątka', 'dziesiątka',
+                             'jedenastka', 'dwunastka', 'trzynastka', 'czternastka', 'piętnastka',
+                             'szesnastka', 'siedemnastka', 'osiemnastka', 'dziewiętnastka', 'dwudziestka']:
+        try:
+            print(word_dict[nnum].keys())
+        except:
+            print(f'{nnum} not found in dictionary')
+
+    # for sense in word_dict['jedenastka']['noun']:
+    #     print(sense)

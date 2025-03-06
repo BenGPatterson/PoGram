@@ -11,19 +11,17 @@ x Other pronouns (który, wszystek, każdy, żaden, się)
 
 o Cardinal numerals (jeden, dwa, trzy, etc.) (dwa, trzy, cztery and possible others do not have declensions in wiki data, may need to hardcode)
 o Collective numerals (dwoje, troje, czworo, etc.)
+o Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
+o Noun numerals (jedynka, dwójka, trójka, etc.) (even teens are very rare, so do not need to use digit field for these) (12, and 14 onwards do not have declensions in dictionary)
 o Dwa/Oba/Obydwa (oba, obydwa, dwa, oboje, obydwoje, dwoje)
 x Other quantifiers (kilka, parę, wiele, ile, tyle) (kilkanaście, kilkadziesiąt, kilkaset) (paręnaście, parędziesiąt, paręset)
 (may also need to hardcode parę - https://www.polskinawynos.com/wp-content/uploads/2015/07/deklinacja-liczebnikc3b3w-gc582c3b3wnych-nieokrec59blonych.pdf)
-x Whether to ask about noun phrase for above (case noun takes, gender/plurality of noun phrase)
 
 x Winien-like verbs (winien, powinien)
-o Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
 x Prepositions (ask for definiton and case(s) following them)
 
 x Forms (number of inflections to ask for in each of above questions)
 x Digits (number of digits for numeral questions e.g. 2 digit numbers, 3 digits numbers etc.)
-
-Need to check some prepositions - some later ones appear to be missing alternative cases for movement meanings (checked all_prep.csv up to and incl. powyżej)
 
 Should maybe add noun numerals? Complex forms do not seem to exist for these (and even the teens I believe are very rare), so these would not use the digit field at the bottom
 

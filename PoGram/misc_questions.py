@@ -88,10 +88,7 @@ class misc_question(question):
             case 'Dwa':
                 word_list = ['dwa', 'oba', 'obydwa', 'dwoje', 'oboje', 'obydwoje']
             case 'Nnum':
-                word_list = ['jedynka', 'dwójka', 'trójka', 'czwórka', 'piątka',
-                             'szóstka', 'siódemka', 'ósemka', 'dziewiątka', 'dziesiątka',
-                             'jedenastka', 'dwunastka', 'trzynastka', 'czternastka', 'piętnastka',
-                             'szesnastka', 'siedemnastka', 'osiemnastka', 'dziewiętnastka', 'dwudziestka']
+                word_list = [str(num)+' (noun)' for num in range(0,13)]
             case 'Oqua':
                 word_list = ['kilka', 'parę', 'wiele', 'ile', 'tyle', 
                              'kilkanaście', 'kilkadziesiąt', 'kilkaset',
@@ -131,7 +128,8 @@ class misc_question(question):
                 word_list.append(proposal)
 
         # Add digit separators
-        word_list = [re.sub(r"(\d)(?=(\d{3})+(?!\d))", r"\1 ", "%d" % int(num)) for num in word_list]
+        if digits > 4:
+            word_list = [re.sub(r"(\d)(?=(\d{3})+(?!\d))", r"\1 ", "%d" % int(num)) for num in word_list]
 
         # Add periods for ordinal numerals
         if self.qtype in ['Ordi']:
@@ -178,7 +176,8 @@ class misc_question(question):
             case 'Dwa':
                 pass
             case 'Nnum':
-                pass
+                self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l', 'v'], ['s', 'p'])
+                self.choose_poss_nnum_declensions()
             case 'Oqua':
                 self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pnv'])
                 self.choose_poss_oqua_declensions()
@@ -363,6 +362,10 @@ class misc_question(question):
     # Works out correct declensions for cardinal numerals
     def choose_poss_card_declensions(self):
 
+        # If zero can use dictionary
+        if self.word == '0':
+            self.choose_poss_declensions('noun')
+
         # Split number into components
         comps = self.split_num()
 
@@ -373,36 +376,32 @@ class misc_question(question):
                      50: 'pięćdzieśiąt', 60: 'sześćdzieśiąt', 70: 'siedemdzieśiąt', 80: 'osiemdzieśiąt', 90: 'dziewięćdzieśiąt', 100: 'sto',
                      200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset', 
                      900: 'dziewięćset'}
+        
  
         # Convert components from numbers to words
         base_comps = []
-        for group in comps:
+        for i, group in enumerate(comps):
             base_comps.append([conv_dict[num] for num in group])
 
-        # Work out which components to inflect
+        # Work out which components to inflect in loose case
         c_infl = []
-        for group in comps:
-            g_infl = []
-            for num in group:
-                if num%100 != 0 or len(group) == 1:
-                    g_infl.append(True)
-                else:
-                    g_infl.append(False)
-            c_infl.append(g_infl)
-
-        # Work out if milion/tysiąc should override to genitive in direct cases
-        noun_num_gen_overrides = []
-        if len(comps) > 1:
-            for group in comps[:-1]:
-                if len(group) > 0:
-                    if group[-1] in [2,3,4]:
-                        noun_num_gen_overrides.append(False)
-                    elif len(group) == 1 and group[-1] == 1:
-                        noun_num_gen_overrides.append(False)
+        found_last = False
+        for group in comps[::-1]:
+            if group != [] and found_last == False:
+                g_infl = []
+                for num in group:
+                    if num%100 != 0 or len(group) == 1:
+                        g_infl.append(True)
                     else:
-                        noun_num_gen_overrides.append(True)
-                else:
-                    noun_num_gen_overrides.append('-')
+                        g_infl.append(False)
+                c_infl.append(g_infl)
+                found_last = True
+            elif found_last == True:
+                c_infl.append([False for i in range(len(group))])
+            else:
+                c_infl.append([])
+        c_infl = c_infl[::-1]
+        print(c_infl)
 
         # Get all correct answers
         self.correct_forms = []
@@ -428,6 +427,36 @@ class misc_question(question):
             self.choose_poss_declensions('noun')
         else:
             self.choose_poss_declensions('pron')
+
+    # Keeps only declensions with answers available for numeral nouns
+    def choose_poss_nnum_declensions(self):
+
+        # Find base polish form from number
+        num = int(self.word.split(' ')[0])
+        words = {0: 'zero', 1: 'jedynka', 2: 'dwójka', 3: 'trójka', 4: 'czwórka',
+                 5: 'piątka', 6: 'szóstka', 7: 'siódemka', 8: 'ósemka', 9: 'dziewiątka',
+                 10: 'dziesiątka', 11: 'jedenastka', 12: 'dwunastka'}
+        word = words[num]
+
+        # Get all correct answers
+        self.correct_forms = []
+        for form in self.forms:
+            numgen, case = form.split('_')
+            try:
+                if word != 'dwunastka':
+                    self.correct_forms.append(get_declension(self.dict, word, 'noun', numgen, case))
+                else:
+                    correct_11 = get_declension(self.dict, 'jedenastka', 'noun', numgen, case)
+                    correct_12 = ['dwu' + ans[4:] for ans in correct_11]
+                    self.correct_forms.append(correct_12)
+            except:
+                self.correct_forms.append([None])
+
+        # Remove forms without answers
+        for i in range(len(self.forms)-1,-1,-1):
+            if self.correct_forms[i] == [None]:
+                self.correct_forms.pop(i)
+                self.forms.pop(i)
 
     # Keeps only declensions with answers available for other quantifiers
     def choose_poss_oqua_declensions(self):
@@ -606,7 +635,7 @@ class misc_question(question):
             match self.qtype:
                 case 'Pers':
                     self.load_declension(disable_numgen=True)
-                case 'Poss'|'Demo'|'Inte'|'Opro'|'Card'|'Oqua':
+                case 'Poss'|'Demo'|'Inte'|'Opro'|'Card'|'Nnum'|'Oqua':
                     self.load_declension()
                 case 'Card'|'Coll'|'Ordi':
                     pass

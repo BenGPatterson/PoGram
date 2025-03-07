@@ -61,7 +61,6 @@ class question():
             except:
                 self.correct_forms.append([None])
 
-
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):
             if self.correct_forms[i] == [None]:

@@ -10,9 +10,9 @@ x Interrogative pronouns (co, kto, coś, ktoś, cokolwiek, ktokolwiek, nic, nikt
 x Other pronouns (który, wszystek, każdy, żaden, się)
 
 o Cardinal numerals (jeden, dwa, trzy, etc.) (dwa, trzy, cztery and possible others do not have declensions in wiki data, may need to hardcode)
-o Collective numerals (dwoje, troje, czworo, etc.)
+o Collective numerals (dwoje, troje, czworo, etc.) (only go up to ten here - usually would always have switched to cardinal by this point)
 o Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
-o Noun numerals (jedynka, dwójka, trójka, etc.) (even teens are very rare, so do not need to use digit field for these) (12, and 14 onwards do not have declensions in dictionary)
+x Numeral nouns (jedynka, dwójka, trójka, etc.) (even teens are very rare, so do not need to use digit field for these)
 o Dwa/Oba/Obydwa (oba, obydwa, dwa, oboje, obydwoje, dwoje)
 x Other quantifiers (kilka, parę, wiele, ile, tyle) (kilkanaście, kilkadziesiąt, kilkaset) (paręnaście, parędziesiąt, paręset)
 (may also need to hardcode parę - https://www.polskinawynos.com/wp-content/uploads/2015/07/deklinacja-liczebnikc3b3w-gc582c3b3wnych-nieokrec59blonych.pdf)
@@ -23,13 +23,17 @@ x Prepositions (ask for definiton and case(s) following them)
 x Forms (number of inflections to ask for in each of above questions)
 x Digits (number of digits for numeral questions e.g. 2 digit numbers, 3 digits numbers etc.)
 
-Should maybe add noun numerals? Complex forms do not seem to exist for these (and even the teens I believe are very rare), so these would not use the digit field at the bottom
+Considering scaled back approach to numerals:
+  - Cardinal up to 1000, correct either decline all (except jeden if compound) or as wikipedia suggests
+  - Collective only up to 10 as would switch to cardinal above this
+  - Ordinal only with non-compound up to 1000, and compound up to 100, turning and declining both parts into ordinal form
+Then do not need digits field
 
 Ability to press enter on options screen to start game
 Avoid 'two in a row' when bad luck protection moves to next word list/inflection list
 
 Customisable keybind settings
-Info page explaining different options
+Info page explaining different options (https://stackoverflow.com/questions/3842155/is-there-a-way-to-make-the-tkinter-text-widget-read-only for block read only text)
 
 ------------------------
 

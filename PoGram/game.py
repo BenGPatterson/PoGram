@@ -127,11 +127,6 @@ class Game():
                     if not self.check_pos_int_entry(freq_no):
                         self.trainers = None
                         return
-            else:
-                digits_no = self.trainers[key].digits_no.get()
-                if not self.check_pos_int_entry(digits_no):
-                    self.trainers = None
-                    return
                 
         # Check question number entry
         w_no = parent.menu_frame.w_no.get()

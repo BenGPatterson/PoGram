@@ -105,34 +105,21 @@ class misc_question(question):
     # Create word list for numeral options
     def create_num_word_list(self):
 
-        # Add all possible values with 1 significant figure
-        digits = int(self.trainer.digits_no.get())
-        if digits == 1:
-            if self.qtype in ['Card', 'Ordi']:
-                low_lim = 0
-            else:
-                low_lim = 2
-        else:
-            low_lim = 1
-        word_list = [str(num*10**(digits-1)) for num in range(low_lim,10)]
-
-        # Add twice as many values equally spread across higher significant figure
-        if digits > 1:
-            while len(word_list)<27:
-                sf_dig = random.randint(2,digits)
-                valid_prop = False
-                while valid_prop == False:
-                    proposal = str(random.randint(10**(sf_dig-1), 10**(sf_dig)-1)*10**(digits-sf_dig))
-                    if proposal not in word_list or proposal[sf_dig-digits-1] != '0':
-                        valid_prop = True
-                word_list.append(proposal)
+        # Add all values for each qtype
+        sfs = {'Card': 3, 'Coll': 1, 'Ordi': 2}
+        word_list = [str(i) for i in range(0, 10**sfs[self.qtype]+1)]
+        if self.qtype == 'Coll':
+            word_list = word_list[2:]
+        elif self.qtype == 'Ordi':
+            word_list += [str(num*100) for num in range(2, 11)]
 
         # Add digit separators
-        if digits > 4:
-            word_list = [re.sub(r"(\d)(?=(\d{3})+(?!\d))", r"\1 ", "%d" % int(num)) for num in word_list]
+        word_list = [re.sub(r"(\d)(?=(\d{3})+(?!\d))", r"\1 ", "%d" % int(num)) for num in word_list]
 
-        # Add periods for ordinal numerals
-        if self.qtype in ['Ordi']:
+        # Add periods for ordinal numerals and collective tag for collective numerals
+        if self.qtype == 'Coll':
+            word_list = [num+' (collective)' for num in word_list]
+        elif self.qtype == 'Ordi':
             word_list = [num+'.' for num in word_list]
 
         return word_list
@@ -321,94 +308,68 @@ class misc_question(question):
     def split_num(self):
 
         # Sanitize word to remove digit separators, ordinal marker
-        word = re.sub('[ |.]', '', self.word)
+        word = re.sub('[ .]|\(.*', '', self.word)
 
-        # Handle zero case
+        # Single digit case and one thousand case
         if word == '0':
             return ['zero']
+        elif word == '1000':
+            return ['tysiąc']
 
-        # Split into groups of three
-        num_groups = []
-        while len(word) >= 3:
-            num_groups.append(word[-3:])
-            word = word[:-3]
-        if len(word) > 0:
-            num_groups.append(word)
-        num_groups.reverse()
+        # Identify number components
+        num_comps = []
+        while len(word) > 0:
+            while len(word) > 0 and word[0] == '0':
+                word = word[1:]
+            if len(word) == 1:
+                num_comps.append(int(word[0]))
+                word = word[1:]
+            elif len(word) == 2:
+                if word[0] == '1' or word[1] == '0':
+                    num_comps.append(int(word))
+                else:
+                    num_comps += [int(word[0])*10, int(word[1])]
+                word = word[2:]
+            elif len(word) == 3:
+                num_comps.append(int(word[0])*100)
+                word = word[1:]
 
-        # Identify number components for each group
-        all_comps = []
-        for i, group in enumerate(num_groups):
-            comp = []
-            while len(group) > 0:
-                while len(group) > 0 and group[0] == '0':
-                    group = group[1:]
-                if len(group) == 1:
-                    comp.append(int(group[0]))
-                    group = group[1:]
-                if len(group) == 2:
-                    if group[0] == '1' or group[1] == '0':
-                        comp.append(int(group))
-                    else:
-                        comp += [int(group[0])*10, int(group[1])]
-                    group = group[2:]
-                if len(group) == 3:
-                    comp.append(int(group[0])*100)
-                    group = group[1:]
-            all_comps.append(comp)
-
-        return all_comps
-    
-    # Works out correct declensions for cardinal numerals
-    def choose_poss_card_declensions(self):
-
-        # If zero can use dictionary
-        if self.word == '0':
-            self.choose_poss_declensions('noun')
-
-        # Split number into components
-        comps = self.split_num()
-
-        # How to convert components from numbers to words
+        # Convert components from numbers to words
         conv_dict = {1: 'jeden', 2: 'dwa', 3: 'trzy', 4: 'cztery', 5: 'pięć', 6: 'sześć', 7: 'siedem', 8: 'osiem', 9: 'dziewięć', 10: 'dziesięć',
                      11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szenaście', 
                      17: 'siedemnaście', 18: 'osiemnaście', 19: 'dziewiętnaście', 20: 'dwadzieścia', 30: 'trzydzieści', 40: 'czterdzieści',
                      50: 'pięćdzieśiąt', 60: 'sześćdzieśiąt', 70: 'siedemdzieśiąt', 80: 'osiemdzieśiąt', 90: 'dziewięćdzieśiąt', 100: 'sto',
                      200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset', 
                      900: 'dziewięćset'}
-        
- 
-        # Convert components from numbers to words
-        base_comps = []
-        for i, group in enumerate(comps):
-            base_comps.append([conv_dict[num] for num in group])
+        word_comps = [conv_dict[num] for num in num_comps]
+
+        return word_comps
+    
+    # Works out correct declensions for cardinal numerals
+    def choose_poss_card_declensions(self):
+
+        # Split number into components
+        comps = self.split_num()
 
         # Work out which components to inflect in loose case
-        c_infl = []
-        found_last = False
-        for group in comps[::-1]:
-            if group != [] and found_last == False:
-                g_infl = []
-                for num in group:
-                    if num%100 != 0 or len(group) == 1:
-                        g_infl.append(True)
-                    else:
-                        g_infl.append(False)
-                c_infl.append(g_infl)
-                found_last = True
-            elif found_last == True:
-                c_infl.append([False for i in range(len(group))])
-            else:
-                c_infl.append([])
-        c_infl = c_infl[::-1]
-        print(c_infl)
-
+        loose_infl = [False for _ in range(len(comps))]
+        if len(comps) == 1:
+            loose_infl[-1] = True
+        elif comps[-1] == 'jeden':
+            loose_infl[-2] = True
+        else:
+            loose_infl[-1] = True
+            units_check = comps[-1] in ['dwa', 'trzy', 'cztery', 'pięć', 'sześć', 'siedem', 'osiem', 'dziewięć']
+            tens_check = comps[-2] in ['dwadzieścia', 'trzydzieści', 'czterdzieści', 'pięćdzieśiąt',
+                                        'sześćdziesiąt', 'siedemdziesiąt', 'osiemdziesiąt', 'dziewięćdziesiąt']
+            if units_check and tens_check:
+                loose_infl[-2] = True
+        
         # Get all correct answers
         self.correct_forms = []
         for form in self.forms:
             numgen, case = form.split('_')
-            self.correct_forms.append(get_num_comp_declension(self.dict, base_comps, c_infl, 
-                                                              noun_num_gen_overrides, numgen, case))
+            self.correct_forms.append(get_num_comp_declension(self.dict, comps, loose_infl, numgen, case))
             
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):

@@ -25,9 +25,11 @@ x Digits (number of digits for numeral questions e.g. 2 digit numbers, 3 digits 
 
 Considering scaled back approach to numerals:
   - Cardinal up to 1000, correct either decline all (except jeden if compound) or as wikipedia suggests
-  - Collective only up to 10 as would switch to cardinal above this
+  - Collective only up to 10 as would likely switch to cardinal above this
   - Ordinal only with non-compound up to 1000, and compound up to 100, turning and declining both parts into ordinal form
 Then do not need digits field
+
+Remove neutral verb conjugations (except 3rd person singular)
 
 Ability to press enter on options screen to start game
 Avoid 'two in a row' when bad luck protection moves to next word list/inflection list

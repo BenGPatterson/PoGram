@@ -200,26 +200,19 @@ class misc_trainer(trainer_frame):
         for i, key in enumerate(q_order):
             misc_btns[key] = btns_list[i]
 
-        # Load option to select number of inflections and number of digits
+        # Load option to select number of inflections
         self.line_border(18)
         self.inflections_no = tk.StringVar(value=self.config['inflections_no'])
         inf_no = Entrybutton(self, variable=None, text=f'Forms:', textvariable=self.inflections_no, btn_type='label', 
                            e_width=2, justify='right', int_only=True, bounded=True, bg=self.bg)
         inf_no.grid(row=19, column=0, columnspan=1, padx=(10,0), pady=(4,0), sticky='w')
-        self.digits_no = tk.StringVar(value=self.config['digits_no'])
-        dig_no = Entrybutton(self, variable=None, text=f'Digits:', textvariable=self.digits_no, btn_type='label', 
-                           e_width=2, e_allow=1, justify='right', int_only=True, bounded=True, bg=self.bg)
-        dig_no.grid(row=19, column=1, columnspan=1, pady=(4,0), sticky='w')
 
         # Enforce disabling restrictions
         inf_no_keys = ['Pers', 'Poss', 'Demo', 'Inte', 'Opro', 'Card', 'Coll', 'Dwa', 'Ordi', 'Nnum', 'Oqua', 'Wini']
-        dig_no_keys = ['Card', 'Coll', 'Ordi']
-        vars_list = [[self.qs[key] for key in inf_no_keys], 
-                     [self.qs[key] for key in dig_no_keys]]
+        vars_list = [[self.qs[key] for key in inf_no_keys]]
         inf_no_ts = [[*seq] for seq in product((True, False), repeat=len(inf_no_keys))][:-1]
-        dig_no_ts = [[*seq] for seq in product((True, False), repeat=len(dig_no_keys))][:-1]
-        ts_list = [inf_no_ts, dig_no_ts]
-        widgets_list = [inf_no.winfo_children(), dig_no.winfo_children()]
+        ts_list = [inf_no_ts]
+        widgets_list = [inf_no.winfo_children()]
         self.disable_restrictions(vars_list, ts_list, widgets_list)
 
         # Enforce at least one option select, and multi-select functionality
@@ -259,7 +252,6 @@ class misc_trainer(trainer_frame):
         for key in self.qs.keys():
             config['qs'][key] = self.qs[key].get()
         config['inflections_no'] = self.inflections_no.get()
-        config['digits_no'] = self.digits_no.get()
         config['widget_status'] = self.widget_status
 
         return config

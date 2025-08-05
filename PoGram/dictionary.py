@@ -4,7 +4,6 @@ import os
 import pickle
 import gzip
 import gc
-from ast import literal_eval
 
 # Loads dictionary from pickled file
 def load_dictionary(path):
@@ -297,24 +296,150 @@ def get_definition(dictionary, lemma, pos):
 
     return definitions
 
+def hardcode_num_declensions(dictionary, word):
+
+    forms = []
+
+    if word == 'dwa':
+        form_codes = {'dwaj': ['pv_n'], 'dwóch': ['pv_n', 'g', 'pv_a', 'l'], 'dwa': ['pm_n', 'pn_g', 'pm_a', 'pn_a'],
+                      'dwie': ['pf_n', 'pf_a'], 'dwóm': ['d'], 'dwoma': ['i'], 'dwiema': ['pf_i']}
+        numgen_codes = {'pv': ['plural', 'virile'], 'pm': ['plural', 'masculine'], 'pn': ['plural', 'neutral'], 'pf': ['plural', 'feminine']}
+        case_codes = {'n': ['nominative'], 'g': ['genitive'], 'd': ['dative'], 'a': ['accusative'], 'i': ['instrumental'], 'l': ['locative']}
+        for form in form_codes.keys():
+            for form_code in form_codes[form]:
+                if len(form_code) == 1:
+                    for code in numgen_codes.keys():
+                        forms.append({'form': form, 'tags': numgen_codes[code] + case_codes[form_code]})
+                else:
+                    forms.append({'form': form, 'tags': numgen_codes[form_code[:-2]] + case_codes[form_code[-1]]})
+                
+    elif word in ['trzy', 'cztery']:
+        if word == 'trzy':
+            form_codes = {'trzej': ['pv_n'], 'trzech': ['pv_n', 'pnv_g', 'pv_a', 'pnv_l'], 'trzy': ['pnv_n', 'pnv_a'],
+                          'trzem': ['pnv_d'], 'trzema': ['pnv_i']}
+        elif word == 'cztery':
+            form_codes = {'czterej': ['pv_n'], 'czterech': ['pv_n', 'pnv_g', 'pv_a', 'pnv_l'], 'cztery': ['pnv_n', 'pnv_a'],
+                          'czterem': ['pnv_d'], 'czterema': ['pnv_i']}
+        numgen_codes = {'pv': ['plural', 'virile'], 'pnv': ['plural']}
+        case_codes = {'n': ['nominative'], 'g': ['genitive'], 'd': ['dative'], 'a': ['accusative'], 'i': ['instrumental'], 'l': ['locative']}
+        for form in form_codes.keys():
+            for form_code in form_codes[form]:
+                forms.append({'form': form, 'tags': numgen_codes[form_code[:-2]] + case_codes[form_code[-1]]})
+
+    elif word == 'sześć':
+        forms = dictionary[word]['noun'][0]['forms']
+
+    dictionary[word]['num'].append({'forms': forms})
+    
+    return dictionary
+
+
 # Get declension of components of compound cardinal numeral
-def get_num_comp_declension(dictionary, base_comps, c_infl, gen_overrides, numgen, case):
-    return(['test'])
+def get_card_comp_declension(dictionary, base_comps, loose_infl, numgen, case):
+
+    # Hardcode missing declensions
+    for base_comp in set(base_comps):
+        if base_comp in ['dwa', 'trzy', 'cztery', 'sześć']:
+            dictionary = hardcode_num_declensions(dictionary, base_comp)
+
+    # Dictionaries for case/voices
+    case_dict = {'n': 'nominative', 'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
+                 'i': 'instrumental', 'l': 'locative', 'v': 'vocative'}
+    numgen_dict = {'sma': ['singular', 'masculine', 'animate'], 'smi': ['singular', 'masculine', 'inanimate'], 'sf': ['singular', 'feminine'],
+                   'sn': ['singular', 'neuter'], 'pv': ['plural', 'virile'], 'pnv': ['plural', 'error-unrecognized-form'],
+                   'pm': ['plural', 'masculine'], 'pf': ['plural', 'feminine'], 'pn': ['plural', 'neutral']}
+    
+    # Get declension for each component
+    comp_declensions = []
+    for base_comp in base_comps:
+
+        if base_comp == 'jeden' and loose_infl[-1] == 1:
+            comp_declensions.append([base_comp])
+            continue
+    
+        tags = set()
+        tags.add(case_dict[case])
+        tags.update(numgen_dict[numgen])
+        if numgen == 'pnv' and base_comp != 'jeden':
+            tags.remove('error-unrecognized-form')
+
+        # Find corresponding declension(s)
+        declensions = set()
+        for sense in dictionary[base_comp]['num']:
+            try:
+                declension = set(item['form'] for item in sense['forms'] if set(item['tags']) == tags)
+                declensions.update(declension)
+            except KeyError:
+                pass
+        if 'virile' in tags and len(declensions) == 0:
+            tags.remove('virile')
+            try:
+                declension = set(item['form'] for item in sense['forms'] if set(item['tags']) == tags)
+                declensions.update(declension)
+            except KeyError:
+                pass
+        if 'stoma' in declensions:
+            declensions.remove('stoma')
+        if None in declensions and len(declensions) > 1:
+            declensions.remove(None)
+        if len(declensions) == 0:
+            declensions = [None]
+        comp_declensions.append(list(declensions))
+
+    print(comp_declensions)
+
+    # Get total declension for compound numeral
+    total_declensions = []
+    strict_inflections = ['']
+    loose_inflection = ['']
+    for i in range(len(base_comps)):
+        new_stricts = []
+        for j in range(len(comp_declensions[i])):
+            for strict in strict_inflections:
+                new_stricts.append(strict + comp_declensions[i][j] + ' ')
+        strict_inflections = new_stricts
+        if loose_infl[i]:
+            new_looses = []
+            for j in range(len(comp_declensions[i])):
+                for loose in loose_inflection:
+                    new_looses.append(loose + comp_declensions[i][j] + ' ')
+            loose_inflection = new_looses
+        else:
+            for j in range(len(loose_inflection)):
+                loose_inflection[j] += base_comps[i] + ' '
+    total_declensions = strict_inflections + loose_inflection
+    for i in range(len(total_declensions)):
+        total_declensions[i] = total_declensions[i][:-1]  # Remove trailing space
+
+    return list(set(total_declensions))
 
 if __name__ == '__main__':
 
     # Test case
     data_path = os.path.join('PoGram', 'data', 'wiki_entries.pgz')
     word_dict = load_dictionary(data_path)
+
+    conv_dict = {1: 'jeden', 2: 'dwa', 3: 'trzy', 4: 'cztery', 5: 'pięć', 6: 'sześć', 7: 'siedem', 8: 'osiem', 9: 'dziewięć', 10: 'dziesięć',
+                     11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szesnaście', 
+                     17: 'siedemnaście', 18: 'osiemnaście', 19: 'dziewiętnaście', 20: 'dwadzieścia', 30: 'trzydzieści', 40: 'czterdzieści',
+                     50: 'pięćdziesiąt', 60: 'sześćdziesiąt', 70: 'siedemdziesiąt', 80: 'osiemdziesiąt', 90: 'dziewięćdziesiąt', 100: 'sto',
+                     200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset', 
+                     900: 'dziewięćset'}
     
-    for nnum in ['jedynka', 'dwójka', 'trójka', 'czwórka', 'piątka',
-                             'szóstka', 'siódemka', 'ósemka', 'dziewiątka', 'dziesiątka',
-                             'jedenastka', 'dwunastka', 'trzynastka', 'czternastka', 'piętnastka',
-                             'szesnastka', 'siedemnastka', 'osiemnastka', 'dziewiętnastka', 'dwudziestka']:
-        try:
-            print(word_dict[nnum].keys())
-        except:
-            print(f'{nnum} not found in dictionary')
+    # for num in conv_dict.values():
+    #     try:
+    #         print(num, word_dict[num].keys())
+    #     except:
+    #         print(f'{num} not found in dictionary')
+    # word_dict = hardcode_num_declensions(word_dict, 'dwa')
+    # print(word_dict['czterysta']['num'][0]['forms'])
 
     # for sense in word_dict['jedenastka']['noun']:
     #     print(sense)
+
+    base_comps = ['trzydzieści', 'dwa']
+
+    for numgen in ['pv', 'pm', 'pf', 'pn']:
+        for case in ['n', 'g', 'd', 'a', 'i', 'l']:
+            print(f'numgen: {numgen}, case: {case}')
+            print(get_card_comp_declension(word_dict, base_comps, [True, True], numgen, case))

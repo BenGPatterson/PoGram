@@ -156,11 +156,12 @@ class question():
         self.correct = self.correct[1:]
     
     # Load declension subquestion
-    def load_declension(self, disable_numgen=False):
+    def load_declension(self, disable_numgen=False, wide_entry=None):
         
         # Forms subquestion text
         gen_text = {'s': 'singular', 'p': 'plural', 'sma': 'masculine (animate)', 'smi': 'masculine (inanimate)', 
-                    'sf': 'feminine', 'sn': 'neuter', 'pv': 'virile', 'pnv': 'non-virile', '-': ''}
+                    'sf': 'feminine', 'sn': 'neuter', 'pv': 'virile', 'pnv': 'non-virile', 'pm': 'masculine (non-virile)', 
+                    'pf': 'feminine', 'pn': 'neutra', '-': ''}
         case_text = {'n': 'nominative', 'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
                      'i': 'instrumental', 'l': 'locative', 'v': 'vocative', '-': ''}
         lcp_text = {'l': 'stressed form', 'c': 'clitic form', 'p': 'after prepositions', '-': ''}
@@ -176,12 +177,12 @@ class question():
         q_text = q_text[:-2] + ':'
 
         # Loads subquestion
-        self.load_subquestion(q_text.capitalize(), self.correct[0], self.simple_correct)
+        self.load_subquestion(q_text.capitalize(), self.correct[0], self.simple_correct, wide_entry=wide_entry)
         self.sub_qs = self.sub_qs[1:]
         self.correct = self.correct[1:]
 
     # Load subquestion
-    def load_subquestion(self, text, correct, command):
+    def load_subquestion(self, text, correct, command, wide_entry=None):
 
         # Load question text
         q_label = tk.Label(self.q_panel.q_frame, text=text, font=('Segoe UI', 18))
@@ -190,7 +191,12 @@ class question():
         # Load entry button
         q_answer = tk.StringVar(value='')
         q_entry = Entry_pl(self.q_panel.q_frame, textvariable=q_answer, bg='SystemWindow', justify='center', font=('Segoe UI', 18))
-        q_entry.pack(side=tk.TOP, pady=(0,5))
+        if wide_entry is not None:
+            fill = tk.X
+            padx=(wide_entry, wide_entry)
+        else:
+            fill, padx = None, None
+        q_entry.pack(side=tk.TOP, fill=fill, pady=(0,5), padx=padx)
 
         # Add command to entry button
         q_entry.bind('<Return>', lambda event: command(q_entry, q_answer.get(), correct))
@@ -289,7 +295,7 @@ class question():
                 correct_text = ''
                 for ans in correct:
                     correct_text += ans + ', '
-            correct_label = tk.Label(self.q_panel.q_frame, text=correct_text[:-2], font=('Segoe UI', 14))
+            correct_label = tk.Label(self.q_panel.q_frame, text=correct_text[:-2], font=('Segoe UI', 14), wraplength=750)
             correct_label.pack(side=tk.TOP)
 
             # Disable and load next subquestion
@@ -400,8 +406,10 @@ class verb_question(question):
                 if tense in ['pa', 'f', 'c'] and voice != 'i':
                     if tense == 'f' and ('i' not in aspect or self.word == 'być'):
                         gens = ['-']
-                    elif 's' in voice:
+                    if voice == '3s':
                         gens = ['m', 'f', 'n']
+                    elif 's' in voice:
+                        gens = ['m', 'f']
                     elif 'p' in voice:
                         gens = ['v', 'nv']
                     else:

@@ -5,7 +5,7 @@ import os
 import re
 from ast import literal_eval
 from questions import question
-from dictionary import get_declension, get_def_conjugation, get_num_comp_declension
+from dictionary import get_declension, get_def_conjugation, get_card_comp_declension
 
 # Load misc questions
 class misc_question(question):
@@ -336,9 +336,9 @@ class misc_question(question):
 
         # Convert components from numbers to words
         conv_dict = {1: 'jeden', 2: 'dwa', 3: 'trzy', 4: 'cztery', 5: 'pięć', 6: 'sześć', 7: 'siedem', 8: 'osiem', 9: 'dziewięć', 10: 'dziesięć',
-                     11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szenaście', 
+                     11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szesnaście', 
                      17: 'siedemnaście', 18: 'osiemnaście', 19: 'dziewiętnaście', 20: 'dwadzieścia', 30: 'trzydzieści', 40: 'czterdzieści',
-                     50: 'pięćdzieśiąt', 60: 'sześćdzieśiąt', 70: 'siedemdzieśiąt', 80: 'osiemdzieśiąt', 90: 'dziewięćdzieśiąt', 100: 'sto',
+                     50: 'pięćdziesiąt', 60: 'sześćdziesiąt', 70: 'siedemdziesiąt', 80: 'osiemdziesiąt', 90: 'dziewięćdziesiąt', 100: 'sto',
                      200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset', 
                      900: 'dziewięćset'}
         word_comps = [conv_dict[num] for num in num_comps]
@@ -360,8 +360,8 @@ class misc_question(question):
         else:
             loose_infl[-1] = True
             units_check = comps[-1] in ['dwa', 'trzy', 'cztery', 'pięć', 'sześć', 'siedem', 'osiem', 'dziewięć']
-            tens_check = comps[-2] in ['dwadzieścia', 'trzydzieści', 'czterdzieści', 'pięćdzieśiąt',
-                                        'sześćdziesiąt', 'siedemdziesiąt', 'osiemdziesiąt', 'dziewięćdziesiąt']
+            tens_check = comps[-2] in ['dwadzieścia', 'trzydzieści', 'czterdzieści', 'pięćdziesiąt',
+                                       'sześćdziesiąt', 'siedemdziesiąt', 'osiemdziesiąt', 'dziewięćdziesiąt']
             if units_check and tens_check:
                 loose_infl[-2] = True
         
@@ -369,7 +369,7 @@ class misc_question(question):
         self.correct_forms = []
         for form in self.forms:
             numgen, case = form.split('_')
-            self.correct_forms.append(get_num_comp_declension(self.dict, comps, loose_infl, numgen, case))
+            self.correct_forms.append(get_card_comp_declension(self.dict, comps, loose_infl, numgen, case))
             
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):
@@ -596,8 +596,10 @@ class misc_question(question):
             match self.qtype:
                 case 'Pers':
                     self.load_declension(disable_numgen=True)
-                case 'Poss'|'Demo'|'Inte'|'Opro'|'Card'|'Nnum'|'Oqua':
+                case 'Poss'|'Demo'|'Inte'|'Opro'|'Nnum'|'Oqua':
                     self.load_declension()
+                case 'Card':
+                    self.load_declension(wide_entry=170)
                 case 'Card'|'Coll'|'Ordi':
                     pass
                 case 'Dwa':

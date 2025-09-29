@@ -53,7 +53,7 @@ class misc_question(question):
         # Create word list if does not already exist
         if self.qtype not in self.game.word_lists['misc'].keys():
             self.create_word_list()
-        
+
         # Randomise order if word list is empty
         if len(self.game.current_word_lists['misc'][self.qtype]) == 0:
             random.shuffle(self.game.word_lists['misc'][self.qtype])
@@ -73,7 +73,7 @@ class misc_question(question):
         # Find word list for each question type
         match self.qtype:
             case 'Pers':
-                word_list = ['ja', 'ty', 'pan', 'pani', 'on', 'ono', 'ona', 
+                word_list = ['ja', 'ty', 'pan', 'pani', 'on', 'ono', 'ona',
                              'my', 'wy', 'panowie', 'państwo', 'panie', 'oni', 'one']
             case 'Poss':
                 word_list = ['mój', 'twój', 'swój', 'nasz', 'wasz']
@@ -90,7 +90,7 @@ class misc_question(question):
             case 'Nnum':
                 word_list = [str(num)+' (noun)' for num in range(0,13)]
             case 'Oqua':
-                word_list = ['kilka', 'parę', 'wiele', 'ile', 'tyle', 
+                word_list = ['kilka', 'parę', 'wiele', 'ile', 'tyle',
                              'kilkanaście', 'kilkadziesiąt', 'kilkaset',
                              'paręnaście', 'parędziesiąt', 'paręset']
             case 'Wini':
@@ -107,11 +107,16 @@ class misc_question(question):
 
         # Add all values for each qtype
         sfs = {'Card': 3, 'Coll': 1, 'Ordi': 2}
-        word_list = [str(i) for i in range(0, 10**sfs[self.qtype]+1)]
+        word_list = [str(i) for i in range(0, 11)]
         if self.qtype == 'Coll':
-            word_list = word_list[2:]
-        elif self.qtype == 'Ordi':
+            word_list = word_list[:2]
+        else:
+            word_list += [str(num) for num in range(11, 21)]
+            word_list += [str(num*10) for num in range(3, 11)]
             word_list += [str(num*100) for num in range(2, 11)]
+            other_nums = [str(num) for num in range(0, 10**sfs[self.qtype]+1)
+                          if str(num) not in word_list]
+            word_list += random.sample(other_nums, int(len(word_list)/3))
 
         # Add digit separators
         word_list = [re.sub(r"(\d)(?=(\d{3})+(?!\d))", r"\1 ", "%d" % int(num)) for num in word_list]
@@ -126,7 +131,7 @@ class misc_question(question):
 
     # Load csv of prepositions, cases, and definitions
     def load_prep_csv(self):
-        
+
         # Load raw preposition data
         self.game.prep_data = pd.read_csv(os.path.join('PoGram', 'data', 'prep_cases.csv'), converters={'prep_en': literal_eval, 'cases': literal_eval})
 
@@ -183,7 +188,7 @@ class misc_question(question):
 
         # List of all requested declensions
         self.forms = []
-        
+
         # Form all combinations
         for case in cases:
             for gen in gens:
@@ -215,7 +220,7 @@ class misc_question(question):
     def choose_poss_pers_declensions(self):
 
         # Lemmas to use for polite forms
-        pol_lemma_dict = {'pan': 'pan', 'pani': 'pani', 'panowie': 'pan', 
+        pol_lemma_dict = {'pan': 'pan', 'pani': 'pani', 'panowie': 'pan',
                           'państwo': 'państwo', 'panie': 'pani'}
 
         # Correct answers for familiar 3rd person masculine singular pronoun 'on'
@@ -295,7 +300,7 @@ class misc_question(question):
     # Keeps only declensions with answers available for cardinal numerals
     def get_all_card_declensions(self):
 
-        if self.word in ['0']:
+        if self.word in ['0', '1000']:
             self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['s', 'p'])
         elif self.word in ['1']:
             self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['sma', 'smi', 'sf', 'sn', 'pv', 'pnv'])
@@ -308,7 +313,7 @@ class misc_question(question):
     def split_num(self):
 
         # Sanitize word to remove digit separators, ordinal marker
-        word = re.sub('[ .]|\(.*', '', self.word)
+        word = re.sub(r'[ .]|\(.*', '', self.word)
 
         # Single digit case and one thousand case
         if word == '0':
@@ -336,15 +341,15 @@ class misc_question(question):
 
         # Convert components from numbers to words
         conv_dict = {1: 'jeden', 2: 'dwa', 3: 'trzy', 4: 'cztery', 5: 'pięć', 6: 'sześć', 7: 'siedem', 8: 'osiem', 9: 'dziewięć', 10: 'dziesięć',
-                     11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szesnaście', 
+                     11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szesnaście',
                      17: 'siedemnaście', 18: 'osiemnaście', 19: 'dziewiętnaście', 20: 'dwadzieścia', 30: 'trzydzieści', 40: 'czterdzieści',
                      50: 'pięćdziesiąt', 60: 'sześćdziesiąt', 70: 'siedemdziesiąt', 80: 'osiemdziesiąt', 90: 'dziewięćdziesiąt', 100: 'sto',
-                     200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset', 
+                     200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset',
                      900: 'dziewięćset'}
         word_comps = [conv_dict[num] for num in num_comps]
 
         return word_comps
-    
+
     # Works out correct declensions for cardinal numerals
     def choose_poss_card_declensions(self):
 
@@ -364,19 +369,19 @@ class misc_question(question):
                                        'sześćdziesiąt', 'siedemdziesiąt', 'osiemdziesiąt', 'dziewięćdziesiąt']
             if units_check and tens_check:
                 loose_infl[-2] = True
-        
+
         # Get all correct answers
         self.correct_forms = []
         for form in self.forms:
             numgen, case = form.split('_')
             self.correct_forms.append(get_card_comp_declension(self.dict, comps, loose_infl, numgen, case))
-            
+
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):
             if self.correct_forms[i] == [None]:
                 self.correct_forms.pop(i)
                 self.forms.pop(i)
-        
+
     # Choose subquestions for interrogative pronouns word type
     def choose_inte_subqs(self):
 
@@ -423,11 +428,11 @@ class misc_question(question):
     def choose_poss_oqua_declensions(self):
 
         # Correct answers for 'parę'
-        parę_correct_dict = {'pv_n': ['parę'], 'pv_g': ['paru'], 'pv_d': ['paru'], 
+        parę_correct_dict = {'pv_n': ['parę'], 'pv_g': ['paru'], 'pv_d': ['paru'],
                              'pv_a': ['parę'], 'pv_i': ['paroma'], 'pv_l': ['paru'],
-                             'pnv_n': ['paru'], 'pnv_g': ['paru'], 'pnv_d': ['paru'], 
+                             'pnv_n': ['paru'], 'pnv_g': ['paru'], 'pnv_d': ['paru'],
                              'pnv_a': ['paru'], 'pnv_i': ['paroma'], 'pnv_l': ['paru']}
-        
+
         # Get all correct answers
         self.correct_forms = []
         for form in self.forms:
@@ -572,7 +577,7 @@ class misc_question(question):
         else:
             case = list(row['cases'])[0][0]
         correct = [case, case_dict[case]]
-        
+
         # Loads subquestion
         self.load_subquestion('Case:', correct, self.simple_correct)
         self.sub_qs = self.sub_qs[1:]
@@ -590,7 +595,7 @@ class misc_question(question):
             self.load_prep_def()
         elif self.sub_qs[0] == 'prep_case':
             self.load_prep_case()
-        
+
         # Load subquestion depending on question type
         else:
             match self.qtype:
@@ -607,4 +612,3 @@ class misc_question(question):
                 case 'Wini':
                     self.load_conjugation()
 
-    

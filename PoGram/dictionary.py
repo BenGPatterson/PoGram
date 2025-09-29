@@ -28,10 +28,10 @@ def get_conjugation(dictionary, lemma, pos, gen, voice, tense):
         base_tags.update(part_dict[tense])
     else:
         base_tags.add(tense_dict[tense])
-    
+
     # Voice tags
     if tense in ['pr', 'pa', 'f', 'c', 'i']:
-        voice_dict = {'1s': ['first-person', 'singular'], '2s': ['second-person', 'singular'], '3s': ['third-person', 'singular'], 
+        voice_dict = {'1s': ['first-person', 'singular'], '2s': ['second-person', 'singular'], '3s': ['third-person', 'singular'],
                       '1p': ['first-person', 'plural'], '2p': ['second-person', 'plural'], '3p': ['third-person', 'plural'],
                       'i': ['impersonal']}
         base_tags.update(voice_dict[voice])
@@ -48,7 +48,7 @@ def get_conjugation(dictionary, lemma, pos, gen, voice, tense):
                 pass
             else:
                 if tense in ['par-act', 'par-pas']:
-                    gen_dict = {'m': ['singular', 'masculine'], 'f': ['singular', 'feminine'], 'n': ['singular', 'neuter'], 
+                    gen_dict = {'m': ['singular', 'masculine'], 'f': ['singular', 'feminine'], 'n': ['singular', 'neuter'],
                                 'v': ['plural', 'virile'], 'nv': ['plural', 'nonvirile']}
                 else:
                     gen_dict = {'m': ['masculine'], 'f': ['feminine'], 'n': ['neuter'], 'v': ['virile'], 'nv': ['nonvirile']}
@@ -87,9 +87,9 @@ def get_conjugation(dictionary, lemma, pos, gen, voice, tense):
                 conjugations.remove(None)
     elif len(conjugations) == 0:
         conjugations.add(None)
-    
+
     return list(conjugations)
-                    
+
 # Gets declined form of word from dictionary
 def get_declension(dictionary, lemma, pos, numgen, case):
 
@@ -98,19 +98,19 @@ def get_declension(dictionary, lemma, pos, numgen, case):
         numgen = 's'
     if case == '-':
         case  = 'n'
-    
+
     # Produce tags
     tags = set()
 
     # Case tags
     if pos == 'adj' and case == 'v':
         case = 'n'
-    case_dict = {'n': 'nominative', 'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
+    case_dict = {'n': 'nominative', 'g': 'genitive', 'd': 'dative', 'a': 'accusative',
                  'i': 'instrumental', 'l': 'locative', 'v': 'vocative'}
     tags.add(case_dict[case.lower()])
 
     # Gender tags
-    number_dict = {'s': ['singular'], 'p': ['plural'], 'sma': ['singular', 'masculine', 'animate'], 'smi': ['singular', 'masculine', 'inanimate'], 
+    number_dict = {'s': ['singular'], 'p': ['plural'], 'sma': ['singular', 'masculine', 'animate'], 'smi': ['singular', 'masculine', 'inanimate'],
                    'sf': ['singular', 'feminine'], 'sn': ['singular', 'neuter'], 'pv': ['plural', 'virile'], 'pnv': ['plural', 'error-unrecognized-form']}
     tags.update(number_dict[numgen.lower()])
 
@@ -164,7 +164,7 @@ def get_declension(dictionary, lemma, pos, numgen, case):
     declensions -= {'-'}
     if len(declensions) == 0:
         declensions = [None]
-    
+
     return list(declensions)
 
 # Gets conjugated form of defective verb from dictionary
@@ -188,7 +188,7 @@ def get_def_conjugation(dictionary, lemma, gen, voice, tense):
     if voice != 'i':
         gen_dict = {'m': ['masculine'], 'f': ['feminine'], 'n': ['neuter'], 'v': ['virile'], 'nv': ['nonvirile']}
         tags.update(gen_dict[gen])
-    
+
     # Voice tags
     voice_dict = {'1': ['first-person'], '2': ['second-person'], '3': ['third-person'], 'i': ['impersonal']}
     tags.update(voice_dict[voice])
@@ -207,7 +207,7 @@ def get_def_conjugation(dictionary, lemma, gen, voice, tense):
     # Clean output
     if None in conjugations and len(conjugations) > 1:
                 conjugations.remove(None)
-    
+
     return list(conjugations)
 
 # Gets derived words from dictionary
@@ -268,7 +268,7 @@ def get_derived_word(dictionary, lemma, pos, form):
                 derived.add(None)
         if None in derived and len(derived) > 1:
             derived.remove(None)
-    
+
     # Other derived words
     else:
         # Decide tags
@@ -301,8 +301,8 @@ def hardcode_num_declensions(dictionary, word):
     forms = []
 
     if word == 'dwa':
-        form_codes = {'dwaj': ['pv_n'], 'dwóch': ['pv_n', 'g', 'pv_a', 'l'], 'dwa': ['pm_n', 'pn_g', 'pm_a', 'pn_a'],
-                      'dwie': ['pf_n', 'pf_a'], 'dwóm': ['d'], 'dwoma': ['i'], 'dwiema': ['pf_i']}
+        form_codes = {'dwaj': ['pv_n'], 'dwóch': ['pv_n', 'g', 'pv_a', 'l'], 'dwa': ['pm_n', 'pn_n', 'pm_a', 'pn_a'],
+                      'dwie': ['pf_n', 'pf_a'], 'dwóm': ['d'], 'dwoma': ['i'], 'dwiema': ['pf_i'], 'dwu': ['pv_a']}
         numgen_codes = {'pv': ['plural', 'virile'], 'pm': ['plural', 'masculine'], 'pn': ['plural', 'neutral'], 'pf': ['plural', 'feminine']}
         case_codes = {'n': ['nominative'], 'g': ['genitive'], 'd': ['dative'], 'a': ['accusative'], 'i': ['instrumental'], 'l': ['locative']}
         for form in form_codes.keys():
@@ -312,7 +312,7 @@ def hardcode_num_declensions(dictionary, word):
                         forms.append({'form': form, 'tags': numgen_codes[code] + case_codes[form_code]})
                 else:
                     forms.append({'form': form, 'tags': numgen_codes[form_code[:-2]] + case_codes[form_code[-1]]})
-                
+
     elif word in ['trzy', 'cztery']:
         if word == 'trzy':
             form_codes = {'trzej': ['pv_n'], 'trzech': ['pv_n', 'pnv_g', 'pv_a', 'pnv_l'], 'trzy': ['pnv_n', 'pnv_a'],
@@ -330,12 +330,16 @@ def hardcode_num_declensions(dictionary, word):
         forms = dictionary[word]['noun'][0]['forms']
 
     dictionary[word]['num'].append({'forms': forms})
-    
+
     return dictionary
 
 
 # Get declension of components of compound cardinal numeral
 def get_card_comp_declension(dictionary, base_comps, loose_infl, numgen, case):
+
+    # Handle zero, tysiąc case
+    if base_comps == ['tysiąc'] or base_comps == ['zero']:
+        return get_declension(dictionary, base_comps[0], 'noun', numgen, case)
 
     # Hardcode missing declensions
     for base_comp in set(base_comps):
@@ -343,12 +347,12 @@ def get_card_comp_declension(dictionary, base_comps, loose_infl, numgen, case):
             dictionary = hardcode_num_declensions(dictionary, base_comp)
 
     # Dictionaries for case/voices
-    case_dict = {'n': 'nominative', 'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
+    case_dict = {'n': 'nominative', 'g': 'genitive', 'd': 'dative', 'a': 'accusative',
                  'i': 'instrumental', 'l': 'locative', 'v': 'vocative'}
     numgen_dict = {'sma': ['singular', 'masculine', 'animate'], 'smi': ['singular', 'masculine', 'inanimate'], 'sf': ['singular', 'feminine'],
                    'sn': ['singular', 'neuter'], 'pv': ['plural', 'virile'], 'pnv': ['plural', 'error-unrecognized-form'],
                    'pm': ['plural', 'masculine'], 'pf': ['plural', 'feminine'], 'pn': ['plural', 'neutral']}
-    
+
     # Get declension for each component
     comp_declensions = []
     for base_comp in base_comps:
@@ -356,12 +360,16 @@ def get_card_comp_declension(dictionary, base_comps, loose_infl, numgen, case):
         if base_comp == 'jeden' and loose_infl[-1] == 1:
             comp_declensions.append([base_comp])
             continue
-    
+
         tags = set()
         tags.add(case_dict[case])
         tags.update(numgen_dict[numgen])
         if numgen == 'pnv' and base_comp != 'jeden':
             tags.remove('error-unrecognized-form')
+        if base_comp != 'dwa' and numgen in ['pm', 'pf', 'pn']:
+            tags.discard('masculine')
+            tags.discard('feminine')
+            tags.discard('neutral')
 
         # Find corresponding declension(s)
         declensions = set()
@@ -385,8 +393,6 @@ def get_card_comp_declension(dictionary, base_comps, loose_infl, numgen, case):
         if len(declensions) == 0:
             declensions = [None]
         comp_declensions.append(list(declensions))
-
-    print(comp_declensions)
 
     # Get total declension for compound numeral
     total_declensions = []
@@ -420,12 +426,12 @@ if __name__ == '__main__':
     word_dict = load_dictionary(data_path)
 
     conv_dict = {1: 'jeden', 2: 'dwa', 3: 'trzy', 4: 'cztery', 5: 'pięć', 6: 'sześć', 7: 'siedem', 8: 'osiem', 9: 'dziewięć', 10: 'dziesięć',
-                     11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szesnaście', 
+                     11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szesnaście',
                      17: 'siedemnaście', 18: 'osiemnaście', 19: 'dziewiętnaście', 20: 'dwadzieścia', 30: 'trzydzieści', 40: 'czterdzieści',
                      50: 'pięćdziesiąt', 60: 'sześćdziesiąt', 70: 'siedemdziesiąt', 80: 'osiemdziesiąt', 90: 'dziewięćdziesiąt', 100: 'sto',
-                     200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset', 
+                     200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset',
                      900: 'dziewięćset'}
-    
+
     # for num in conv_dict.values():
     #     try:
     #         print(num, word_dict[num].keys())
@@ -434,12 +440,12 @@ if __name__ == '__main__':
     # word_dict = hardcode_num_declensions(word_dict, 'dwa')
     # print(word_dict['czterysta']['num'][0]['forms'])
 
-    # for sense in word_dict['jedenastka']['noun']:
-    #     print(sense)
+    for sense in word_dict['zero']['num']:
+        print(sense)
 
-    base_comps = ['trzydzieści', 'dwa']
+    # base_comps = ['trzydzieści', 'dwa']
 
-    for numgen in ['pv', 'pm', 'pf', 'pn']:
-        for case in ['n', 'g', 'd', 'a', 'i', 'l']:
-            print(f'numgen: {numgen}, case: {case}')
-            print(get_card_comp_declension(word_dict, base_comps, [True, True], numgen, case))
+    # for numgen in ['pv', 'pm', 'pf', 'pn']:
+    #     for case in ['n', 'g', 'd', 'a', 'i', 'l']:
+    #         print(f'numgen: {numgen}, case: {case}')
+    #         print(get_card_comp_declension(word_dict, base_comps, [True, True], numgen, case))

@@ -34,6 +34,8 @@ Avoid 'two in a row' when bad luck protection moves to next word list/inflection
 Customisable keybind settings
 Info page explaining different options (https://stackoverflow.com/questions/3842155/is-there-a-way-to-make-the-tkinter-text-widget-read-only for block read only text)
 
+Added priors to frequency analysis to prevent 'maić problem'. Reran with 10k lines, need to rerun with full dataset (will take ~3.5 hours)
+
 ------------------------
 
 Sources used:

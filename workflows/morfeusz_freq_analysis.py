@@ -24,7 +24,7 @@ try:
     print('Setting up concraft-pl server')
     morfeusz = Morfeusz(expand_tags=True)
     model_path = os.path.join('workflows', 'concraft-pl-model-SGJP-20220221.gz')
-    concraft_path = 'C:\\Users\\xasde\\AppData\\Roaming\\local\\bin\\concraft-pl.exe'
+    concraft_path = os.path.join('workflows', 'concraft-pl.exe')
     server = Server(model_path=model_path, concraft_path=concraft_path, port=3001)
     concraft = Concraft(server_addr='http://127.0.0.1', port=3001)
     
@@ -33,37 +33,106 @@ try:
     start = time.time()
     sentences_path = os.path.join('workflows', 'pol-com_web_2018_1M-sentences.txt')
     with open(sentences_path, encoding="utf-8") as file:
-        pos_dict = {}
+        dup_pos_dict = {}
         count = 0
-        for line in file:
+        for i, line in enumerate(file):
 
             # Analyse sentence
             sentence = line.split('\t')[1]
             dag = morfeusz.analyse(sentence)
             res = concraft.disamb(dag)
 
-            # Add frequency of each possible lemma interpretation
+            # Get required information from each interpretation
+            current_word = 0
+            interp_infos = {0: {}}
             for item in res:
                 try:
-                    wiki_pos = pos_conv[item[2][2].split(':')[0]]
+                    if item[0] != current_word:
+                        current_word = item[0]
+                        interp_infos[current_word] = {}
+                    full_pos = item[2][2]
+                    word = item[2][0]
                     lemma = item[2][1].split(':')[0]
                     prob = float(item[3])
                     try:
-                        word_freqs[wiki_pos][lemma] += prob
+                        interp_infos[current_word][f'{full_pos}_{word}'].append((lemma, prob))
                     except KeyError:
-                        word_freqs[wiki_pos][lemma] = prob
+                        interp_infos[current_word][f'{full_pos}_{word}'] = [(lemma, prob)]
                 except:
                     pass
+
+            # Analyse interpretations for probabilities and duplicates
+            for i in interp_infos.keys():
+                for key in interp_infos[i].keys():
+
+                    # Ignore if empty
+                    if len(interp_infos[i][key]) == 0:
+                        continue
+
+                    # Check for duplicates
+                    elif len(interp_infos[i][key]) > 1:
+                        lemmas = [x[0] for x in interp_infos[i][key]]
+                        if len(set(lemmas)) == 1:
+                            interp_infos[i][key] = [interp_infos[i][key][0]]
+                        else:
+                            try:
+                                dup_pos_dict[key] += interp_infos[i][key]
+                            except KeyError:
+                                dup_pos_dict[key] = interp_infos[i][key]
+                            continue
+
+                    # Otherwise add to frequency list
+                    try:
+                        full_pos, word = key.split('_')
+                        wiki_pos = pos_conv[full_pos.split(':')[0]]
+                        lemma, prob = interp_infos[i][key][0]
+                        try:
+                            word_freqs[wiki_pos][lemma] += prob
+                        except KeyError:
+                            word_freqs[wiki_pos][lemma] = prob
+                    except:
+                        pass
             
             # Progress bar
             count += 1
             if count%100 == 0:
                 print(f'\rAnalysed {count} sentences', end='')
+            if count == 10000:
+                break
 
 finally:
     server.terminate()
 end = time.time()
 print(f'\nAnalysis complete in {end-start} seconds')
+
+# Analyse duplicates
+print(f'Checking {len(dup_pos_dict)} duplicates')
+for key in dup_pos_dict.keys():
+    try:
+        lemmas = set([x[0] for x in dup_pos_dict[key]])
+        probs = [x[1] for x in dup_pos_dict[key]]
+        prob = sum(probs)/len(set(lemmas))
+        full_pos, word = key.split('_')
+        wiki_pos = pos_conv[full_pos.split(':')[0]]
+        priors = {}
+        total_prior = 0
+        for lemma in lemmas:
+            try:
+                priors[lemma] = word_freqs[wiki_pos][lemma]
+            except KeyError:
+                priors[lemma] = 0
+            total_prior += priors[lemma]
+        if total_prior == 0:
+            total_prior = len(lemmas)
+            for lemma in lemmas:
+                priors[lemma] = 1
+        for lemma in lemmas:
+            try:
+                word_freqs[wiki_pos][lemma] += prob*(priors[lemma]/total_prior)
+            except KeyError:
+                word_freqs[wiki_pos][lemma] = prob*(priors[lemma]/total_prior)
+    except:
+        pass
 
 # Load wiki pages for post-processing sanity checks
 print('Loading dictionary')

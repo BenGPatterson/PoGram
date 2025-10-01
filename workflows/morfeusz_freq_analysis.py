@@ -1,5 +1,6 @@
 from morfeusz2 import Morfeusz
 from concraft_pl2 import Concraft, Server # Requires concraft_pl2.py (https://github.com/kawu/concraft-pl) in the same directory
+import requests
 import os
 import pandas as pd
 import time
@@ -19,7 +20,6 @@ for i in set(pos_conv.values()):
     word_freqs[i] = {}
 
 try:
-
     # Set up server
     print('Setting up concraft-pl server')
     morfeusz = Morfeusz(expand_tags=True)
@@ -31,16 +31,22 @@ try:
     # Loop over each sentence
     print('Analysing sentences', end='')
     start = time.time()
-    sentences_path = os.path.join('workflows', 'pol-com_web_2018_1M-sentences.txt')
+    # sentences_path = os.path.join('workflows', 'pol-com_web_2018_1M-sentences.txt')
+    sentences_path = os.path.join('workflows', 'pol_news_2024_1M-sentences.txt')
     with open(sentences_path, encoding="utf-8") as file:
         dup_pos_dict = {}
-        count = 0
         for i, line in enumerate(file):
 
             # Analyse sentence
-            sentence = line.split('\t')[1]
-            dag = morfeusz.analyse(sentence)
-            res = concraft.disamb(dag)
+            analysing = True
+            while analysing:
+                try:
+                    sentence = line.split('\t')[1]
+                    dag = morfeusz.analyse(sentence)
+                    res = concraft.disamb(dag)
+                    analysing = False
+                except requests.exceptions.ConnectionError:
+                    time.sleep(5)
 
             # Get required information from each interpretation
             current_word = 0
@@ -62,30 +68,30 @@ try:
                     pass
 
             # Analyse interpretations for probabilities and duplicates
-            for i in interp_infos.keys():
-                for key in interp_infos[i].keys():
+            for j in interp_infos.keys():
+                for key in interp_infos[j].keys():
 
                     # Ignore if empty
-                    if len(interp_infos[i][key]) == 0:
+                    if len(interp_infos[j][key]) == 0:
                         continue
 
                     # Check for duplicates
-                    elif len(interp_infos[i][key]) > 1:
-                        lemmas = [x[0] for x in interp_infos[i][key]]
+                    elif len(interp_infos[j][key]) > 1:
+                        lemmas = [x[0] for x in interp_infos[j][key]]
                         if len(set(lemmas)) == 1:
-                            interp_infos[i][key] = [interp_infos[i][key][0]]
+                            interp_infos[j][key] = [interp_infos[j][key][0]]
                         else:
                             try:
-                                dup_pos_dict[key] += interp_infos[i][key]
+                                dup_pos_dict[key] += interp_infos[j][key]
                             except KeyError:
-                                dup_pos_dict[key] = interp_infos[i][key]
+                                dup_pos_dict[key] = interp_infos[j][key]
                             continue
 
                     # Otherwise add to frequency list
                     try:
                         full_pos, word = key.split('_')
                         wiki_pos = pos_conv[full_pos.split(':')[0]]
-                        lemma, prob = interp_infos[i][key][0]
+                        lemma, prob = interp_infos[j][key][0]
                         try:
                             word_freqs[wiki_pos][lemma] += prob
                         except KeyError:
@@ -94,11 +100,8 @@ try:
                         pass
             
             # Progress bar
-            count += 1
-            if count%100 == 0:
-                print(f'\rAnalysed {count} sentences', end='')
-            if count == 10000:
-                break
+            if (i+1)%1000 == 0:
+                print(f'\rAnalysed {i+1} sentences', end='')
 
 finally:
     server.terminate()
@@ -194,7 +197,7 @@ for key in word_freqs:
                     check_form = False
                 if check_form:
                     if basic_form == [None]:
-                        valid = False             
+                        valid = False 
 
             # Mark invalid words to be deleted        
             except KeyError:

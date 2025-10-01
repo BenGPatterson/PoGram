@@ -42,5 +42,5 @@ Sources used:
 
 - Processed wiki entries downloaded from https://kaikki.org/dictionary/Polish/words/index.html.
 - http://morfeusz.sgjp.pl/en and https://github.com/kawu/concraft-pl/tree/master/bindings/python used to identify lemmas of words in sentences (with probability).
-- Applied to (Web com 2018 1M) corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.
+- Applied to (news 2024 1M) corpus of sentences (https://wortschatz.uni-leipzig.de/en/download) to identify word frequencies.
 - Adapted preposition case and definitions from https://courseofpolish.com/grammar/cases/cases-after-prepositions/list-of-prepositions

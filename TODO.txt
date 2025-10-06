@@ -1,34 +1,10 @@
 To do:
 
-Updated menu settings page to have planned misc options
-Planned marked by 'o', implemented marked as 'x':
-
-x Personal pronouns (ja, ty, on, etc.) (include polite forms) (think only need to hardcode 'on' form)
-x Possessive pronouns (mój, twój, nasz, etc.) (only include 1p and 2p - 3p do not inflect)
-x Demonstrative pronouns (ten, tamten)
-x Interrogative pronouns (co, kto, coś, ktoś, cokolwiek, ktokolwiek, nic, nikt)
-x Other pronouns (który, wszystek, każdy, żaden, się)
-
-x Cardinal numerals (jeden, dwa, trzy, etc.) (dwa, trzy, cztery and possible others do not have declensions in wiki data, may need to hardcode)
-x Collective numerals (dwoje, troje, czworo, etc.) (only go up to ten here - usually would always have switched to cardinal by this point)
-x Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
-x Numeral nouns (jedynka, dwójka, trójka, etc.) (even teens are very rare, so do not need to use digit field for these)
-x Dwa/Oba/Obydwa (oba, obydwa, dwa, oboje, obydwoje, dwoje)
-x Other quantifiers (kilka, parę, wiele, ile, tyle) (kilkanaście, kilkadziesiąt, kilkaset) (paręnaście, parędziesiąt, paręset)
-(may also need to hardcode parę - https://www.polskinawynos.com/wp-content/uploads/2015/07/deklinacja-liczebnikc3b3w-gc582c3b3wnych-nieokrec59blonych.pdf)
-
-x Winien-like verbs (winien, powinien)
-x Prepositions (ask for definiton and case(s) following them)
-
-x Forms (number of inflections to ask for in each of above questions)
-
 Ability to press enter on options screen to start game
 Avoid 'two in a row' when bad luck protection moves to next word list/inflection list
 
 Customisable keybind settings
 Info page explaining different options (https://stackoverflow.com/questions/3842155/is-there-a-way-to-make-the-tkinter-text-widget-read-only for block read only text)
-
-Added priors to frequency analysis to prevent 'maić problem'. Reran with 10k lines, need to rerun with full dataset (will take ~3.5 hours)
 
 ------------------------
 

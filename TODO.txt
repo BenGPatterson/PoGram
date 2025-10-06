@@ -10,8 +10,8 @@ x Interrogative pronouns (co, kto, coś, ktoś, cokolwiek, ktokolwiek, nic, nikt
 x Other pronouns (który, wszystek, każdy, żaden, się)
 
 x Cardinal numerals (jeden, dwa, trzy, etc.) (dwa, trzy, cztery and possible others do not have declensions in wiki data, may need to hardcode)
-o Collective numerals (dwoje, troje, czworo, etc.) (only go up to ten here - usually would always have switched to cardinal by this point)
-o Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
+x Collective numerals (dwoje, troje, czworo, etc.) (only go up to ten here - usually would always have switched to cardinal by this point)
+x Ordinal numerals (pierwszy, drugi, trzeci, etc.) (inflect like adjectives/are adjectives)
 x Numeral nouns (jedynka, dwójka, trójka, etc.) (even teens are very rare, so do not need to use digit field for these)
 o Dwa/Oba/Obydwa (oba, obydwa, dwa, oboje, obydwoje, dwoje)
 x Other quantifiers (kilka, parę, wiele, ile, tyle) (kilkanaście, kilkadziesiąt, kilkaset) (paręnaście, parędziesiąt, paręset)
@@ -21,12 +21,6 @@ x Winien-like verbs (winien, powinien)
 x Prepositions (ask for definiton and case(s) following them)
 
 x Forms (number of inflections to ask for in each of above questions)
-
-Using scaled back approach to numerals:
-  - Cardinal up to 1000, correct either decline all (except jeden if compound) or as wikipedia suggests
-  - Collective only up to 10 as would likely switch to cardinal above this
-  - Ordinal only with non-compound up to 1000, and compound up to 100, turning and declining both parts into ordinal form
-Then no longer need digits field
 
 Ability to press enter on options screen to start game
 Avoid 'two in a row' when bad luck protection moves to next word list/inflection list

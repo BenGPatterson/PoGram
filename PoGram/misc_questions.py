@@ -109,7 +109,7 @@ class misc_question(question):
         sfs = {'Card': 3, 'Coll': 1, 'Ordi': 2}
         word_list = [str(i) for i in range(0, 11)]
         if self.qtype == 'Coll':
-            word_list = word_list[:2]
+            word_list = word_list[2:]
         else:
             word_list += [str(num) for num in range(11, 21)]
             word_list += [str(num*10) for num in range(3, 11)]
@@ -163,8 +163,12 @@ class misc_question(question):
             case 'Card':
                 self.get_all_card_declensions()
                 self.choose_poss_card_declensions()
-            case 'Coll'|'Ordi':
-                pass
+            case 'Coll':
+                self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['p'])
+                self.choose_poss_coll_declensions()
+            case 'Ordi':
+                self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['sma', 'smi', 'sf', 'sn', 'pv', 'pnv'])
+                self.choose_poss_ordi_declensions()
             case 'Dwa':
                 pass
             case 'Nnum':
@@ -310,16 +314,18 @@ class misc_question(question):
             self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pnv'])
 
     # Splits number into components
-    def split_num(self):
+    def split_num(self, num_type):
 
         # Sanitize word to remove digit separators, ordinal marker
         word = re.sub(r'[ .]|\(.*', '', self.word)
 
         # Single digit case and one thousand case
+        zero_case = {'card': ['zero'], 'ordi': ['zerowy']}
+        tysiąc_case = {'card': ['tysiąc'], 'ordi': ['tysięczny']}
         if word == '0':
-            return ['zero']
+            return zero_case[num_type]
         elif word == '1000':
-            return ['tysiąc']
+            return tysiąc_case[num_type]
 
         # Identify number components
         num_comps = []
@@ -340,12 +346,20 @@ class misc_question(question):
                 word = word[1:]
 
         # Convert components from numbers to words
-        conv_dict = {1: 'jeden', 2: 'dwa', 3: 'trzy', 4: 'cztery', 5: 'pięć', 6: 'sześć', 7: 'siedem', 8: 'osiem', 9: 'dziewięć', 10: 'dziesięć',
-                     11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szesnaście',
-                     17: 'siedemnaście', 18: 'osiemnaście', 19: 'dziewiętnaście', 20: 'dwadzieścia', 30: 'trzydzieści', 40: 'czterdzieści',
-                     50: 'pięćdziesiąt', 60: 'sześćdziesiąt', 70: 'siedemdziesiąt', 80: 'osiemdziesiąt', 90: 'dziewięćdziesiąt', 100: 'sto',
-                     200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset',
-                     900: 'dziewięćset'}
+        if num_type == 'card':
+            conv_dict = {1: 'jeden', 2: 'dwa', 3: 'trzy', 4: 'cztery', 5: 'pięć', 6: 'sześć', 7: 'siedem', 8: 'osiem', 9: 'dziewięć', 10: 'dziesięć',
+                        11: 'jedenaście', 12: 'dwanaście', 13: 'trzynaście', 14: 'czternaście', 15: 'piętnaście', 16: 'szesnaście',
+                        17: 'siedemnaście', 18: 'osiemnaście', 19: 'dziewiętnaście', 20: 'dwadzieścia', 30: 'trzydzieści', 40: 'czterdzieści',
+                        50: 'pięćdziesiąt', 60: 'sześćdziesiąt', 70: 'siedemdziesiąt', 80: 'osiemdziesiąt', 90: 'dziewięćdziesiąt', 100: 'sto',
+                        200: 'dwieście', 300: 'trzysta', 400: 'czterysta', 500: 'pięćset', 600: 'sześćset', 700: 'siedemset', 800: 'osiemset',
+                        900: 'dziewięćset'}
+        elif num_type == 'ordi':
+            conv_dict = {1: 'pierwszy', 2: 'drugi', 3: 'trzeci', 4: 'czwarty', 5: 'piąty', 6: 'szósty', 7: 'siódmy', 8: 'ósmy', 9: 'dziewiąty',
+                         10: 'dziesiąty', 11: 'jedenasty', 12: 'dwunasty', 13: 'trzynasty', 14: 'czternasty', 15: 'piętnasty', 16: 'szesnasty',
+                         17: 'siedemnasty', 18: 'osiemnasty', 19: 'dziewiętnasty', 20: 'dwudziesty', 30: 'trzydziesty', 40: 'czterdziesty',
+                         50: 'pięćdziesiąty', 60: 'sześćdziesiąty', 70: 'siedemdziesiąty', 80: 'osiemdziesiąty', 90: 'dziewięćdziesiąty',
+                         100: 'setny', 200: 'dwusetny', 300: 'trzechsetny', 400: 'czterechsetny', 500: 'pięćsetny', 600: 'sześćsetny',
+                         700: 'siedemsetny', 800: 'osiemsetny', 900: 'dziewięćsetny'}
         word_comps = [conv_dict[num] for num in num_comps]
 
         return word_comps
@@ -354,7 +368,7 @@ class misc_question(question):
     def choose_poss_card_declensions(self):
 
         # Split number into components
-        comps = self.split_num()
+        comps = self.split_num('card')
 
         # Work out which components to inflect in loose case
         loose_infl = [False for _ in range(len(comps))]
@@ -375,6 +389,50 @@ class misc_question(question):
         for form in self.forms:
             numgen, case = form.split('_')
             self.correct_forms.append(get_card_comp_declension(self.dict, comps, loose_infl, numgen, case))
+
+        # Remove forms without answers
+        for i in range(len(self.forms)-1,-1,-1):
+            if self.correct_forms[i] == [None]:
+                self.correct_forms.pop(i)
+                self.forms.pop(i)
+
+    # Works out correct declensions for collective numerals
+    def choose_poss_coll_declensions(self):
+
+        # Find number in words
+        conv_dict = {'2': 'dwoje', '3': 'troje', '4': 'czworo', '5': 'pięcioro', '6': 'sześcioro',
+                     '7': 'siedmioro', '8': 'ośmioro', '9': 'dziewięcioro', '10': 'dziesięcioro'}
+        num_digits = self.word.split(' ')[0]
+        num_word = conv_dict[num_digits]
+
+        # Get all correct answers
+        self.correct_forms = []
+        for form in self.forms:
+            numgen, case = form.split('_')
+            self.correct_forms.append(get_declension(self.dict, num_word, 'num', numgen, case))
+
+        # Remove forms without answers
+        for i in range(len(self.forms)-1,-1,-1):
+            if self.correct_forms[i] == [None]:
+                self.correct_forms.pop(i)
+                self.forms.pop(i)
+
+    # Works out correct declensions for ordinal numerals
+    def choose_poss_ordi_declensions(self):
+
+        # Split number into components
+        comps = self.split_num('ordi')
+
+        # Get all correct answers
+        self.correct_forms = []
+        for form in self.forms:
+            numgen, case = form.split('_')
+            correct_form = ''
+            for comp in comps:
+                correct_form += get_declension(self.dict, comp, 'adj', numgen, case)[0]
+                correct_form += ' '
+            correct_form = correct_form[:-1]
+            self.correct_forms.append([correct_form])
 
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):
@@ -601,12 +659,10 @@ class misc_question(question):
             match self.qtype:
                 case 'Pers':
                     self.load_declension(disable_numgen=True)
-                case 'Poss'|'Demo'|'Inte'|'Opro'|'Nnum'|'Oqua':
+                case 'Poss'|'Demo'|'Inte'|'Opro'|'Coll'|'Nnum'|'Oqua':
                     self.load_declension()
-                case 'Card':
+                case 'Card'|'Ordi':
                     self.load_declension(wide_entry=170)
-                case 'Card'|'Coll'|'Ordi':
-                    pass
                 case 'Dwa':
                     pass
                 case 'Wini':

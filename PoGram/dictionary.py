@@ -440,8 +440,14 @@ if __name__ == '__main__':
     # word_dict = hardcode_num_declensions(word_dict, 'dwa')
     # print(word_dict['czterysta']['num'][0]['forms'])
 
-    for sense in word_dict['Andrzej']['noun']:
-        print(sense)
+    colls = ['dwoje', 'troje', 'czworo', 'pięcioro', 'sześcioro', 'siedmioro', 'ośmioro', 'dziewięcioro', 'dziesięcioro']
+    cases = ['n', 'g', 'd', 'a', 'i', 'l']
+
+    for word in colls:
+        for case in cases:
+            ans = get_declension(word_dict, word, 'num', 'p', case)
+            print(ans)
+    
 
     # base_comps = ['trzydzieści', 'dwa']
 

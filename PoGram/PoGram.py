@@ -2,6 +2,7 @@
 
 import os
 import tkinter as tk
+import ctypes
 from homepage import HomePage, LoadingPage
 from gamepage import GamePage
   
@@ -48,6 +49,8 @@ class tkinterApp(tk.Tk):
 if __name__ == '__main__':
 
     app = tkinterApp()
+    if os.name == 'nt':
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID('PoGram')
     app.iconbitmap(os.path.join('PoGram', 'icon.ico'))
     app.after(250, app.load_dict)
     app.mainloop()

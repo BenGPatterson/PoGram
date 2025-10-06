@@ -160,8 +160,8 @@ class question():
         
         # Forms subquestion text
         gen_text = {'s': 'singular', 'p': 'plural', 'sma': 'masculine (animate)', 'smi': 'masculine (inanimate)', 
-                    'sf': 'feminine', 'sn': 'neuter', 'pv': 'virile', 'pnv': 'non-virile', 'pm': 'masculine (non-virile)', 
-                    'pf': 'feminine', 'pn': 'neutra', '-': ''}
+                    'sf': 'feminine', 'sn': 'neuter', 'pv': 'virile', 'pnv': 'non-virile', 'pm': 'masculine (non-personal)', 
+                    'pf': 'feminine', 'pn': 'neutral', '-': ''}
         case_text = {'n': 'nominative', 'g': 'genitive', 'd': 'dative', 'a': 'accusative', 
                      'i': 'instrumental', 'l': 'locative', 'v': 'vocative', '-': ''}
         lcp_text = {'l': 'stressed form', 'c': 'clitic form', 'p': 'after prepositions', '-': ''}

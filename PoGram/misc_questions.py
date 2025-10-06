@@ -86,7 +86,7 @@ class misc_question(question):
             case 'Card'|'Coll'|'Ordi':
                 word_list = self.create_num_word_list()
             case 'Dwa':
-                word_list = ['dwa', 'oba', 'obydwa', 'dwoje', 'oboje', 'obydwoje']
+                word_list = ['dwa', 'oba', 'obydwa']
             case 'Nnum':
                 word_list = [str(num)+' (noun)' for num in range(0,13)]
             case 'Oqua':
@@ -170,7 +170,8 @@ class misc_question(question):
                 self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['sma', 'smi', 'sf', 'sn', 'pv', 'pnv'])
                 self.choose_poss_ordi_declensions()
             case 'Dwa':
-                pass
+                self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pm', 'pf', 'pn'])
+                self.choose_poss_dwa_declensions()
             case 'Nnum':
                 self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l', 'v'], ['s', 'p'])
                 self.choose_poss_nnum_declensions()
@@ -308,7 +309,7 @@ class misc_question(question):
             self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['s', 'p'])
         elif self.word in ['1']:
             self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['sma', 'smi', 'sf', 'sn', 'pv', 'pnv'])
-        elif self.word[-1] == '2' and self.word[-2] != '1':
+        elif self.word in ['2'] or (self.word[-1] == '2' and self.word[-2] != '1'):
             self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pm', 'pf', 'pn'])
         else:
             self.get_all_case_gen_declensions(['n', 'g', 'd', 'a', 'i', 'l'], ['pv', 'pnv'])
@@ -433,6 +434,21 @@ class misc_question(question):
                 correct_form += ' '
             correct_form = correct_form[:-1]
             self.correct_forms.append([correct_form])
+
+        # Remove forms without answers
+        for i in range(len(self.forms)-1,-1,-1):
+            if self.correct_forms[i] == [None]:
+                self.correct_forms.pop(i)
+                self.forms.pop(i)
+
+    # Works out correct declensions for dwa/oba/obydwa numerals
+    def choose_poss_dwa_declensions(self):
+
+        # Get all correct answers
+        self.correct_forms = []
+        for form in self.forms:
+            numgen, case = form.split('_')
+            self.correct_forms.append(get_card_comp_declension(self.dict, [self.word], [True], numgen, case))
 
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):
@@ -659,7 +675,7 @@ class misc_question(question):
             match self.qtype:
                 case 'Pers':
                     self.load_declension(disable_numgen=True)
-                case 'Poss'|'Demo'|'Inte'|'Opro'|'Coll'|'Nnum'|'Oqua':
+                case 'Poss'|'Demo'|'Inte'|'Opro'|'Coll'|'Nnum'|'Dwa'|'Oqua':
                     self.load_declension()
                 case 'Card'|'Ordi':
                     self.load_declension(wide_entry=170)

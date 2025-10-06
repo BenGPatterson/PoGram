@@ -296,13 +296,30 @@ def get_definition(dictionary, lemma, pos):
 
     return definitions
 
+# Hardcode declensions for certain numerals missing/lacking in dictionary
 def hardcode_num_declensions(dictionary, word):
 
     forms = []
 
-    if word == 'dwa':
+    # Two/both
+    if word in ['dwa', 'oba', 'obydwa']:
+
+        # All declensions
         form_codes = {'dwaj': ['pv_n'], 'dwóch': ['pv_n', 'g', 'pv_a', 'l'], 'dwa': ['pm_n', 'pn_n', 'pm_a', 'pn_a'],
                       'dwie': ['pf_n', 'pf_a'], 'dwóm': ['d'], 'dwoma': ['i'], 'dwiema': ['pf_i'], 'dwu': ['pv_a']}
+        if word == 'oba':
+            form_codes['dwu'] = form_codes.pop('dwóch')
+            for key in list(form_codes.keys()):
+                item = form_codes.pop(key)
+                key = 'ob' + key[2:]
+                form_codes[key] = item
+        elif word == 'obydwa':
+            for key in list(form_codes.keys()):
+                item = form_codes.pop(key)
+                key = 'oby' + key
+                form_codes[key] = item
+
+        # Get forms of each case/gender
         numgen_codes = {'pv': ['plural', 'virile'], 'pm': ['plural', 'masculine'], 'pn': ['plural', 'neutral'], 'pf': ['plural', 'feminine']}
         case_codes = {'n': ['nominative'], 'g': ['genitive'], 'd': ['dative'], 'a': ['accusative'], 'i': ['instrumental'], 'l': ['locative']}
         for form in form_codes.keys():
@@ -313,6 +330,7 @@ def hardcode_num_declensions(dictionary, word):
                 else:
                     forms.append({'form': form, 'tags': numgen_codes[form_code[:-2]] + case_codes[form_code[-1]]})
 
+    # Three/four
     elif word in ['trzy', 'cztery']:
         if word == 'trzy':
             form_codes = {'trzej': ['pv_n'], 'trzech': ['pv_n', 'pnv_g', 'pv_a', 'pnv_l'], 'trzy': ['pnv_n', 'pnv_a'],
@@ -326,10 +344,11 @@ def hardcode_num_declensions(dictionary, word):
             for form_code in form_codes[form]:
                 forms.append({'form': form, 'tags': numgen_codes[form_code[:-2]] + case_codes[form_code[-1]]})
 
+    # Six is listed as noun instead of numeral in dictionary
     elif word == 'sześć':
         forms = dictionary[word]['noun'][0]['forms']
 
-    dictionary[word]['num'].append({'forms': forms})
+    dictionary[word]['num'] = [{'forms': forms}]
 
     return dictionary
 
@@ -343,7 +362,7 @@ def get_card_comp_declension(dictionary, base_comps, loose_infl, numgen, case):
 
     # Hardcode missing declensions
     for base_comp in set(base_comps):
-        if base_comp in ['dwa', 'trzy', 'cztery', 'sześć']:
+        if base_comp in ['dwa', 'oba', 'obydwa', 'trzy', 'cztery', 'sześć']:
             dictionary = hardcode_num_declensions(dictionary, base_comp)
 
     # Dictionaries for case/voices
@@ -366,7 +385,7 @@ def get_card_comp_declension(dictionary, base_comps, loose_infl, numgen, case):
         tags.update(numgen_dict[numgen])
         if numgen == 'pnv' and base_comp != 'jeden':
             tags.remove('error-unrecognized-form')
-        if base_comp != 'dwa' and numgen in ['pm', 'pf', 'pn']:
+        if base_comp not in ['dwa', 'oba', 'obydwa'] and numgen in ['pm', 'pf', 'pn']:
             tags.discard('masculine')
             tags.discard('feminine')
             tags.discard('neutral')
@@ -440,14 +459,16 @@ if __name__ == '__main__':
     # word_dict = hardcode_num_declensions(word_dict, 'dwa')
     # print(word_dict['czterysta']['num'][0]['forms'])
 
-    colls = ['dwoje', 'troje', 'czworo', 'pięcioro', 'sześcioro', 'siedmioro', 'ośmioro', 'dziewięcioro', 'dziesięcioro']
-    cases = ['n', 'g', 'd', 'a', 'i', 'l']
+    # colls = ['dwoje', 'troje', 'czworo', 'pięcioro', 'sześcioro', 'siedmioro', 'ośmioro', 'dziewięcioro', 'dziesięcioro']
+    # cases = ['n', 'g', 'd', 'a', 'i', 'l']
 
-    for word in colls:
-        for case in cases:
-            ans = get_declension(word_dict, word, 'num', 'p', case)
-            print(ans)
-    
+    for sense in word_dict['oba']['num']:
+        print(sense)
+
+    # for word in colls:
+    #     for case in cases:
+    #         ans = get_declension(word_dict, word, 'num', 'p', case)
+    #         print(ans)
 
     # base_comps = ['trzydzieści', 'dwa']
 

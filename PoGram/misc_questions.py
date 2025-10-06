@@ -679,8 +679,6 @@ class misc_question(question):
                     self.load_declension()
                 case 'Card'|'Ordi':
                     self.load_declension(wide_entry=170)
-                case 'Dwa':
-                    pass
                 case 'Wini':
                     self.load_conjugation()
 

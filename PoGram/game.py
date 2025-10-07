@@ -51,7 +51,6 @@ class Game():
         if self.current_word_no > int(self.parent.menu_frame.w_no.get()):
             tk.messagebox.showinfo('Score', f'{self.total_correct} questions correct out of {self.total_questions}.')
             self.controller.show_frame('home')
-            self.parent.menu_frame.play_btn.focus_set()
             return
         self.word_counter.set(f'{self.current_word_no}/{int(self.parent.menu_frame.w_no.get())}')
         

@@ -68,7 +68,9 @@ class question_panel(tk.Frame):
     # Updates question panel after widget added
     def q_frame_update(self):
         self.q_frame.update()
+        lower_pad = 10
         free_space = self.controller.winfo_height() - self.q_frame.winfo_height()\
-                     - self.parent.title_frame.word_lbl.winfo_height() - 2*self.parent.title_frame.grid_info()['ipady']
+                     - self.parent.title_frame.word_lbl.winfo_height() - 2*self.parent.title_frame.grid_info()['ipady']\
+                     - lower_pad
         pad_amount = max(0, int(free_space/2))
-        self.q_frame.canvas.grid_configure(pady=(pad_amount,0))
+        self.q_frame.canvas.grid_configure(pady=(pad_amount, lower_pad))

@@ -24,6 +24,7 @@ class menu_display(tk.Frame):
         # Load play button
         self.play_btn = tk.Button(self, text='Play', command=lambda: self.start_game(parent, controller))
         self.play_btn.grid(row=3, column=0, columnspan=2, padx=30, pady=(0,10), sticky='ew')
+        self.play_btn.bind('<Return>', lambda event: self.start_game(parent, controller))
 
     # Load dictionary when instructed in start up
     def load_dict(self, path):

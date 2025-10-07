@@ -57,6 +57,13 @@ class misc_question(question):
         # Randomise order if word list is empty
         if len(self.game.current_word_lists['misc'][self.qtype]) == 0:
             random.shuffle(self.game.word_lists['misc'][self.qtype])
+            last_word = self.q_panel.parent.title_frame.word.get()
+            if last_word == self.game.word_lists['misc'][self.qtype][0] and len(self.game.word_lists['misc'][self.qtype]) > 1:
+                rand_low = int(len(self.game.word_lists['misc'][self.qtype])/2)
+                rand_upper = len(self.game.word_lists['misc'][self.qtype]) - 1
+                new_index = random.randint(rand_low, rand_upper)
+                self.game.word_lists['misc'][self.qtype].pop(0)
+                self.game.word_lists['misc'][self.qtype].insert(new_index, last_word)
             self.game.current_word_lists['misc'][self.qtype] = self.game.word_lists['misc'][self.qtype].copy()
 
         # Pick next word

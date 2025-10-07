@@ -16,8 +16,11 @@ class tkinterApp(tk.Tk):
 
         # Window settings
         self.title('PoGram')
-        self.geometry(f'874x540')
-        self.resizable(False,False)
+        self.base_size = (874, 540)
+        self.game_size = (874, 540)
+        self.game_fs = 'normal'
+        self.geometry(f'{self.base_size[0]}x{self.base_size[1]}')
+        self.resizable(False, False)
          
         # Creating a container
         container = tk.Frame(self)
@@ -33,12 +36,29 @@ class tkinterApp(tk.Tk):
             frame = F(container, self)
             self.frames[name] = frame
             frame.grid(row=0, column=0, sticky='nsew')
+        self.current_frame = None
         self.show_frame('loading')
   
     # Displays chosen page
     def show_frame(self, name):
-        frame = self.frames[name]
-        frame.tkraise()
+
+        # Change window size back to default when leaving game
+        if self.current_frame == self.frames['game']:
+            self.resizable(False, False)
+            self.game_fs = self.wm_state()
+            self.wm_state('normal')
+            self.game_size = (self.winfo_width(), self.winfo_height())
+            self.geometry(f'{self.base_size[0]}x{self.base_size[1]}')
+
+        # Load new frame
+        self.current_frame = self.frames[name]
+        if name == 'home':
+            self.current_frame.menu_frame.play_btn.focus_set()
+        elif name == 'game':
+            self.resizable(True, True)
+            self.wm_state(self.game_fs)
+            self.geometry(f'{self.game_size[0]}x{self.game_size[1]}')
+        self.current_frame.tkraise()
 
     # Tell menu frame to load dictionary
     def load_dict(self):

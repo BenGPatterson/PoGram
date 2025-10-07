@@ -15,7 +15,7 @@ class Entry_pl(tk.Entry):
 
     # Keeps track of pressed keys
     def keyup(self, e):
-        if  e.keycode in self.history :
+        if e.keycode in self.history :
             self.history.pop(self.history.index(e.keycode))
     def keydown(self, e):
         if not e.keycode in self.history :
@@ -23,6 +23,7 @@ class Entry_pl(tk.Entry):
 
     # Replaces old character with polish character
     def on_key_press(self, e):
+        pass
         for pl_char, pl_code in self.pl_char_dict.items():
             if set(pl_code).issubset(set(self.history)):
                 e.widget.insert('insert', e.char[:-1] + pl_char)

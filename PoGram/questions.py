@@ -21,6 +21,13 @@ class question():
         # Randomise new word list if current empty
         if len(self.game.current_word_lists[pos]) == 0:
             random.shuffle(self.game.word_lists[pos])
+            last_word = self.q_panel.parent.title_frame.word.get()
+            if last_word == self.game.word_lists[pos][0] and len(self.game.word_lists[pos]) > 1:
+                rand_low = int(len(self.game.word_lists[pos])/2)
+                rand_upper = len(self.game.word_lists[pos]) - 1
+                new_index = random.randint(rand_low, rand_upper)
+                self.game.word_lists[pos].pop(0)
+                self.game.word_lists[pos].insert(new_index, last_word)
             self.game.current_word_lists[pos] = self.game.word_lists[pos].copy()
 
         # Pick next word in list
@@ -232,7 +239,7 @@ class question():
             self.def_no = 0
             self.defs = correct
             self.def_text = tk.StringVar(value=f'1. {correct[0]}')
-            correct_label = tk.Label(self.q_panel.q_frame, textvariable=self.def_text, font=('Segoe UI', 14), wraplength=750)
+            correct_label = tk.Label(self.q_panel.q_frame, textvariable=self.def_text, font=('Segoe UI', 14), wraplength=self.q_panel.winfo_width()-100)
             correct_label.pack(side=tk.TOP)
 
             # Load buttons to check definition

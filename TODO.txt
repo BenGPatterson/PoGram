@@ -1,7 +1,7 @@
 To do:
 
-Ability to press enter on options screen to start game
-Avoid 'two in a row' when bad luck protection moves to next word list/inflection list
+Move window back to base position when exiting game
+Update all widgets when resize/change wm_state (i.e. clicking on maximise/minimise button). This should then update e.g. wrap on definition labels, padding on vertical subquestion placement (latter may be non-trivial)
 
 Customisable keybind settings
 Info page explaining different options (https://stackoverflow.com/questions/3842155/is-there-a-way-to-make-the-tkinter-text-widget-read-only for block read only text)

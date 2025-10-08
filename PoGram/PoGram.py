@@ -38,6 +38,9 @@ class tkinterApp(tk.Tk):
             frame.grid(row=0, column=0, sticky='nsew')
         self.current_frame = None
         self.show_frame('loading')
+
+        # Bind resize event to update widgets
+        self.bind('<Configure>', self.resize_update)
   
     # Displays chosen page
     def show_frame(self, name):
@@ -64,6 +67,11 @@ class tkinterApp(tk.Tk):
     def load_dict(self):
         self.frames['home'].menu_frame.load_dict(os.path.join('PoGram', 'data', 'wiki_entries.pgz'))
         self.show_frame('home')
+
+    # Update game frame widgets after resizing window
+    def resize_update(self, event):
+        if event.widget == self and self.current_frame == self.frames['game']:
+            self.frames['game'].question_frame.q_frame_update()        
 
 # Driver code
 if __name__ == '__main__':

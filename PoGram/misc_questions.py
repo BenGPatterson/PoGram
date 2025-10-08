@@ -624,7 +624,7 @@ class misc_question(question):
             for ans in correct:
                 def_text += ans + ', '
             def_text = def_text[:-2]
-            correct_label = tk.Label(self.q_panel.q_frame, text=def_text, font=('Segoe UI', 14))
+            correct_label = tk.Label(self.q_panel.q_frame, text=def_text, font=('Segoe UI', 14), wraplength=self.q_panel.winfo_width()-50)
             correct_label.pack(side=tk.TOP)
 
             # Load button to toggle correct status

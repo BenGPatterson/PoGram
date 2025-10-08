@@ -192,7 +192,7 @@ class question():
     def load_subquestion(self, text, correct, command, wide_entry=None):
 
         # Load question text
-        q_label = tk.Label(self.q_panel.q_frame, text=text, font=('Segoe UI', 18))
+        q_label = tk.Label(self.q_panel.q_frame, text=text, font=('Segoe UI', 18), wraplength=self.q_panel.winfo_width()-50)
         q_label.pack(side=tk.TOP)
 
         # Load entry button
@@ -239,7 +239,7 @@ class question():
             self.def_no = 0
             self.defs = correct
             self.def_text = tk.StringVar(value=f'1. {correct[0]}')
-            correct_label = tk.Label(self.q_panel.q_frame, textvariable=self.def_text, font=('Segoe UI', 14), wraplength=self.q_panel.winfo_width()-100)
+            correct_label = tk.Label(self.q_panel.q_frame, textvariable=self.def_text, font=('Segoe UI', 14), wraplength=self.q_panel.winfo_width()-50)
             correct_label.pack(side=tk.TOP)
 
             # Load buttons to check definition
@@ -302,7 +302,7 @@ class question():
                 correct_text = ''
                 for ans in correct:
                     correct_text += ans + ', '
-            correct_label = tk.Label(self.q_panel.q_frame, text=correct_text[:-2], font=('Segoe UI', 14), wraplength=750)
+            correct_label = tk.Label(self.q_panel.q_frame, text=correct_text[:-2], font=('Segoe UI', 14), wraplength=self.q_panel.winfo_width()-50)
             correct_label.pack(side=tk.TOP)
 
             # Disable and load next subquestion

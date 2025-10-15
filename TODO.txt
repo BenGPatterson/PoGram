@@ -1,5 +1,7 @@
 To do:
 
+Consider whether nominative, vocative are actually useful in some misc trainers e.g. interrogative pronouns
+
 Customisable keybind settings
 Info page explaining different options (https://stackoverflow.com/questions/3842155/is-there-a-way-to-make-the-tkinter-text-widget-read-only for block read only text)
 

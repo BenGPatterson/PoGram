@@ -286,7 +286,7 @@ class misc_question(question):
 
                 # 'mię' is now considered dated or dialectal
                 if self.correct_forms[-1] == ['mię']:
-                    self.correct_forms[-1].append('mnie')
+                    self.correct_forms[-1] = ['mnie']
 
         # Remove forms without answers
         for i in range(len(self.forms)-1,-1,-1):

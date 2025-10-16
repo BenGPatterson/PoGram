@@ -224,7 +224,7 @@ class misc_question(question):
             elif self.word in ['my', 'wy', 'oni', 'one']:
                 gens = ['p']
             for case in cases:
-                if case in ['l', 'i']:
+                if case in ['l', 'i'] or self.word in ['my', 'wy']:
                     for gen in gens:
                         self.forms.append(gen+'_'+case+'_-')
                 else:

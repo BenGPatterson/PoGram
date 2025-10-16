@@ -223,10 +223,14 @@ class misc_question(question):
                 gens = ['s']
             elif self.word in ['my', 'wy', 'oni', 'one']:
                 gens = ['p']
-            for form in ['l', 'c', 'p']:
-                for case in cases:
+            for case in cases:
+                if case in ['l', 'i']:
                     for gen in gens:
-                        self.forms.append(gen+'_'+case+'_'+form)
+                        self.forms.append(gen+'_'+case+'_-')
+                else:
+                    for form in ['l', 'c', 'p']:
+                        for gen in gens:
+                            self.forms.append(gen+'_'+case+'_'+form)
 
     # Keeps only declensions with answers available for personal pronouns
     def choose_poss_pers_declensions(self):
@@ -240,13 +244,11 @@ class misc_question(question):
                            'g_l': ['jego'], 'g_c': ['go'], 'g_p': ['niego'],
                            'd_l': ['jemu'], 'd_c': ['mu'], 'd_p': ['niemu'],
                            'a_l': ['jego'], 'a_c': ['go'], 'a_p': ['niego'],
-                           'i_l': ['nim'], 'i_c': ['nim'], 'i_p': ['nim'],
-                           'l_l': ['nim'], 'l_c': ['nim'], 'l_p': ['nim'],
-                           'v_l': [None], 'v_c': [None], 'v_p': [None]}
+                           'i_-': ['nim'], 'l_-': ['nim']}
 
         # Get all correct answers
         self.correct_forms = []
-        for form in self.forms:
+        for i, form in enumerate(self.forms):
 
             # Polite form
             if self.word in ['pan', 'pani', 'panowie', 'państwo', 'panie']:
@@ -265,6 +267,11 @@ class misc_question(question):
                 numgen, case, lcp = form.split('_')
                 try:
                     lcp_forms = get_declension(self.dict, self.word, 'pron', numgen, case)
+
+                    # For locative, instrumental case
+                    if lcp == '-':
+                        self.correct_forms.append(lcp_forms)
+                        continue
 
                     if len(lcp_forms) == 1: # If all are the same
                         lcp_dict = {'l': 0, 'c': 0, 'p': 0}
